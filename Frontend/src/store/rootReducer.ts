@@ -1,10 +1,14 @@
 import { combineReducers } from '@reduxjs/toolkit';
 import authReducer from './slices/authSlice'
-import userReducer from './slices/userSlice';
+import {userSlice} from '../store/slices/userSlice';
+import { adminSlice } from './slices/adminSlice';
+import { institutionSlice } from './slices/institutionSlice';
 
 const rootReducer = combineReducers({
     auth:authReducer,
-    user:userReducer
+    user:userSlice,
+    admin:adminSlice,
+    institution:institutionSlice
 });
 
 export default rootReducer;

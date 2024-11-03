@@ -1,60 +1,42 @@
-import { createSlice,PayloadAction } from "@reduxjs/toolkit";
-import { LoginCredentials,AuthState,User } from "./sliceTypes";
-import { AppDispatch } from '../index.ts'
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+
+interface AuthState {
+  userInfo: Record<string, any> | null;
+  adminInfo: Record<string, any> | null;
+  institutionInfo: Record<string, any> | null;
+}
 
 const initialState: AuthState = {
-    user: null,
-    isAuthenticated: false,
-    loading: false,
-    error: null
+  userInfo: localStorage.getItem("userInfo")
+    ? JSON.parse(localStorage.getItem("userInfo") as string)
+    : null,
+  adminInfo: localStorage.getItem("adminInfo")
+    ? JSON.parse(localStorage.getItem("adminInfo") as string)
+    : null,
+  institutionInfo: localStorage.getItem("institutionInfo")
+    ? JSON.parse(localStorage.getItem("institutionInfo") as string)
+    : null,
 };
 
 const authSlice = createSlice({
-    name:'auth',
-    initialState,
-    reducers:{
-        loginStart(state){
-            state.loading = true;
-            state.error = null;
-        },
-        loginSuccess(state,action:PayloadAction<AuthState['user']>){
-            state.user = action.payload;
-            state.isAuthenticated = true;
-            state.loading = false;
-        },
-        loginFailure(state,action:PayloadAction<string>){
-            state.error = action.payload;
-            state.isAuthenticated = false;
-        },
-        logout(state){
-            state.user = null;
-            state.isAuthenticated = false;
-        },
+  name: "auth",
+  initialState,
+  reducers: {
+    setCredentials: (state, action: PayloadAction<Record<string, any>>) => {
+      state.userInfo = action.payload;
+      localStorage.setItem("userInfo", JSON.stringify(action.payload));
     },
+    setAdminCredentials: (state, action: PayloadAction<Record<string, any>>) => {
+      state.adminInfo = action.payload;
+      localStorage.setItem("adminInfo", JSON.stringify(action.payload));
+    },
+    setInstituteCredentials: (state, action: PayloadAction<Record<string, any>>) => {
+      state.institutionInfo = action.payload;
+      localStorage.setItem("institutionInfo", JSON.stringify(action.payload));
+    },
+  },
 });
 
-export const {loginStart,loginSuccess,loginFailure,logout} = authSlice.actions;
-
-const credentials: LoginCredentials = {     email: 'johndoe@example.com',
-    password: 'password123'};
-  
-  export const login = (credentials: LoginCredentials) => async (dispatch: AppDispatch) => {
-    try {
-      dispatch(loginStart(credentials));
-      
-      const user: User = {
-        id: '1234',
-        name: 'johndoe',
-        email: 'johndoe@example.com',
-        role: 'user',
-      };
-  
-      // const user = await loginUser(credentials); // Uncomment this to call the actual login function
-      dispatch(loginSuccess(user));
-    } catch (error) {
-      dispatch(loginFailure("unknown error"));
-    }
-  };
-  
+export const { setCredentials, setAdminCredentials, setInstituteCredentials } = authSlice.actions;
 
 export default authSlice.reducer;

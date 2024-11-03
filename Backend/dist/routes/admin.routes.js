@@ -1,0 +1,23 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const admin_controller_1 = require("../controllers/admin.controller");
+const admin_service_1 = require("../services/admin.service");
+const user_controller_1 = require("../controllers/user.controller");
+const user_service_1 = require("../services/user.service");
+const user_repository_1 = require("../repositories/user.repository");
+const institute_service_1 = require("../services/institute.service");
+const institute_repository_1 = require("../repositories/institute.repository");
+const router = (0, express_1.Router)();
+const adminService = new admin_service_1.AdminService();
+const userRepository = new user_repository_1.UserRepository();
+const instituteRepository = new institute_repository_1.InstituteRepository();
+const userService = new user_service_1.UserService(userRepository);
+const instituteService = new institute_service_1.InstituteService(instituteRepository);
+const adminController = new admin_controller_1.AdminController(adminService, userService, instituteService);
+const userController = new user_controller_1.UserController(userService);
+router.post('/verify', adminController.verifyAdmin.bind(adminController));
+router.get('/user-list', adminController.getUser.bind(adminController));
+router.get('/institute-list', adminController.getInstitutes.bind(adminController));
+exports.default = router;
+//# sourceMappingURL=admin.routes.js.map

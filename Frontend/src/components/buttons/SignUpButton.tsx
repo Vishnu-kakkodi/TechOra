@@ -3,7 +3,6 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../store';
-import { login } from '../../store/slices/authSlice';
 import { LoginCredentials } from '../../store/slices/sliceTypes';
 
 interface SignUpButtonProps {
@@ -20,26 +19,23 @@ const SignUpButton: React.FC<SignUpButtonProps> = ({
   setModalOpen 
 }) => {
   const dispatch = useDispatch<AppDispatch>();
-  const loading = useSelector((state: RootState) => state.auth.loading);
-  const error = useSelector((state: RootState) => state.auth.error);
 
-  const handleLogin = async () => {
-    try {
-      const credentials: LoginCredentials = {     
-        email: 'johndoe@example.com',
-        password: 'password123'
-      };
-      await dispatch(login(credentials));
+  // const handleLogin = async () => {
+  //   try {
+  //     const credentials: LoginCredentials = {     
+  //       email: 'johndoe@example.com',
+  //       password: 'password123'
+  //     };
 
-      if (setModalOpen) {
-        setModalOpen(false); 
-      }
-    } catch (err) {
-      if (setModalOpen) {
-        setModalOpen(true); 
-      }
-    }
-  };
+  //     if (setModalOpen) {
+  //       setModalOpen(false); 
+  //     }
+  //   } catch (err) {
+  //     if (setModalOpen) {
+  //       setModalOpen(true); 
+  //     }
+  //   }
+  // };
 
   return (
     <>

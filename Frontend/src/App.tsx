@@ -1,23 +1,22 @@
 import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from './store';
-import { logout } from './store/slices/authSlice';
-import LoginButton from './components/buttons/SignUpButton';
-import LandingPage from './pages/LandingPage';
+import 'react-toastify/dist/ReactToastify.css';
+import { Routes, Route } from 'react-router-dom';
+import UserRoutes from './routes/userRoutes';
+import AdminRoutes from './routes/adminRoute';
+import InstituteRoutes from './routes/institutionRoute';
+import { ToastContainer } from 'react-toastify';
 
 function App() {
-  const dispatch = useDispatch();
-  const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
-  const user = useSelector((state: RootState) => state.auth.user);
-
-  // const handleLogout = () => {
-  //   dispatch(logout());
-  // };
-
   return (
     <>
-      <LandingPage />
+     <ToastContainer />
+     <Routes>
+        <Route path="/*" element={<UserRoutes />} />
+        <Route path="/admin/*" element={<AdminRoutes />} />
+        <Route path="/institute/*" element={<InstituteRoutes />} />
+    </Routes>
     </>
+
   );
 }
 

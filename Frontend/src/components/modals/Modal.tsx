@@ -22,3 +22,6 @@ const Modal: React.FC<ModalProps> = ({ onClose, children }) => {
 };
 
 export default Modal;
+
+
+
