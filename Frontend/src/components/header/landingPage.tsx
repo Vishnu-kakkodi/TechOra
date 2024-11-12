@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import SignUpButton from '../buttons/SignUpButton';
 import SignUpModal from '../modals/SignUpModal';
 import LoginButton from '../buttons/LoginButton';
@@ -6,14 +6,34 @@ import LoginModal from '../modals/LoginModal';
 import TutorButton from '../buttons/TutorLogin';
 import SearchBar from "../search/SearchBar";
 import OtpModal from '../modals/OtpModal';
+import EmailVerify from '../modals/EmailVerify';
 
 const LandingPageHeader = () => {
   const [isSignUpModalOpen, setSignUpModalOpen] = useState(false);
   const [isLoginModalOpen, setLoginModalOpen] = useState(false);
-  const [isTutorLoginModalOpen, setTutorLoginModalOpen] = useState(false);
+  const [isEmailVerifyOpen, setEmailVerifyOpen] = useState(false);
   const [isOtpModalOpen, setOtpModalOpen] = useState(false);
 
+  const [otpMode, setOtpMode] = useState<'signup' | 'verifyEmail' | 'forgotPassword'>('signup');
+
   const searchData = ["Course", "Quiz"];
+
+  const handleForgotPassword = () => {
+    setLoginModalOpen(false);
+    setEmailVerifyOpen(true);
+    setOtpMode('forgotPassword');
+  };
+
+  const handleSignUpOtp = () => {
+    setOtpMode('signup');
+    setOtpModalOpen(true);
+  };
+
+  const handleOtpModalOpen = (mode: 'signup' | 'verifyEmail' | 'forgotPassword') => {
+    setOtpMode(mode);
+    setOtpModalOpen(true);
+  };
+
 
   return (
     <>
@@ -51,16 +71,32 @@ const LandingPageHeader = () => {
       {isSignUpModalOpen && (
         <SignUpModal
           setSignUpModalOpen={setSignUpModalOpen}
-          setOtpModalOpen={setOtpModalOpen}
+          setOtpModalOpen={() => handleOtpModalOpen('signup')}
         />
       )}
 
       {isLoginModalOpen && (
-        <LoginModal setLoginModalOpen={setLoginModalOpen} />
+        <LoginModal 
+          setLoginModalOpen={setLoginModalOpen} 
+          setOtpModalOpen={() => handleOtpModalOpen('verifyEmail')}
+          onForgotPassword={handleForgotPassword}
+        />
       )}
 
-      {isOtpModalOpen && <OtpModal setOtpModalOpen={setOtpModalOpen} mode='signup'/>}
+      {isEmailVerifyOpen && (
+        <EmailVerify
+          setEmailVerify={setEmailVerifyOpen}
+          setOtpModalOpen={() => handleOtpModalOpen('forgotPassword')}
+          mode="user"
+        />
+      )}
 
+      {isOtpModalOpen && (
+        <OtpModal 
+          setOtpModalOpen={setOtpModalOpen} 
+          mode={otpMode}
+        />
+      )}
     </>
   );
 };

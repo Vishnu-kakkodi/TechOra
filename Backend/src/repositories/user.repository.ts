@@ -25,4 +25,18 @@ export class UserRepository extends BaseRepository<IUserDocument> {
             throw error;
         }
     }
+
+    async findById(userId : string): Promise<IUserDocument | null> { 
+        try {
+            console.log("UserId",typeof(userId));
+            
+            const user =  await this.model.findById(userId);
+            console.log(user,"ufdsakdgks");
+            return user;
+            
+        } catch (error) {
+            throw error;
+        }
+    }
+    
 }

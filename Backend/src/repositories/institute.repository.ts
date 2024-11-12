@@ -23,4 +23,18 @@ export class InstituteRepository extends BaseRepository<InstituteDocument> {
             throw error;
         }
     }
+
+    
+    async findById(instituteId : string): Promise<InstituteDocument | null> { 
+        try {
+            console.log("instituteId",typeof(instituteId));
+            
+            const institute =  await this.model.findById(instituteId);
+            console.log(institute,"ufdsakdgks");
+            return institute;
+            
+        } catch (error) {
+            throw error;
+        }
+    }
 }

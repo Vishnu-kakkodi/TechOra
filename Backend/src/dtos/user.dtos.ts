@@ -10,4 +10,5 @@ export class UpdateUserDto{
     email?: string;
     password?: string;
     phoneNumber?: string;
+    status?: string;
 }

@@ -5,4 +5,13 @@ export class CreateUserDto{
     country!: string;
     state!: string;
     district!: string;
+    documentUrl?: string;
+}
+
+export class CreateTutorDto{
+    department!: string;
+    tutorname!: string;
+    education!: string;
+    experiance!: string;
+    gender!: string;
 }

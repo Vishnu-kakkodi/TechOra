@@ -1,70 +1,33 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserController = void 0;
 const error_middleware_1 = require("../middleware/error.middleware");
-const nodemailer_1 = __importDefault(require("nodemailer"));
-const generateToken_1 = require("../utils/generateToken");
 class UserController {
     constructor(userService) {
         this.userService = userService;
     }
     async initiateUser(req, res, next) {
         try {
-            console.log("hai");
-            console.log(req.body);
-            const generateNumericOTP = (length) => {
-                let otp = '';
-                for (let i = 0; i < length; i++) {
-                    otp += Math.floor(Math.random() * 10);
-                }
-                return otp;
-            };
-            const OTP = generateNumericOTP(4);
-            console.log(OTP);
             const user = {
                 userName: req.body.userName,
                 email: req.body.email,
                 password: req.body.password,
                 phoneNumber: req.body.phoneNumber,
             };
+            console.log("Request came here");
+            const OTP = await this.userService.initiateUser(req.body.email);
+            console.log(OTP, "otp");
             const userData = {
                 user: user,
                 otp: OTP,
                 timeStamp: new Date().getTime()
             };
-            async function main(email) {
-                const transporter = nodemailer_1.default.createTransport({
-                    host: 'smtp.gmail.com',
-                    port: 587,
-                    secure: false,
-                    requireTLS: true,
-                    auth: {
-                        user: "techoraworld@gmail.com",
-                        pass: "ygop jwhp xkwg dbuc",
-                    },
-                    logger: true
-                });
-                const info = await transporter.sendMail({
-                    from: 'techoraworld@gmail.com',
-                    to: email,
-                    subject: "Otp For Authentication",
-                    text: `This is your otp ${OTP} for authentication`,
-                    html: `<p>Your OTP for authentication is: <strong>${OTP}</strong></p>`,
-                    headers: { 'x-myheader': 'test header' }
-                });
-                console.log("Message sent: %s", info.response);
-            }
-            await main(req.body.email);
             res.cookie('userData', userData, {
                 httpOnly: true,
                 secure: true,
                 sameSite: 'strict',
                 maxAge: 5 * 60 * 1000
             });
-            console.log("kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk");
             res.status(201).json({ OTP: "Otp send successfully" });
         }
         catch (error) {
@@ -80,15 +43,20 @@ class UserController {
                 throw new Error('No user data found');
             }
             const userdata = CookieData;
-            console.log(typeof (otp));
-            console.log(typeof (userdata.otp));
+            console.log(otp);
+            console.log(userdata.otp);
             if (otp !== userdata.otp) {
                 throw new Error('Invalid OTP');
             }
             else if (otp === userdata.otp) {
                 const user = await this.userService.createUser(userdata.user);
                 res.clearCookie('userData');
-                await (0, generateToken_1.generateToken)(res, user.id);
+                res.cookie('userCredential', user, {
+                    httpOnly: true,
+                    secure: true,
+                    sameSite: 'strict',
+                    maxAge: 10 * 60 * 1000
+                });
                 res.status(201).json({
                     message: 'User verified and created successfully',
                     user
@@ -105,13 +73,44 @@ class UserController {
             }
         }
     }
+    async resendOtp(req, res, next) {
+        try {
+            const email = req.cookies.userData.user.email;
+            const userdata = req.cookies.userData.user;
+            if (!email) {
+                throw new Error('No user data found');
+            }
+            const response = await this.userService.resendOtp(email);
+            if (response) {
+                const updatedUserData = {
+                    ...userdata,
+                    otp: response,
+                    timeStamp: Date.now(),
+                };
+                res.cookie('userData', updatedUserData, {
+                    httpOnly: true,
+                    secure: true,
+                    sameSite: 'strict',
+                    maxAge: 5 * 60 * 1000,
+                });
+            }
+            res.status(201).json({ OTP: "Otp send successfully" });
+        }
+        catch (error) {
+            console.error('Error', error);
+        }
+    }
     async createUser(req, res, next) {
         try {
             console.log(req.body, "controller");
             console.log("Hai");
             const user = await this.userService.createUser(req.body);
-            (0, generateToken_1.generateToken)(res, user.id);
-            console.log("Token generated");
+            res.cookie('userData', user, {
+                httpOnly: true,
+                secure: true,
+                sameSite: 'strict',
+                maxAge: 5 * 60 * 1000,
+            });
             console.log(user);
             res.status(201).json({ user, message: 'Successfull' });
         }
@@ -125,8 +124,51 @@ class UserController {
             if (!user) {
                 throw new error_middleware_1.HttpException(404, 'User not found');
             }
-            await (0, generateToken_1.generateToken)(res, user.id);
+            res.cookie('userData', user, {
+                httpOnly: true,
+                secure: true,
+                sameSite: 'strict',
+                maxAge: 5 * 60 * 1000,
+            });
             res.json({ user });
+        }
+        catch (error) {
+            next(error);
+        }
+    }
+    async verifyEmail(req, res, next) {
+        try {
+            console.log(req.body, "controller");
+            const response = await this.userService.verifyEmail(req.body.email);
+            if (response) {
+                res.cookie('forgotPassword', response, {
+                    httpOnly: true,
+                    secure: true,
+                    sameSite: 'strict',
+                    maxAge: 2 * 60 * 1000,
+                });
+                res.status(201).json({ message: 'Successful' });
+            }
+            else {
+                res.status(400).json({ message: 'Verification failed' });
+            }
+        }
+        catch (error) {
+            next(error);
+        }
+    }
+    async verifyOtp(req, res, next) {
+        try {
+            const { otp } = req.body;
+            console.log(otp, "controller");
+            console.log("Hai");
+            const CookieOtp = req.cookies.forgotPassword;
+            console.log(CookieOtp);
+            const response = await this.userService.verifyOtp(otp, CookieOtp);
+            if (response) {
+                res.clearCookie('userData');
+                res.status(201).json({ message: 'Successfull' });
+            }
         }
         catch (error) {
             next(error);

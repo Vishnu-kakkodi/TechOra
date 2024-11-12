@@ -1,13 +1,24 @@
-import { InstituteDocument } from "../interfaces/institute.interface";
+import { Institute, InstituteDocument, InstituteResponse, InstituteStatus } from "../interfaces/institute.interface";
 import { InstituteRepository } from "../repositories/institute.repository";
-import { CreateUserDto } from "../dtos/institute.dtos";
+import { CreateTutorDto, CreateUserDto } from "../dtos/institute.dtos";
 import nodemailer from 'nodemailer';
 import Mail from "nodemailer/lib//mailer";
+import helperFunction from "../helperFunction/authHelper";
+import { HttpException } from "../middleware/error.middleware";
+import generator from "../utils/generateApplicationID";
+import { application } from "express";
+import { Tutor } from "../interfaces/tutor.interface";
+import { TutorRepository } from "../repositories/tutor.repository";
 
 export class InstituteService {
-    constructor(private readonly instituteRepository: InstituteRepository){}
+    private instituteRepository: InstituteRepository;
+    private tutorRepository: TutorRepository
+    constructor(){
+        this.instituteRepository = new InstituteRepository();
+        this.tutorRepository = new TutorRepository();
+    }
 
-    async verifyEmail(email: string ): Promise<string>{
+    async verifyEmail(email: string ): Promise<string[]>{
         try{
 
             const generateNumericOTP = (length: number): string => {
@@ -50,7 +61,7 @@ export class InstituteService {
 
             await main(email);
 
-            return OTP
+            return [OTP,email]
             
         }catch(error){
             throw error
@@ -69,20 +80,63 @@ export class InstituteService {
         }
     }
 
-    async createUser(instituteData: CreateUserDto): Promise<InstituteDocument>{
+    async createInstitute(instituteData: CreateUserDto): Promise<Institute>{
         try{
-            console.log(instituteData,"instituteData")
-            return await this.instituteRepository.create(instituteData);
+            console.log(instituteData,"instituteData");
+            
+            const applicationId = generator.generateID()
+            const institutedata = {
+                ...instituteData,
+                applicationId
+            }
+            console.log(institutedata,"data")
+            const response =  await this.instituteRepository.create(institutedata);
+            console.log("response",response)
+
+            // const accessToken = helperFunction.accesstoken(response.id,"institute");
+            // const refreshToken = helperFunction.refreshtoken(response.id, "institute");
+
+            // const institute = {
+            //     id: response.id,
+            //     collegeName: response.collegeName,
+            //     instituteEmail: response.instituteEmail,
+            //     accessToken,
+            //     refreshToken
+            //   };
+
+            return response;
         }catch(error){
             throw error
         }
     }
 
-    async getUgetInstitution(instituteEmail: string): Promise<InstituteDocument | null>{
+    async getUgetInstitution(instituteEmail: string, collegeCode: string): Promise<InstituteDocument | null>{
         try{
-            return await this.instituteRepository.findByEmail(instituteEmail)
+            const institute =  await this.instituteRepository.findByEmail(instituteEmail)
+            console.log("kjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj",institute)
+            if(!institute){
+                throw new HttpException(400, "User does not exist");
+            }
+            if(institute.collegeCode!==collegeCode){
+                throw new HttpException(400, "Password mismatch");
+            }
+            if (institute.status !== InstituteStatus.Active) {
+                throw new HttpException(400, "Institution does not exist");
+              }
+              
+            const accessToken = helperFunction.accesstoken(institute.id,"institute");
+            const refreshToken = helperFunction.refreshtoken(institute.id, "institute");
+
+            institute.accessToken = accessToken
+            institute.refreshToken = refreshToken
+
+            return institute
         }catch(error){
             throw error;
         }
+    }
+
+    async createTutor(tutorData: CreateTutorDto): Promise<void>{
+        const response =  await this.tutorRepository.create(tutorData);
     }
 }

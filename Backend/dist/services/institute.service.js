@@ -4,10 +4,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.InstituteService = void 0;
+const institute_interface_1 = require("../interfaces/institute.interface");
+const institute_repository_1 = require("../repositories/institute.repository");
 const nodemailer_1 = __importDefault(require("nodemailer"));
+const authHelper_1 = __importDefault(require("../helperFunction/authHelper"));
+const error_middleware_1 = require("../middleware/error.middleware");
+const generateApplicationID_1 = __importDefault(require("../utils/generateApplicationID"));
+const tutor_repository_1 = require("../repositories/tutor.repository");
 class InstituteService {
-    constructor(instituteRepository) {
-        this.instituteRepository = instituteRepository;
+    constructor() {
+        this.instituteRepository = new institute_repository_1.InstituteRepository();
+        this.tutorRepository = new tutor_repository_1.TutorRepository();
     }
     async verifyEmail(email) {
         try {
@@ -43,7 +50,7 @@ class InstituteService {
                 console.log("Message sent: %s", info.response);
             }
             await main(email);
-            return OTP;
+            return [OTP, email];
         }
         catch (error) {
             throw error;
@@ -62,22 +69,57 @@ class InstituteService {
             throw error;
         }
     }
-    async createUser(instituteData) {
+    async createInstitute(instituteData) {
         try {
             console.log(instituteData, "instituteData");
-            return await this.instituteRepository.create(instituteData);
+            const applicationId = generateApplicationID_1.default.generateID();
+            const institutedata = {
+                ...instituteData,
+                applicationId
+            };
+            console.log(institutedata, "data");
+            const response = await this.instituteRepository.create(institutedata);
+            console.log("response", response);
+            // const accessToken = helperFunction.accesstoken(response.id,"institute");
+            // const refreshToken = helperFunction.refreshtoken(response.id, "institute");
+            // const institute = {
+            //     id: response.id,
+            //     collegeName: response.collegeName,
+            //     instituteEmail: response.instituteEmail,
+            //     accessToken,
+            //     refreshToken
+            //   };
+            return response;
         }
         catch (error) {
             throw error;
         }
     }
-    async getUgetInstitution(instituteEmail) {
+    async getUgetInstitution(instituteEmail, collegeCode) {
         try {
-            return await this.instituteRepository.findByEmail(instituteEmail);
+            const institute = await this.instituteRepository.findByEmail(instituteEmail);
+            console.log("kjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj", institute);
+            if (!institute) {
+                throw new error_middleware_1.HttpException(400, "User does not exist");
+            }
+            if (institute.collegeCode !== collegeCode) {
+                throw new error_middleware_1.HttpException(400, "Password mismatch");
+            }
+            if (institute.status !== institute_interface_1.InstituteStatus.Active) {
+                throw new error_middleware_1.HttpException(400, "Institution does not exist");
+            }
+            const accessToken = authHelper_1.default.accesstoken(institute.id, "institute");
+            const refreshToken = authHelper_1.default.refreshtoken(institute.id, "institute");
+            institute.accessToken = accessToken;
+            institute.refreshToken = refreshToken;
+            return institute;
         }
         catch (error) {
             throw error;
         }
+    }
+    async createTutor(tutorData) {
+        const response = await this.tutorRepository.create(tutorData);
     }
 }
 exports.InstituteService = InstituteService;

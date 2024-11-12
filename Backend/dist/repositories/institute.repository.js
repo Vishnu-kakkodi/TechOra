@@ -23,6 +23,17 @@ class InstituteRepository extends base_repository_1.BaseRepository {
             throw error;
         }
     }
+    async findById(instituteId) {
+        try {
+            console.log("instituteId", typeof (instituteId));
+            const institute = await this.model.findById(instituteId);
+            console.log(institute, "ufdsakdgks");
+            return institute;
+        }
+        catch (error) {
+            throw error;
+        }
+    }
 }
 exports.InstituteRepository = InstituteRepository;
 //# sourceMappingURL=institute.repository.js.map

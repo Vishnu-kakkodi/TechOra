@@ -11,16 +11,20 @@ import { FcGoogle } from 'react-icons/fc';
 import { auth, googleProvider } from '../../firebase/firebaseConfig';
 import * as Yup from 'yup';
 import { signInWithPopup, UserCredential, AuthError, GoogleAuthProvider } from 'firebase/auth';
+import EmailVerify from './EmailVerify';
 
 interface LoginModalProps {
   setLoginModalOpen: (open: boolean) => void;
+  setOtpModalOpen: (open: boolean) => void;
+  onForgotPassword: () => void;
 }
 
-const LoginModal: React.FC<LoginModalProps> = ({ setLoginModalOpen }) => {
+const LoginModal: React.FC<LoginModalProps> = ({ setLoginModalOpen, setOtpModalOpen, onForgotPassword  }) => {
   const [login] = useLoginMutation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [emailVerify, setEmailVerify] = useState(false);
 
   useEffect(() => {
     const savedEmail = localStorage.getItem('email');
@@ -48,6 +52,9 @@ const LoginModal: React.FC<LoginModalProps> = ({ setLoginModalOpen }) => {
     }
   };
 
+  const handleForgotPassword = () => {
+    onForgotPassword();
+  };
 
   const validationSchema = Yup.object({
     email: Yup.string()
@@ -70,7 +77,6 @@ const LoginModal: React.FC<LoginModalProps> = ({ setLoginModalOpen }) => {
     onSubmit: async (values, { setSubmitting }) => {
       try {
         const response = await login(values).unwrap();
-        console.log(response.message)
         toast.success('Login successful!');
         setLoginModalOpen(false);
         dispatch(setCredentials({ ...response.user }));
@@ -120,7 +126,10 @@ const LoginModal: React.FC<LoginModalProps> = ({ setLoginModalOpen }) => {
           {formik.touched.password && formik.errors.password && (
             <div className="text-red-500 mb-4">{formik.errors.password}</div>
           )}
-          <label className="block text-white mb-2">Forgot Password?</label>
+          <label className="block text-white mb-2">
+            <a onClick={handleForgotPassword} className="hover:cursor-pointer hover:text-gold">Forgot Password?</a>
+          </label>
+
           <div className="flex justify-center">
             <button
               type="submit"
@@ -140,11 +149,16 @@ const LoginModal: React.FC<LoginModalProps> = ({ setLoginModalOpen }) => {
               <span>Continue With Google</span>
             </div>
           </div>
-          <h4 className="text-white text-center mt-7 text-[14px]">
-            New To TechOra? <span className="text-pink-500 cursor-pointer">Sign Up</span>
-          </h4>
         </form>
       </Modal>
+
+      {emailVerify && (
+        <EmailVerify
+          setEmailVerify={setEmailVerify}
+          setOtpModalOpen={setOtpModalOpen}
+          mode="institute"
+        />
+      )}
     </div>
   );
 };

@@ -7,12 +7,17 @@ import { useNavigate } from 'react-router-dom';
 import { useVerifyAdminMutation } from '../../store/slices/adminSlice';
 import { setInstituteCredentials } from '../../store/slices/authSlice';
 import loginPage from '../../assets/frontEnd/registerPage.jpg'
-import InstituteEmailVerify from '../../components/modals/InstituteEmailVerify';
+import InstituteEmailVerify from '../../components/modals/EmailVerify';
 import OtpModal from '../../components/modals/OtpModal';
 import { useInstitutionLoginMutation } from '../../store/slices/institutionSlice';
+import { InstituteDocument } from '../../../../Backend/src/interfaces/institute.interface';
 
-const InstituteLogin: React.FC = () => {
-  const [instituteLogin, setInstituteLogin] = useState(false);
+interface ForgotPasswordProps {
+  setModalOpen?: (state: boolean) => void;
+}
+
+const InstituteLogin: React.FC<ForgotPasswordProps> = ({setModalOpen}) => {
+  const [emailVerify, setEmailVerify] = useState(false);
   const [isOtpModalOpen, setOtpModalOpen] = useState(false);
   const [login] = useInstitutionLoginMutation();
   const dispatch = useDispatch();
@@ -26,7 +31,8 @@ const InstituteLogin: React.FC = () => {
     onSubmit: async (values, { setSubmitting }) => {
       try {
         const response = await login(values).unwrap();
-        dispatch(setInstituteCredentials({ ...response.institute }));
+        console.log(response.institute,"response")
+        dispatch(setInstituteCredentials(response.institute));
         navigate('/institute/dashboard');
       } catch (err) {
         console.error('Institute login error:', err);
@@ -38,7 +44,7 @@ const InstituteLogin: React.FC = () => {
   });
 
   const handleRegister = () => {
-    setInstituteLogin(true);
+    setEmailVerify(true);
   };
 
   return (
@@ -119,10 +125,11 @@ const InstituteLogin: React.FC = () => {
     </form>
   </div>
 
-  {instituteLogin && (
+  {emailVerify && (
     <InstituteEmailVerify
-      setInstituteLogin={setInstituteLogin}
+    setEmailVerify={setEmailVerify}
       setOtpModalOpen={setOtpModalOpen}
+      mode='institute'
     />
   )}
 

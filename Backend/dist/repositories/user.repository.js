@@ -24,6 +24,17 @@ class UserRepository extends base_repository_1.BaseRepository {
             throw error;
         }
     }
+    async findById(userId) {
+        try {
+            console.log("UserId", typeof (userId));
+            const user = await this.model.findById(userId);
+            console.log(user, "ufdsakdgks");
+            return user;
+        }
+        catch (error) {
+            throw error;
+        }
+    }
 }
 exports.UserRepository = UserRepository;
 //# sourceMappingURL=user.repository.js.map

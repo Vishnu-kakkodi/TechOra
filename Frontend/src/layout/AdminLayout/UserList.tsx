@@ -1,16 +1,29 @@
 import React from 'react';
 import { 
   Pencil, 
-  Trash2, 
+  UserX, 
   UserCog,
   Search
 } from 'lucide-react';
 
-import { useUserListQuery } from '../../store/slices/adminSlice';
-import { IUser } from '../../../../Backend/src/interfaces/user.interface'; 
+import { useUserActionMutation, useUserListQuery } from '../../store/slices/adminSlice';
+import { IUserDocument } from '../../../../Backend/src/interfaces/user.interface'; 
 
 const UserList: React.FC = () => {
-  const { data: { users } = {} } = useUserListQuery(null);
+  const { data: { users } = {}} = useUserListQuery(null);
+
+  const [userAction] = useUserActionMutation();
+
+  const handleUser = async (userId: any) => {
+    try {
+      console.log(userId)
+      const response = await userAction(userId).unwrap();
+      console.log('User action successful:', response);
+    } catch (error) {
+      console.error('Error performing user action:', error);
+    }
+  };
+
 
   return (
     <div className="w-full bg-white p-4 rounded-lg shadow">
@@ -44,7 +57,7 @@ const UserList: React.FC = () => {
           </thead>
           <tbody className="divide-y divide-gray-200">
             {users ? (
-              users.map((user: IUser) => (
+              users.map((user: IUserDocument) => (
                 <tr key={user.id} className="hover:bg-gray-50 transition-colors">
                   <td className="py-4 px-6">
                     <img
@@ -62,8 +75,7 @@ const UserList: React.FC = () => {
                   <td className="py-4 px-6">
                     <div className="text-sm text-gray-500">{user.phoneNumber}</div>
                   </td>
-                  {/* Uncomment and update status handling if available */}
-                  {/* <td className="py-4 px-6">
+                   <td className="py-4 px-6">
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
                       ${user.status === 'active' 
                         ? 'bg-green-100 text-green-800' 
@@ -71,14 +83,14 @@ const UserList: React.FC = () => {
                       }`}>
                       {user.status.charAt(0).toUpperCase() + user.status.slice(1)}
                     </span>
-                  </td> */}
+                  </td> 
                   <td className="py-4 px-6 text-right text-sm font-medium">
                     <div className="flex justify-end gap-3">
                       <button 
                         className="text-red-600 hover:text-red-900 transition-colors"
                         title="Delete user"
                       >
-                        <Trash2 className="h-5 w-5" />
+                        <UserX onClick={() => handleUser(user._id)}  className="h-5 w-5" />
                       </button>
                     </div>
                   </td>
@@ -103,12 +115,6 @@ const UserList: React.FC = () => {
           </button>
         </div>
         <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-          <div>
-            <p className="text-sm text-gray-700">
-              Showing <span className="font-medium">1</span> to <span className="font-medium">10</span> of{' '}
-              <span className="font-medium">97</span> results
-            </p>
-          </div>
           <div>
             <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
               <button className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0">

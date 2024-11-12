@@ -4,13 +4,18 @@ const express_1 = require("express");
 const user_controller_1 = require("../controllers/user.controller");
 const user_service_1 = require("../services/user.service");
 const user_repository_1 = require("../repositories/user.repository");
+const auth_middleware_1 = require("../middleware/auth.middleware");
 const router = (0, express_1.Router)();
 const userRepository = new user_repository_1.UserRepository();
 const userService = new user_service_1.UserService(userRepository);
 const userController = new user_controller_1.UserController(userService);
 router.post('/initiate-register', userController.initiateUser.bind(userController));
 router.post('/verify-user', userController.verifyUser.bind(userController));
+router.post('/resend-otp', userController.resendOtp.bind(userController));
 router.post('/register', userController.createUser.bind(userController));
 router.post('/login', userController.getUser.bind(userController));
+router.post('/verify-email', userController.verifyEmail.bind(userController));
+router.post('/verify-Otp', userController.verifyOtp.bind(userController));
+router.use(auth_middleware_1.authMiddleware);
 exports.default = router;
 //# sourceMappingURL=user.routes.js.map

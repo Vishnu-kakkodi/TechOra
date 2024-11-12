@@ -1,5 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { userLogout } from '../../store/slices/authSlice';
+import { useAppDispatch } from '../../store/hook';
+
 
 interface LogoutButtonProps{
     label?: string;
@@ -12,8 +15,10 @@ const LogoutButton: React.FC<LogoutButtonProps>=({
 }) => {
 
     const navigate = useNavigate();
+    const dispatch = useAppDispatch()
 
     const handleLogout = () => {
+        dispatch(userLogout())
         navigate('/');
     }
     

@@ -3,21 +3,24 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import OTPIMG from '../../assets/frontEnd/OTPIMG.jpeg';
 import Modal from '../../components/modals/Modal';
-import { useRegisterMutation, useVerifyUserMutation } from '../../store/slices/userSlice';
+import { useRegisterMutation, useResendOtpMutation, useVerifyUserMutation } from '../../store/slices/userSlice';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { setCredentials } from '../../store/slices/authSlice';
+import { setCredentials, setInstituteEmailCredentials } from '../../store/slices/authSlice';
 import { useEmailVerifyMutation, useOtpVerifyMutation } from '../../store/slices/institutionSlice';
+import { toast } from 'react-toastify';
 
 interface OtpModalProps {
   setOtpModalOpen: (open: boolean) => void;
-  mode: 'signup' | 'verifyEmail' ;
+  mode: 'signup' | 'verifyEmail' | 'forgotPassword' ;
 }
 
 const OtpModal: React.FC<OtpModalProps> = ({ setOtpModalOpen, mode }) => {
   const [register] = useRegisterMutation();
+  const [resendOtp] = useResendOtpMutation();
   const [verifyUser] = useVerifyUserMutation();
   const [emailVerify] = useEmailVerifyMutation();
+  const [userOtpVerify] = useVerifyUserMutation();
   const [otpVerify] = useOtpVerifyMutation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -31,44 +34,65 @@ const OtpModal: React.FC<OtpModalProps> = ({ setOtpModalOpen, mode }) => {
     onSubmit: async () => {
       const otp: string = otpCode.join('');
       try {
-        setOtpModalOpen(false);
+        switch (mode) {
+          case 'signup':
+            console.log("signupppp")
+            const signupResponse = await verifyUser({ otp }).unwrap();
+            if (signupResponse.user) {
+              dispatch(setCredentials(signupResponse.user));
+              toast.success('Account verified successfully!');
+              navigate('/home');
+            }
+            break;
 
-        if (mode === 'signup') {
-          const response = await verifyUser({ otp }).unwrap();
-          if (response.user) {
-            dispatch(setCredentials(response.user));
-            navigate('/home');
-          }
-        } else if (mode === 'verifyEmail') {
-          const response = await otpVerify({otp}).unwrap();
-          if (response) {
-            navigate('/institute/register');
-          }
+          case 'verifyEmail':
+            console.log("verifyyyyyy")
+            const emailResponse = await otpVerify({ otp }).unwrap();
+            if (emailResponse) {
+              toast.success('Email verified successfully!');
+              console.log("response came")
+              console.log("email:",emailResponse.email)
+              dispatch(setInstituteEmailCredentials(emailResponse.email))
+              navigate('/institute/register');
+            }
+            break;
+
+          case 'forgotPassword':
+            const resetResponse = await userOtpVerify({ otp }).unwrap();
+            if (resetResponse) {
+              toast.success('OTP verified successfully!');
+              navigate('/home'); 
+            }
+            break;
         }
-      } catch (error) {
+        setOtpModalOpen(false);
+      } catch (error: any) {
         console.error('Error during OTP verification:', error);
+        toast.error(error.message || 'OTP verification failed. Please try again.');
       }
     },
   });
 
   const handleOtpChange = (index: number, value: string) => {
-    if (value.match(/^[0-9]$/)) {
+    if (value.match(/^[0-9]$/) || value === '') {
       const newOtpCode = [...otpCode];
       newOtpCode[index] = value;
       setOtpCode(newOtpCode);
-
-      if (index < otpCode.length - 1 && value) {
+  
+      if (value === '' && index > 0) {
+        const prevInput = document.getElementById(`otpCode${index - 1}`);
+        if (prevInput) prevInput.focus();
+      } else if (index < otpCode.length - 1 && value) {
         const nextInput = document.getElementById(`otpCode${index + 1}`);
         if (nextInput) nextInput.focus();
       }
     }
   };
-
-  const resendOTP = () => {
+  const resendOTP = async () => {
     setSeconds(59);
 
     if (mode === 'signup') {
-
+      const response = await resendOtp().unwrap()
     } else if (mode === 'verifyEmail') {
 
     } else if (mode === 'forgotPassword') {

@@ -1,9 +1,31 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
+interface UserInfo {
+  id?: string;
+  email?: string;
+  name?: string;
+  [key: string]: any;
+}
+
+interface InstituteEmailInfo {
+  instituteEmail?: string;
+}
+
+interface InstituteInfo {
+  id?: string;
+  collegeName?: string;
+  instituteEmail?: string;
+  [key: string]: any;
+}
+
 interface AuthState {
-  userInfo: Record<string, any> | null;
-  adminInfo: Record<string, any> | null;
-  institutionInfo: Record<string, any> | null;
+  userInfo: UserInfo | null;
+  adminInfo: UserInfo | null;
+  institutionInfo: InstituteInfo | null;
+  institutionEmailInfo: InstituteEmailInfo | null;
+  isUserAuthenticated: boolean;
+  isAdminAuthenticated: boolean;
+  isInstituteAuthenticated: boolean;
 }
 
 const initialState: AuthState = {
@@ -16,27 +38,63 @@ const initialState: AuthState = {
   institutionInfo: localStorage.getItem("institutionInfo")
     ? JSON.parse(localStorage.getItem("institutionInfo") as string)
     : null,
+  institutionEmailInfo: localStorage.getItem("institutionEmailInfo")
+    ? JSON.parse(localStorage.getItem("institutionEmailInfo") as string)
+    : null,
+    isUserAuthenticated: !!localStorage.getItem("userInfo"), 
+    isAdminAuthenticated: !!localStorage.getItem("adminInfo"), 
+    isInstituteAuthenticated: !!localStorage.getItem("institutionInfo"), 
 };
 
 const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    setCredentials: (state, action: PayloadAction<Record<string, any>>) => {
+    setCredentials: (state, action: PayloadAction<UserInfo>) => {
       state.userInfo = action.payload;
+      state.isUserAuthenticated = true;
       localStorage.setItem("userInfo", JSON.stringify(action.payload));
     },
-    setAdminCredentials: (state, action: PayloadAction<Record<string, any>>) => {
+    setAdminCredentials: (state, action: PayloadAction<UserInfo>) => {
       state.adminInfo = action.payload;
+      state.isAdminAuthenticated = true;
       localStorage.setItem("adminInfo", JSON.stringify(action.payload));
     },
-    setInstituteCredentials: (state, action: PayloadAction<Record<string, any>>) => {
+    setInstituteCredentials: (state, action: PayloadAction<InstituteInfo>) => {
       state.institutionInfo = action.payload;
+      state.isInstituteAuthenticated = true;
       localStorage.setItem("institutionInfo", JSON.stringify(action.payload));
+    },
+    setInstituteEmailCredentials: (state, action: PayloadAction<InstituteEmailInfo>) => {
+      state.institutionEmailInfo = action.payload;
+      localStorage.setItem("institutionEmailInfo", JSON.stringify(action.payload));
+    },
+    userLogout: (state) => {
+      state.userInfo = null;
+      state.isUserAuthenticated = false; 
+      localStorage.removeItem("userInfo");
+    },
+    adminLogout: (state) => {
+      state.adminInfo = null;
+      state.isAdminAuthenticated = false; 
+      localStorage.removeItem("adminInfo");
+    },
+    instituteLogout: (state) => {
+      state.institutionInfo = null;
+      state.isInstituteAuthenticated = false; 
+      localStorage.removeItem("institutionInfo");
     },
   },
 });
 
-export const { setCredentials, setAdminCredentials, setInstituteCredentials } = authSlice.actions;
+export const { 
+  setCredentials, 
+  setAdminCredentials, 
+  setInstituteCredentials,
+  setInstituteEmailCredentials,
+  userLogout, 
+  adminLogout,
+  instituteLogout
+} = authSlice.actions;
 
 export default authSlice.reducer;

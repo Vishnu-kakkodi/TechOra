@@ -1,16 +1,32 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const institute_controller_1 = require("../controllers/institute.controller");
 const institute_service_1 = require("../services/institute.service");
 const institute_repository_1 = require("../repositories/institute.repository");
+const bucketConfig_1 = __importDefault(require("../bucketConfig"));
+const course_controller_1 = require("../controllers/course.controller");
+const course_service_1 = require("../services/course.service");
+const course_repository_1 = require("../repositories/course.repository");
 const router = (0, express_1.Router)();
 const instituteRepository = new institute_repository_1.InstituteRepository();
-const instituteService = new institute_service_1.InstituteService(instituteRepository);
+const instituteService = new institute_service_1.InstituteService();
+const courseRepository = new course_repository_1.CourseRepository();
+const courseService = new course_service_1.CourseService(courseRepository);
 const instituteController = new institute_controller_1.InstitutionController(instituteService);
+const courseController = new course_controller_1.CourseController(courseService);
+router.get('/draft-course', courseController.draftCourse.bind(courseController));
+router.get('/course-list', courseController.courseList.bind(courseController));
+router.get('/course-detail/:courseId', courseController.courseDetail.bind(courseController));
 router.post('/verify-email', instituteController.verifyEmail.bind(instituteController));
 router.post('/verify-Otp', instituteController.verifyOtp.bind(instituteController));
 router.post('/login', instituteController.getInstitution.bind(instituteController));
-router.post('/register', instituteController.createUser.bind(instituteController));
+router.post('/register', bucketConfig_1.default.single('documents'), instituteController.createInstitute.bind(instituteController));
+router.post('/create-tutor', instituteController.createTutor.bind(instituteController));
+router.post('/create-course', bucketConfig_1.default.single('thumbnail'), courseController.createCourse.bind(courseController));
+router.post('/create-module', bucketConfig_1.default.single('video'), courseController.createModule.bind(courseController));
 exports.default = router;
 //# sourceMappingURL=institution.routes.js.map

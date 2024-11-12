@@ -1,5 +1,5 @@
 import React from 'react';
-import UserList from '../../layout/AdminLayout.tsx/UserList';
+import UserList from '../../layout/AdminLayout/UserList';
 import Sidebar from '../../components/sidebar/AdminSidebar';
 
 const UserListingPage = () => {

@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAppSelector } from '../../store/hook';
 import {
   Users,
   Building2,
@@ -7,13 +8,35 @@ import {
   LogOut,
   Home,
   BarChart,
-  CheckCircle2
+  CheckCircle2,
+  BookOpen,
+  ClipboardList,
+  PlusCircle,
+  GraduationCap,
+  Brain,
+  FileEdit
 } from 'lucide-react';
 import { useUserListQuery } from '../../store/slices/adminSlice';
+import { useAppDispatch } from '../../store/hook';
+import { instituteLogout } from '../../store/slices/authSlice';
+import { useDraftCourseListQuery } from '../../store/slices/institutionSlice';
 
 const InstituteSidebar: React.FC = () => {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const {data: course} = useDraftCourseListQuery(null);
+  const institutionInfo = useAppSelector((state) => state.auth.institutionInfo);
+
   const { data: users, error } = useUserListQuery(null);
+
+  const handleDraft = async() =>{
+    if (course) {
+      console.log("User list fetched successfully:", course);
+      navigate('/institute/course-drafts');
+    } else if (error) {
+      console.error("Error fetching course list:");
+    }
+  }
 
   const handleNavigate = (path: string) => {
     navigate(path);
@@ -29,11 +52,12 @@ const InstituteSidebar: React.FC = () => {
   };
 
   const handleLogout = (): void => {
-    navigate('/login');
+    dispatch(instituteLogout());
+    navigate('/institute/login');
   };
 
   return (
-    <div className="h-screen w-64 bg-gray-900 text-white">
+    <div className="min-h-screen w-64 bg-gray-900 text-white">
       <div className="px-6 py-4 border-b border-gray-800">
         <h1 className="text-xl font-bold">Institute Portal</h1>
       </div>
@@ -41,7 +65,7 @@ const InstituteSidebar: React.FC = () => {
       <div className="p-4 border-b border-gray-800">
         <div className="mb-6 pt-5">
           <button 
-            onClick={() => handleNavigate('')}
+            onClick={() => handleNavigate('/dashboard')}
             className="flex items-center space-x-2 text-gray-300 hover:text-white"
           >
             <Home className="w-5 h-5" />
@@ -49,64 +73,105 @@ const InstituteSidebar: React.FC = () => {
           </button>
         </div>
 
-        <div className="mb-6 space-y-8">
-          <div className="mb-2 text-gray-500 text-sm uppercase">
+        {/* Course Management Section */}
+        <div className="mb-6 space-y-4">
+          <div className="text-gray-500 text-sm uppercase">
+            Course Management
+          </div>
+          <div className="ml-5 space-y-3">
+            <button 
+              onClick={() => handleNavigate('/institute/courses')}
+              className="flex items-center space-x-2 text-gray-300 hover:text-white w-full"
+            >
+              <BookOpen className="w-5 h-5" />
+              <span>Course List</span>
+            </button>
+            <button 
+              onClick={() => handleNavigate('/institute/course-add')}
+              className="flex items-center space-x-2 text-gray-300 hover:text-white w-full"
+            >
+              <PlusCircle className="w-5 h-5" />
+              <span>Add Course</span>
+            </button>
+            <button 
+              onClick={() => handleDraft()}
+              className="flex items-center space-x-2 text-gray-300 hover:text-white w-full"
+            >
+              <FileEdit className="w-5 h-5" />
+              <span>Draft Courses</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Quiz Management Section */}
+        <div className="mb-6 space-y-4">
+          <div className="text-gray-500 text-sm uppercase">
+            Quiz Management
+          </div>
+          <div className="ml-5 space-y-3">
+            <button 
+              onClick={() => handleNavigate('/quizzes')}
+              className="flex items-center space-x-2 text-gray-300 hover:text-white w-full"
+            >
+              <Brain className="w-5 h-5" />
+              <span>Quiz List</span>
+            </button>
+            <button 
+              onClick={() => handleNavigate('/quizzes/add')}
+              className="flex items-center space-x-2 text-gray-300 hover:text-white w-full"
+            >
+              <PlusCircle className="w-5 h-5" />
+              <span>Add Quiz</span>
+            </button>
+            <button 
+              onClick={() => handleNavigate('/quizzes/drafts')}
+              className="flex items-center space-x-2 text-gray-300 hover:text-white w-full"
+            >
+              <FileEdit className="w-5 h-5" />
+              <span>Draft Quizzes</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Tutor Management Section */}
+        <div className="mb-6 space-y-4">
+          <div className="text-gray-500 text-sm uppercase">
+            Tutor Management
+          </div>
+          <div className="ml-5 space-y-3">
+            <button 
+              onClick={() => handleNavigate('/tutors')}
+              className="flex items-center space-x-2 text-gray-300 hover:text-white w-full"
+            >
+              <GraduationCap className="w-5 h-5" />
+              <span>Tutor List</span>
+            </button>
+            <button 
+              onClick={() => handleNavigate('/tutors/add')}
+              className="flex items-center space-x-2 text-gray-300 hover:text-white w-full"
+            >
+              <PlusCircle className="w-5 h-5" />
+              <span>Add Tutor</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Students Section */}
+        <div className="mb-6 space-y-4">
+          <div className="text-gray-500 text-sm uppercase">
             Students
           </div>
           <button 
-            // onClick={handleUserList}
-            className="flex items-center space-x-2 text-gray-300 hover:text-white"
+            onClick={handleUserList}
+            className="flex items-center space-x-2 text-gray-300 hover:text-white ml-5"
           >
-            <Users className="w-5 h-5 ml-5" />
+            <Users className="w-5 h-5" />
             <span>All Students</span>
           </button>
         </div>
 
-        <div className="mb-6 space-y-8">
-          <div className="ml-0 mb-2 text-gray-500 text-sm uppercase">
-            Department Management
-          </div>
-          <div className='ml-5'>
-            <div className="space-y-2">
-              <button 
-                onClick={() => handleNavigate('')}
-                className="flex items-center space-x-2 text-gray-300 hover:text-white w-full"
-              >
-                <Building2 className="w-5 h-5" />
-                <span>All Departments</span>
-              </button>
-              
-              <button 
-                onClick={() => handleNavigate('')}
-                className="flex items-center space-x-2 text-gray-300 hover:text-white w-full"
-              >
-                <Clock className="w-5 h-5" />
-                <span>Pending Approvals</span>
-                <span className="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full">
-                  3
-                </span>
-              </button>
-              
-              <button 
-                onClick={() => handleNavigate('')}
-                className="flex items-center space-x-2 text-gray-300 hover:text-white w-full"
-              >
-                <CheckCircle2 className="w-5 h-5" />
-                <span>Approved Institutes</span>
-              </button>
-              
-              <button 
-                onClick={() => handleNavigate('')}
-                className="flex items-center space-x-2 text-gray-300 hover:text-white w-full"
-              >
-                <BarChart className="w-5 h-5" />
-                <span>Analytics</span>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-auto">
+        {/* Logout Button */}
+        <div className="mt-8">
           <button 
             onClick={handleLogout}
             className="flex items-center space-x-2 text-gray-300 hover:text-white"

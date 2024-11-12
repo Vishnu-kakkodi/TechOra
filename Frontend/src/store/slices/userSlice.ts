@@ -71,7 +71,7 @@ interface RegisterResponse {
 const baseQuery = fetchBaseQuery({ baseUrl: `${backendUrl}/api/` });
 
 export const userSlice = createApi({
-  reducerPath: 'userApi',  // Set a unique reducerPath
+  reducerPath: 'userApi', 
   baseQuery: baseQuery as BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError>,
   tagTypes: ['User'],
   endpoints: (builder) => ({
@@ -111,11 +111,22 @@ export const userSlice = createApi({
 
     }),
 
+    resendOtp: builder.mutation<void, void>({
+      query: () => ({
+        url: 'users/resend-otp',
+        method: 'POST',
+        credentials: 'include'
+      }),
+      invalidatesTags: [{ type: 'User' }],
+    }),
+    
+
     register: builder.mutation<RegisterResponse, Partial<User>>({
       query: (data) => ({
         url: 'users/register',
         method: 'POST',
         body: data,
+        credentials: 'include'
       }),
       transformResponse: (response: RegisterResponse) => {
         console.log("Transform response:", response);
@@ -132,6 +143,7 @@ export const userSlice = createApi({
         url: 'users/login',
         method: 'POST',
         body: data,
+        credentials: 'include'
       }),
       transformResponse: (response: RegisterResponse) => {
         console.log("Transform response:", response);
@@ -143,8 +155,29 @@ export const userSlice = createApi({
       },
       invalidatesTags: [{ type: 'User' }],
     }),
+
+    userEmailVerify: builder.mutation({
+      query: (data) => ({
+        url: 'users/verify-email',
+        method: 'POST',
+        body: data,
+        credentials: 'include',
+      }),
+      invalidatesTags: [{ type: 'User' }],
+    }),
+
+    userOtpVerify: builder.mutation({
+      query: (data: { otp: string }) => ({
+        url: '/users/verify-Otp',
+        method: 'POST',
+        body: data,
+        credentials: 'include'
+
+      }),
+      invalidatesTags: ['User'],
+    }),
   }),
 });
 
-export const { useInitiateSignupMutation, useVerifyUserMutation, useRegisterMutation, useLoginMutation } = userSlice;
+export const { useInitiateSignupMutation, useVerifyUserMutation, useResendOtpMutation, useRegisterMutation, useLoginMutation, useUserEmailVerifyMutation, useUserOtpVerifyMutation } = userSlice;
 

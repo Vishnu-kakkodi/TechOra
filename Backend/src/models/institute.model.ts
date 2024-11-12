@@ -1,5 +1,5 @@
 import { Schema, model, Document } from 'mongoose';
-import { InstituteDocument } from '../interfaces/institute.interface';
+import { InstituteDocument, InstituteStatus } from '../interfaces/institute.interface';
 
 const instituteSchema = new Schema<InstituteDocument>(
   {
@@ -8,7 +8,11 @@ const instituteSchema = new Schema<InstituteDocument>(
     collegeCode: { type: String, required: true },
     country: { type: String, required: true },
     state: { type: String, required: true },
-    district: { type: String, required: true }
+    district: { type: String, required: true },
+    documentUrl:{ type: String, required: true },
+    applicationId:{ type: String, required: true},
+    status: { type: String, enum: Object.values(InstituteStatus), default: InstituteStatus.Pending }
+
   },
   { timestamps: true }
 );

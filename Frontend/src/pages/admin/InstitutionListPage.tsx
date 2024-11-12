@@ -1,5 +1,5 @@
 import React from 'react';
-import InstitutionList from '../../layout/AdminLayout.tsx/InstituteList';
+import InstitutionList from '../../layout/AdminLayout/InstituteList';
 import Sidebar from '../../components/sidebar/AdminSidebar';
 
 const InstituteListingPage = () => {

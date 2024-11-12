@@ -1,27 +1,40 @@
-import React from 'react';
-import { 
+import React, {useEffect} from 'react';
+import {
   Search,
   Download,
   Eye
 } from 'lucide-react';
 import { useInstituteListQuery } from '../../store/slices/adminSlice';
-import { Institute } from '../../../../Backend/src/interfaces/institute.interface';
+import { InstituteDocument } from '../../../../Backend/src/interfaces/institute.interface';
+import { useNavigate } from 'react-router-dom';
+
+
 
 
 const InstitutionList = () => {
 
-  const { data: { institutes } = {} } =useInstituteListQuery(null);
-  console.log(institutes,"Haaaai");
 
-//   const handleViewApplication = (institutionId) => {
-//     // Implement view application logic
-//     console.log(`Viewing application for institution ${institutionId}`);
-//   };
 
-//   const handleDownloadDocument = (institutionId, documentName) => {
-//     // Implement document download logic
-//     console.log(`Downloading ${documentName} for institution ${institutionId}`);
-//   };
+  const navigate = useNavigate();
+
+  const { data: { institutes } = {}, refetch  } = useInstituteListQuery(null);
+  console.log(institutes, "Haaaai");
+
+  useEffect(() => {
+    refetch(); 
+  }, [institutes]);
+
+    const handleViewApplication = async (instituteId: any) => {
+      console.log(instituteId)
+      navigate(`/admin/institute-detail/${instituteId}`)
+
+      console.log(`Viewing application for institution ${instituteId}`);
+    };
+
+  //   const handleDownloadDocument = (institutionId, documentName) => {
+  //     // Implement document download logic
+  //     console.log(`Downloading ${documentName} for institution ${institutionId}`);
+  //   };
 
   return (
     <div className="w-full bg-white p-4 rounded-lg shadow">
@@ -38,22 +51,27 @@ const InstitutionList = () => {
           </div>
         </div>
       </div>
-      
+
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white rounded-lg">
           <thead>
             <tr className="bg-gray-50 border-b border-gray-200">
+              <th className="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Application No.</th>
               <th className="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">College Name</th>
               <th className="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
               <th className="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">College Code</th>
               <th className="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Documents</th>
+              <th className="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
               <th className="py-3 px-6 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
             {institutes ? (
-              institutes.map((institute:Institute) => (
+              institutes.map((institute: InstituteDocument) => (
                 <tr key={institute.id} className="hover:bg-gray-50 transition-colors">
+                  <td className="py-4 px-6">
+                    <div className="text-sm font-medium text-gray-900">{institute.applicationId}</div>
+                  </td>
                   <td className="py-4 px-6">
                     <div className="text-sm font-medium text-gray-900">{institute.collegeName}</div>
                   </td>
@@ -76,14 +94,24 @@ const InstitutionList = () => {
                         </button>
                       ))}
                     </div> */}
+                    <div className="flex flex-col gap-2">
+                      <button
+                        //   onClick={() => handleDownloadDocument(institution.id, doc.name)}
+                        className="flex items-center text-sm text-blue-600 hover:text-blue-800"
+                      >
+                        <Download className="h-4 ml-7 w-4 mr-2" />
+                      </button>
+                    </div>
+                  </td>
+                  <td className="py-4 px-6">
+                    <div className="text-sm text-gray-500">{institute.status}</div>
                   </td>
                   <td className="py-4 px-6 text-right text-sm font-medium">
-                    <button 
-                    //   onClick={() => handleViewApplication(institution.id)}
+                    <button
+                        onClick={() => handleViewApplication(institute._id)}
                       className="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors"
                     >
-                      <Eye className="h-4 w-4 mr-2" />
-                      View Application
+                      View
                     </button>
                   </td>
                 </tr>
@@ -107,12 +135,6 @@ const InstitutionList = () => {
           </button>
         </div>
         <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-          <div>
-            <p className="text-sm text-gray-700">
-              Showing <span className="font-medium">1</span> to <span className="font-medium">3</span> of{' '}
-              <span className="font-medium">3</span> results
-            </p>
-          </div>
           <div>
             <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
               <button className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0">

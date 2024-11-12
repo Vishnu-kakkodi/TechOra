@@ -42,8 +42,6 @@ const InstituteLogin: React.FC = () => {
       className="min-h-screen flex justify-center items-center bg-cover bg-center relative" 
       style={{ backgroundImage: `url(${loginPage})` }}
     >
-      {/* Background overlay for better contrast */}
-
 
       <div className="relative w-[600px] bg-black bg-opacity-70 rounded-lg shadow-lg p-8">
         <div className="text-center mb-6">

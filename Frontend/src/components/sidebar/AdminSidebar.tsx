@@ -10,9 +10,12 @@ import {
   CheckCircle2
 } from 'lucide-react';
 import { useInstituteListQuery, useUserListQuery } from '../../store/slices/adminSlice';
+import { adminLogout } from '../../store/slices/authSlice';
+import { useAppDispatch } from '../../store/hook';
 
 const Sidebar: React.FC = () => {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const { data: users, error } = useUserListQuery(null);
   const {data: institutes} = useInstituteListQuery(null);
 
@@ -37,17 +40,16 @@ const Sidebar: React.FC = () => {
   };
 
   const handleLogout = (): void => {
-    navigate('/login');
+    dispatch(adminLogout());
+    navigate('/admin/login');
   };
 
   return (
     <div className="h-screen w-64 bg-gray-900 text-white">
-      {/* Logo/Brand Area */}
       <div className="px-6 py-4 border-b border-gray-800">
         <h1 className="text-xl font-bold">Admin Portal</h1>
       </div>
 
-      {/* Navigation Links */}
       <div className="p-4 border-b border-gray-800">
         <div className="mb-6 pt-5">
           <button 
@@ -91,9 +93,6 @@ const Sidebar: React.FC = () => {
               >
                 <Clock className="w-5 h-5" />
                 <span>Pending Approvals</span>
-                <span className="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full">
-                  3
-                </span>
               </button>
               
               <button 
@@ -102,14 +101,6 @@ const Sidebar: React.FC = () => {
               >
                 <CheckCircle2 className="w-5 h-5" />
                 <span>Approved Institutes</span>
-              </button>
-              
-              <button 
-                onClick={() => handleNavigate('/analytics')}
-                className="flex items-center space-x-2 text-gray-300 hover:text-white w-full"
-              >
-                <BarChart className="w-5 h-5" />
-                <span>Analytics</span>
               </button>
             </div>
           </div>
