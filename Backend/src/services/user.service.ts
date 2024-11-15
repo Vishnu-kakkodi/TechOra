@@ -96,7 +96,7 @@ export class UserService {
             const refreshToken = helperFunction.refreshtoken(user.id, "user");
             
 
-            return Object.assign({}, user, { accessToken, refreshToken });
+            return { ...user.toObject(), accessToken, refreshToken };
 
         }catch(error){
             throw error;

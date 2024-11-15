@@ -124,6 +124,7 @@ class UserController {
             if (!user) {
                 throw new error_middleware_1.HttpException(404, 'User not found');
             }
+            console.log(user, "User");
             res.cookie('userData', user, {
                 httpOnly: true,
                 secure: true,

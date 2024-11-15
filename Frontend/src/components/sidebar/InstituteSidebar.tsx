@@ -14,7 +14,7 @@ import {
   PlusCircle,
   GraduationCap,
   Brain,
-  FileEdit
+  FileEdit,
 } from 'lucide-react';
 import { useUserListQuery } from '../../store/slices/adminSlice';
 import { useAppDispatch } from '../../store/hook';

@@ -60,6 +60,7 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { BaseQueryFn, FetchArgs, FetchBaseQueryError } from '@reduxjs/toolkit/query';
 import { User, UserLogin } from '../../types/userTypes';
+import { cartResponse } from '../../types/cartType';
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
@@ -176,8 +177,46 @@ export const userSlice = createApi({
       }),
       invalidatesTags: ['User'],
     }),
+
+    cartPage: builder.query<cartResponse,null>({
+      query: () =>({
+        url: '/users/cart-items',
+        method: 'GET',
+        credentials: 'include'
+      }),
+      providesTags: ['User']
+    }),
+
+    addToCart: builder.mutation<string, { courseId: string }>({
+      query: ({courseId}) =>({
+        url: '/users/add-cart',
+        method: 'POST',
+        credentials: 'include',
+        body: {courseId}
+      })
+    }),
+
+    payment: builder.mutation({
+      query: () =>({
+        url: '/users/payment',
+        method: 'POST',
+        credentials: 'include',
+      })
+    }),
   }),
+
 });
 
-export const { useInitiateSignupMutation, useVerifyUserMutation, useResendOtpMutation, useRegisterMutation, useLoginMutation, useUserEmailVerifyMutation, useUserOtpVerifyMutation } = userSlice;
+export const 
+{ useInitiateSignupMutation,
+   useVerifyUserMutation, 
+   useResendOtpMutation, 
+   useRegisterMutation, 
+   useLoginMutation, 
+   useUserEmailVerifyMutation,
+   useUserOtpVerifyMutation,
+   useCartPageQuery,
+   useAddToCartMutation,
+   usePaymentMutation
+  } = userSlice;
 

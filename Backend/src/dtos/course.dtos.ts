@@ -7,7 +7,7 @@ export class CreateCourseDto {
     duration!: string;
     description!: string;
     startDate!: string;
-    price!: string;
+    price!: number;
     status!: 'draft' | 'published';
     thumbnail!: string;  
     institutionId!: Types.ObjectId | string

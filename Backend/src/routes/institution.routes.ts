@@ -7,12 +7,14 @@ import { TutorRepository } from "../repositories/tutor.repository";
 import { CourseController } from "../controllers/course.controller";
 import { CourseService } from "../services/course.service";
 import { CourseRepository } from "../repositories/course.repository";
+import { CartRepository } from "../repositories/cart.repository";
 
 const router = Router();
 const instituteRepository = new InstituteRepository()
 const instituteService = new InstituteService();
 const courseRepository = new CourseRepository();
-const courseService = new CourseService(courseRepository);
+const cartRepository = new CartRepository();
+const courseService = new CourseService(courseRepository,cartRepository);
 const instituteController = new InstitutionController(instituteService);
 const courseController = new CourseController(courseService);
 

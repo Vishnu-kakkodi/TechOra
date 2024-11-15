@@ -14,21 +14,21 @@ const HomeLayout3 = () => {
     <div>
       <hr className='boarder-t boareder-grey-300' />
       <main className="container bg ml-2container">
-        <div className='bg-custom-gradient flex items-center h-[100vh]'>
+        <div className=' flex items-center h-[100vh]'>
           <div className="w-1/2 ml-[130px] mb-[120px]">
-            <p className="text-[14px] font-bold text-left text-white mb-2 font-jakarta capitalize tracking-widest">
+            <p className="text-[14px] font-bold text-left text-black mb-2 font-inter capitalize tracking-tight">
               Build Your Future
             </p>
-            <h1 className="text-[45px] font-bold text-left text-white mb-2 font-jakarta capitalize">
+            <h1 className="text-[45px] font-bold text-left text-black mb-2 font-inter capitalize tracking-tight">
               Let's Build Skills
             </h1>
-            <p className="text-[45px] font-bold text-left text-white mb-2 font-jakarta">
+            <p className="text-[45px] font-bold text-left text-black mb-2 font-jakarta">
               WITH <span className="text-yellow-500">techOra</span> & LEARN
             </p>
-            <p className="text-[45px] font-bold text-left text-white mb-2 font-jakarta capitalize">
+            <p className="text-[45px] font-bold text-left text-black mb-2 font-inter capitalize tracking-tight">
               without limits
             </p>
-            <p className="text-[14px] font-bold text-left text-white mb-6 font-jakarta capitalize">
+            <p className="text-[14px] font-bold text-left text-black mb-6 font-inter capitalize tracking-tight">
               Take your learning organization to the next level.
             </p>
           </div>

@@ -5,10 +5,13 @@ import {
   ArrowRight
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import { useSpring, animated } from 'react-spring';
+
 
 const HomeLayout1 = () => {
 
   const navigate = useNavigate();
+  const props = useSpring({ to: { opacity: 1, transform: 'translateY(0px)' }, from: { opacity: 0, transform: 'translateY(-50px)' }, config: { duration: 1000 } });
 
   return (
     <div>

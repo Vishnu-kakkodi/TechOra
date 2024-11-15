@@ -1,7 +1,5 @@
 import { Model,Document } from "mongoose";
-import { QueryParams } from "../types/repository.types";
 import { BaseInterface } from "../interfaces/base.interface";
-import { Course, CourseDocument, Module } from "../interfaces/course.interface";
 
 export abstract class BaseRepository<T extends BaseInterface & Document> {
     constructor(protected readonly model: Model<T & Document>) {}

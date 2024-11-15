@@ -79,7 +79,7 @@ const AddCourse: React.FC = () => {
   const [submitError, setSubmitError] = useState<string>('');
 
   const institutionInfo = useAppSelector((state) => state.auth.institutionInfo);
-  console.log(institutionInfo._id);
+  console.log(institutionInfo?._id);
   
 
 
@@ -115,7 +115,7 @@ const AddCourse: React.FC = () => {
             formData.append('thumbnail', values.thumbnail);
         }
 
-        if (institutionInfo._id) {
+        if (institutionInfo?._id) {
           formData.append('institutionId', institutionInfo._id);
         }else{
           console.log("Id not")
@@ -255,6 +255,7 @@ const AddCourse: React.FC = () => {
                     <option value="computer-science">Computer Science</option>
                     <option value="mathematics">Mathematics</option>
                     <option value="business">Business</option>
+                    <option value="hotel-management">Hotel Management</option>
                   </Field>
                   <ErrorMessage name="fieldName">
                     {(msg) => <div className="text-red-500 text-sm mt-1">{msg}</div>}

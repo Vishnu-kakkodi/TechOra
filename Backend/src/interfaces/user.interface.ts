@@ -15,4 +15,4 @@ export interface IUser extends BaseInterface{
     status: UserStatus;
 }
 
-export type IUserDocument = IUser & Document;
+export type IUserDocument = IUser & Document;   

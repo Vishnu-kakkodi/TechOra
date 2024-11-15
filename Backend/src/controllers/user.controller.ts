@@ -171,11 +171,12 @@ export class UserController {
             if (!user) {
                 throw new HttpException(404, 'User not found');
             }
+            console.log(user,"User")
             res.cookie('userData', user, {
                 httpOnly: true,
                 secure: true,
                 sameSite: 'strict',
-                maxAge: 5 * 60 * 1000, 
+                maxAge: 25 * 60 * 1000, 
               });
             res.json({ user });
         } catch (error) {

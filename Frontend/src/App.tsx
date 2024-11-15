@@ -9,7 +9,6 @@ import { ToastContainer } from 'react-toastify';
 function App() {
   return (
     <>
-     <ToastContainer />
      <Routes>
         <Route path="/*" element={<UserRoutes />} />
         <Route path="/admin/*" element={<AdminRoutes />} />

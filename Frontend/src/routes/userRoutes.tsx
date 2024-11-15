@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, { useEffect } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import LandingPage from '../pages/LandingPage';
@@ -7,6 +7,8 @@ import UserProtectedRoute from './ProtectedRoute/UserProtectedRoute';
 import { RootState } from '../store';
 import { Navigate } from 'react-router-dom';
 import ErrorPage from '../pages/user/errorPage';
+import UserCart from '../pages/user/UserCart';
+import CourseList from '../pages/user/CourseList';
 
 const UserRoutes: React.FC = () => {
 
@@ -20,9 +22,9 @@ const UserRoutes: React.FC = () => {
   }, [isUserAuthenticated, navigate]);
   return (
     <Routes>
-      <Route 
-        path="/" 
-        element={isUserAuthenticated ? <Navigate to="/home" replace /> : <LandingPage />} 
+      <Route
+        path="/"
+        element={isUserAuthenticated ? <Navigate to="/home" replace /> : <LandingPage />}
       />
       <Route
         path="/home"
@@ -32,7 +34,27 @@ const UserRoutes: React.FC = () => {
           </UserProtectedRoute>
         }
       />
-              <Route path="*" element={<ErrorPage />} />
+
+      <Route
+      path="/cart"
+      element={
+        <UserProtectedRoute>
+          <UserCart />
+        </UserProtectedRoute>
+      }
+      />
+
+      <Route
+      path="/course"
+      element={
+        <UserProtectedRoute>
+          <CourseList />
+        </UserProtectedRoute>
+      }
+      />
+
+
+      <Route path="*" element={<ErrorPage />} />
 
     </Routes>
   );

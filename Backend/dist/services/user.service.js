@@ -77,7 +77,7 @@ class UserService {
             }
             const accessToken = authHelper_1.default.accesstoken(user.id, "user");
             const refreshToken = authHelper_1.default.refreshtoken(user.id, "user");
-            return Object.assign({}, user, { accessToken, refreshToken });
+            return { ...user.toObject(), accessToken, refreshToken };
         }
         catch (error) {
             throw error;

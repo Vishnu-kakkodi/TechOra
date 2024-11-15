@@ -104,7 +104,7 @@ export class InstitutionController{
                 httpOnly: true,
                 secure: true,
                 sameSite: 'strict',
-                maxAge: 15 * 60 * 1000
+                maxAge: 25 * 60 * 1000
             });
             res.json({ institute,message:"Login successfully" });
         } catch (error) {

@@ -3,12 +3,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CourseService = void 0;
 const error_middleware_1 = require("../middleware/error.middleware");
 class CourseService {
-    constructor(courseRepository) {
+    constructor(courseRepository, cartRepository) {
         this.courseRepository = courseRepository;
+        this.cartRepository = cartRepository;
     }
     async createCourse(courseData) {
         try {
-            // Validate required fields
             if (!courseData.title || !courseData.institutionId) {
                 throw new error_middleware_1.HttpException(400, 'Missing required fields');
             }
@@ -50,6 +50,15 @@ class CourseService {
     async courseDetail(courseId) {
         try {
             const data = await this.courseRepository.findById(courseId);
+            return data;
+        }
+        catch (error) {
+            throw error;
+        }
+    }
+    async getCartItems(userId) {
+        try {
+            const data = await this.cartRepository.findCart(userId);
             return data;
         }
         catch (error) {
