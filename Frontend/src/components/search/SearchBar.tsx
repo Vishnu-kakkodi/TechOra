@@ -10,19 +10,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ data }) => {
     const [query, setQuery] = useState('');
     const [filteredResult, setFilteredResult] = useState<string[]>([]);
 
-    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const input = e.target.value;
-        setQuery(input);
 
-        if (input) {
-            const results = data.filter((item) => {
-                item.toLowerCase().includes(input.toLowerCase());
-            });
-            setFilteredResult(results);
-        } else {
-            setFilteredResult([]);
-        }
-    };
 
     return (
         <div className="search-bar relative mt-2">
@@ -34,9 +22,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ data }) => {
                 <input
                     type="text"
                     placeholder="Search..."
-                    value={query}
-                    onChange={handleSearch}
-                    className="search-input p-2 pl-10 border border-gray-300 rounded-full w-[500px]"
+                    className="search-input p-2 pl-10 border border-gray-300 rounded-[10px] w-[300px]"
                 />
             </div>
             <div className="search-results mt-2">

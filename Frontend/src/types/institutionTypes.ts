@@ -12,3 +12,11 @@ export interface InstituteType{
     instituteEmail:string;
     collegeCode:string;
 }
+
+export interface TutorFormData {
+    department: string;
+    tutorname: string;
+    education: string;
+    experiance: string;
+    gender: string;
+  }

@@ -11,13 +11,9 @@ interface UserCartProps {
 }
 
 const UserCart: React.FC<UserCartProps> = ({ onRemoveItem, onCheckout }) => {
-
   const { data: cartData, isLoading, isError } = useCartPageQuery(null);
   const cartItems = cartData?.Data[0];
-  console.log(cartItems?.items[0].course, "Cartdata");
-
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
-
   const [payment] = usePaymentMutation();
 
   const handleItemSelect = (id: string) => {
@@ -53,18 +49,50 @@ const UserCart: React.FC<UserCartProps> = ({ onRemoveItem, onCheckout }) => {
   };
 
   const handleCheckout = async () => {
-    onCheckout?.(selectedItemsDetails); 
-    // const response = await payment()
+    onCheckout?.(selectedItemsDetails);
   };
 
   return (
-    <>
+    <div className="min-h-screen flex flex-col">
       <Navbar />
-      <div className="min-h-screen bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 py-8">
-          <h1 className="text-3xl font-bold text-center mb-8">Cart</h1>
+      <div className="flex-grow bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-8">Shopping Cart</h1>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Order Summary for Mobile */}
+          <div className="lg:hidden mb-6">
+            <div className="bg-white rounded-lg shadow-sm p-4">
+              <h2 className="text-lg font-bold mb-3">Order Summary</h2>
+              {selectedItemsDetails.length > 0 ? (
+                <>
+                  <div className="space-y-2">
+                    {selectedItemsDetails.map((item) => (
+                      <div key={item.course._id} className="flex justify-between text-sm">
+                        <span className="text-gray-600 truncate mr-2">{item.course.title}</span>
+                        <span className="font-medium">${item.price.toFixed(2)}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="border-t mt-3 pt-3">
+                    <div className="flex justify-between font-bold">
+                      <span>Total</span>
+                      <span>${total.toFixed(2)}</span>
+                    </div>
+                  </div>
+                  <button
+                    onClick={handleCheckout}
+                    className="w-full mt-4 bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    Checkout Now
+                  </button>
+                </>
+              ) : (
+                <p className="text-gray-500 text-center py-2">Select items to see total</p>
+              )}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2">
               <div className="bg-white rounded-lg shadow-sm mb-4 p-4">
                 <label className="flex items-center space-x-2">
@@ -74,87 +102,89 @@ const UserCart: React.FC<UserCartProps> = ({ onRemoveItem, onCheckout }) => {
                     onChange={handleSelectAll}
                     className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
                   />
-                  <span className="text-sm font-medium">Select All Items</span>
+                  <span className="text-sm font-medium">Select All</span>
                 </label>
               </div>
 
-              {cartItems?.items.map((item) => (
-                <div
-                  key={item.course._id}
-                  className="bg-white rounded-lg shadow-sm mb-4 hover:shadow-lg transition-shadow p-6"
-                >
-                  <div className="flex flex-col md:flex-row gap-6">
-                    <div className="flex items-start pt-2">
-                      <input
-                        type="checkbox"
-                        checked={selectedItems.has(item.course._id)}
-                        onChange={() => handleItemSelect(item.course._id)}
-                        className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
-                      />
-                    </div>
-
-                    <div className="w-full md:w-24 h-16">
-                      <img
-                        src={item.course.thumbnail}
-                        alt={item.course.title}
-                        className="w-full h-full object-cover rounded-lg"
-                      />
-                    </div>
-
-                    <div className="flex-grow">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <h3 className="text-xl font-semibold">{item.course.title}</h3>
-                          <p className="text-gray-600 mt-1">by {item.course.instructor}</p>
-                          <div className="mt-2 space-y-1">
-                            <p className="text-sm text-gray-500">
-                              Duration: {item.course.duration}
-                            </p>
-                            <p className="text-sm text-gray-500">
-                              Department: {item.course.department}
-                            </p>
-                          </div>
+              <div className="space-y-4">
+                {cartItems?.items.map((item) => (
+                  <div
+                    key={item.course._id}
+                    className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow"
+                  >
+                    <div className="p-4">
+                      <div className="flex items-start gap-4">
+                        <input
+                          type="checkbox"
+                          checked={selectedItems.has(item.course._id)}
+                          onChange={() => handleItemSelect(item.course._id)}
+                          className="mt-1 w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                        />
+                        <div className="w-20 h-20 flex-shrink-0">
+                          <img
+                            src={item.course.thumbnail}
+                            alt={item.course.title}
+                            className="w-full h-full object-cover rounded-md"
+                          />
                         </div>
-                        <div className="text-right">
-                          <p className="text-xl font-bold">{item.price.toFixed(2)}</p>
-                          <button
-                            className="mt-2 text-red-500 hover:text-red-700 flex items-center gap-1"
-                            onClick={() => handleRemoveItem(item.course._id)}
-                            aria-label={`Remove ${item.course.title} from cart`}
-                          >
-                            <Trash2 size={16} />
-                            <span className="text-sm">Remove</span>
-                          </button>
+                        <div className="flex-grow min-w-0">
+                          <div className="flex flex-col sm:flex-row sm:justify-between">
+                            <div className="mb-2 sm:mb-0">
+                              <h3 className="text-lg font-semibold truncate">{item.course.title}</h3>
+                              <p className="text-sm text-gray-600">by {item.course.instructor}</p>
+                            </div>
+                            <div className="flex items-center justify-between sm:flex-col sm:items-end">
+                              <div className="text-lg font-bold">${item.price.toFixed(2)}</div>
+                              <button
+                                onClick={() => handleRemoveItem(item.course._id)}
+                                className="text-red-500 hover:text-red-700 flex items-center gap-1 sm:mt-2"
+                              >
+                                <Trash2 size={16} />
+                                <span className="text-sm">Remove</span>
+                              </button>
+                            </div>
+                          </div>
+                          <div className="mt-2 grid grid-cols-2 sm:flex sm:gap-4 text-sm text-gray-500">
+                            <span>Duration: {item.course.duration}</span>
+                            <span>Department: {item.course.department}</span>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
 
+              {cartItems?.items.length === 0 && (
+                <div className="text-center py-12 bg-white rounded-lg shadow-sm">
+                  <h2 className="text-xl font-semibold text-gray-600">Your cart is empty</h2>
+                  <p className="text-gray-500 mt-2">Browse our courses to add items to your cart</p>
+                </div>
+              )}
             </div>
 
-            <div className="lg:col-span-1">
-              <div className="bg-white rounded-lg shadow-sm p-6">
+            {/* Desktop Order Summary */}
+            <div className="hidden lg:block">
+              <div className="bg-white rounded-lg shadow-sm p-6 sticky top-6">
                 <h2 className="text-xl font-bold mb-4">Order Summary</h2>
                 <div className="space-y-4">
                   {selectedItemsDetails.length > 0 ? (
                     <>
-                      {selectedItemsDetails?.map((item) => (
+                      {selectedItemsDetails.map((item) => (
                         <div key={item.course._id} className="flex justify-between text-sm">
-                          <span className="text-gray-600">{item.course.title}</span>
-                          <span>{item.price.toFixed(2)}</span>
+                          <span className="text-gray-600 truncate mr-2">{item.course.title}</span>
+                          <span>${item.price.toFixed(2)}</span>
                         </div>
                       ))}
                       <div className="border-t pt-4">
                         <div className="flex justify-between font-bold">
                           <span>Total</span>
-                          <span>{total.toFixed(2)}</span>
+                          <span>${total.toFixed(2)}</span>
                         </div>
                       </div>
                       <button
-                        className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors mt-4"
                         onClick={handleCheckout}
+                        className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors"
                       >
                         Proceed to Checkout
                       </button>
@@ -171,17 +201,10 @@ const UserCart: React.FC<UserCartProps> = ({ onRemoveItem, onCheckout }) => {
               </div>
             </div>
           </div>
-
-          {cartItems?.items.length === 0 && (
-            <div className="text-center py-12">
-              <h2 className="text-xl font-semibold text-gray-600">Your cart is empty</h2>
-              <p className="text-gray-500 mt-2">Browse our courses to add items to your cart</p>
-            </div>
-          )}
         </div>
       </div>
       <Footer />
-    </>
+    </div>
   );
 };
 

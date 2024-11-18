@@ -8,7 +8,7 @@ export interface Tutor extends BaseInterface{
     education:string;
     experiance:string;
     gender:string;
-    institute: Types.ObjectId;
+    institutionId: Types.ObjectId;
 }
 
 export type TutorDocument = Tutor & Document;

@@ -2,11 +2,38 @@ import { Request, Response, NextFunction } from "express";
 import { InstituteService } from "../services/institute.service";
 import { CreateUserDto, CreateTutorDto } from "../dtos/institute.dtos";
 import { HttpException } from "../middleware/error.middleware";
-import { generateToken } from "../utils/generateToken";
-import { CreateCourseDto } from "../dtos/course.dtos";
+import { setCookie } from "../helperFunction/cookieUtils";
+import { decodedToken } from "../helperFunction/authHelper";
 
 export class InstitutionController{
     constructor(private readonly instituteService: InstituteService){}
+
+
+    async trackStatus(
+        req: Request<{}, {}>,
+        res: Response,
+        next: NextFunction
+    ): Promise<void>{
+
+        try{
+            const trackID:string = req.body.trackID;
+            console.log(trackID)
+            const response = await this.instituteService.trackStatus(trackID);
+            console.log(response,"yy")
+            if(!response){
+                res.status(401).json({
+                    message: "Application is active"
+                })
+            }
+            res.status(201).json({
+                message:"Success",
+                data: response
+            })
+        }catch(error){
+            next(error)
+        }
+
+    }
 
     async verifyEmail(
         req: Request<{}, {}>,
@@ -47,7 +74,7 @@ export class InstitutionController{
             const response = await this.instituteService.verifyOtp(otp,CookieData[0]);
             const email = CookieData[1]
             if(response){
-                res.clearCookie('userData');
+                res.clearCookie('institutionOTP');
                 res.status(201).json({email,message:'Successfull'});
             }
         }catch(error){
@@ -77,13 +104,16 @@ export class InstitutionController{
               };
             const institute = await this.instituteService.createInstitute(instituteData);
             console.log(institute,"ggggggggggggggggggggg")
-            res.cookie('instituteCredential', institute, {
-                httpOnly: true,
-                secure: true,
-                sameSite: 'strict',
-                maxAge: 10 * 60 * 1000
-            });
-            res.status(201).json({institute, message:'Successfull'});
+            const { accessToken, refreshToken, ...instituteDetails } = institute;
+            console.log(instituteDetails,"Institute")
+            const Token ={
+                accessToken: accessToken,
+                refreshToken: refreshToken
+            }
+
+            setCookie(res, 'institute', Token);
+
+            res.status(201).json({instituteDetails, message:'Successfull'});
         }catch(error){
             next(error);
         }
@@ -100,12 +130,15 @@ export class InstitutionController{
             if (!institute) {
                 throw new HttpException(404, 'Institution not found');
             }
-            res.cookie('instituteCredential', institute, {
-                httpOnly: true,
-                secure: true,
-                sameSite: 'strict',
-                maxAge: 25 * 60 * 1000
-            });
+            const { accessToken, refreshToken, ...instituteDetails } = institute;
+            console.log(instituteDetails,"Institute")
+            const Token ={
+                accessToken: accessToken,
+                refreshToken: refreshToken
+            }
+
+            setCookie(res, 'institute', Token);
+
             res.json({ institute,message:"Login successfully" });
         } catch (error) {
             next(error);
@@ -119,14 +152,43 @@ export class InstitutionController{
     ): Promise<void>{
         try{
             console.log("data");
-            const instituteId = req.query.id as string;
+            const token = req.cookies.institute.accessToken;
+            const requiredRole = "institute";
+            console.log(token,"Token")
+            const institutionId: string | null = decodedToken(token, requiredRole);
             const tutorDetail = req.body;
-            console.log(instituteId,tutorDetail,"Data")
+            console.log(institutionId,tutorDetail,"Data")
             const tutorData = {
                 ...tutorDetail,
-                instituteId
+                institutionId
             }
-            const tutor = this.instituteService.createTutor(tutorData)
+            console.log(tutorDetail)
+            await this.instituteService.createTutor(tutorData)
+            res.status(201).json({
+                status: 'success',
+                message: 'Tutor created successfully'
+            });
+        }catch(error){
+            next(error);
+        }
+    }
+
+
+    async tutorList(
+        req: Request<{}, {}>,
+        res: Response,
+        next: NextFunction
+    ): Promise<void>{
+        try{
+            const token = req.cookies.institute.accessToken;
+            const requiredRole = "institute";
+            console.log(token,"TokenGet")
+            const institutionId: string | null = decodedToken(token, requiredRole);
+            const institutes = await this.instituteService.tutorList(institutionId);
+            console.log(institutes,"Ins")
+            res.status(201).json({
+                institutes
+            });
         }catch(error){
             next(error);
         }

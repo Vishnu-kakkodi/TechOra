@@ -7,7 +7,7 @@ interface UserInfo {
   [key: string]: any;
 }
 
-interface InstituteEmailInfo {
+export interface InstituteEmailInfo {
   instituteEmail?: string;
 }
 
@@ -22,7 +22,7 @@ interface AuthState {
   userInfo: UserInfo | null;
   adminInfo: UserInfo | null;
   institutionInfo: InstituteInfo | null;
-  institutionEmailInfo: InstituteEmailInfo | null;
+  institutionEmailInfo: InstituteEmailInfo;
   isUserAuthenticated: boolean;
   isAdminAuthenticated: boolean;
   isInstituteAuthenticated: boolean;

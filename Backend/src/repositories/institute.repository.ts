@@ -10,7 +10,16 @@ export class InstituteRepository extends BaseRepository<InstituteDocument> {
 
     async findByEmail(instituteEmail: string): Promise <InstituteDocument | null >{
         try{
-            return await this.model.findOne({instituteEmail});
+            return await this.model.findOne({instituteEmail,status: { $eq: 'Active' } });
+        }catch(error){
+            throw error;
+        }
+    }
+
+    async findOne(applicationId: string): Promise <InstituteDocument | null >{
+        try{
+            console.log(typeof(applicationId))
+            return await this.model.findOne({ applicationId: applicationId,status: { $ne: 'Active' }  });
         }catch(error){
             throw error;
         }

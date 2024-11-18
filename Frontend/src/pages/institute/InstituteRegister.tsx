@@ -7,6 +7,7 @@ import { useVerifyInstitutionMutation } from '../../store/slices/institutionSlic
 import { useAppDispatch, useAppSelector } from '../../store/hook';
 import { useNavigate } from 'react-router-dom';
 import { setInstituteCredentials } from '../../store/slices/authSlice';
+import { toast } from 'react-toastify';
 
 interface FormValues {
   collegeName: string;
@@ -71,11 +72,12 @@ const CollegeRegistration: React.FC = () => {
   const [verifyInstitution] = useVerifyInstitutionMutation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const institutionInfo = useAppSelector((state) => state.auth.institutionInfo)
+  const institutionInfo = useAppSelector((state) => state.auth.institutionEmailInfo)
+  console.log(institutionInfo,"Info")
   const formik = useFormik<FormValues>({
     initialValues: {
       collegeName: '',
-      instituteEmail: institutionInfo?.instituteEmail || '',
+      instituteEmail: institutionInfo || '',
       collegeCode: '',
       country: '',
       state: '',
@@ -98,8 +100,8 @@ const CollegeRegistration: React.FC = () => {
         const response = await verifyInstitution(formData).unwrap();
         console.log("haiiiii")
         if(response){
-          dispatch(setInstituteCredentials(response))
-          navigate('/institute/dashboard');
+          toast.success("Application submit successfully")
+          navigate('/');
         }
       } catch (error) {
         console.error('Error:', error);
@@ -149,7 +151,7 @@ const CollegeRegistration: React.FC = () => {
               <input
                 type="email"
                 {...formik.getFieldProps('instituteEmail')}
-                // disabled={true}
+                disabled={true}
                 className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="college@example.in"
               />

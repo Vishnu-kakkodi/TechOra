@@ -8,6 +8,7 @@ import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { setCredentials, setInstituteEmailCredentials } from '../../store/slices/authSlice';
 import { useEmailVerifyMutation, useOtpVerifyMutation } from '../../store/slices/institutionSlice';
+import { useUserOtpVerifyMutation } from '../../store/slices/userSlice';
 import { toast } from 'react-toastify';
 
 interface OtpModalProps {
@@ -15,17 +16,23 @@ interface OtpModalProps {
   mode: 'signup' | 'verifyEmail' | 'forgotPassword' ;
 }
 
+interface emailProps{
+  message:string,
+  data:string
+}
+
 const OtpModal: React.FC<OtpModalProps> = ({ setOtpModalOpen, mode }) => {
   const [register] = useRegisterMutation();
   const [resendOtp] = useResendOtpMutation();
   const [verifyUser] = useVerifyUserMutation();
   const [emailVerify] = useEmailVerifyMutation();
-  const [userOtpVerify] = useVerifyUserMutation();
+  const [userOtpVerify] = useUserOtpVerifyMutation();
   const [otpVerify] = useOtpVerifyMutation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [seconds, setSeconds] = useState<number>(59);
   const [otpCode, setOtpCode] = useState<string[]>(['', '', '', '']);
+  const [email,setEmail] = useState('')
 
   const formik = useFormik({
     initialValues: {
@@ -58,11 +65,14 @@ const OtpModal: React.FC<OtpModalProps> = ({ setOtpModalOpen, mode }) => {
             break;
 
           case 'forgotPassword':
-            const resetResponse = await userOtpVerify({ otp }).unwrap();
-            if (resetResponse) {
+            console.log("Forgot")
+            const res:emailProps = await userOtpVerify({ otp }).unwrap();
+            setEmail(res.data)
               toast.success('OTP verified successfully!');
-              navigate('/home'); 
-            }
+              navigate('/forgot-password', { 
+                state: { email: res.data }  
+              });
+          
             break;
         }
         setOtpModalOpen(false);
@@ -92,11 +102,8 @@ const OtpModal: React.FC<OtpModalProps> = ({ setOtpModalOpen, mode }) => {
     setSeconds(59);
 
     if (mode === 'signup') {
+      console.log("Resend")
       const response = await resendOtp().unwrap()
-    } else if (mode === 'verifyEmail') {
-
-    } else if (mode === 'forgotPassword') {
-
     }
   };
 

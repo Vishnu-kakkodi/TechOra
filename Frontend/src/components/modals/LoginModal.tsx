@@ -93,10 +93,10 @@ const LoginModal: React.FC<LoginModalProps> = ({ setLoginModalOpen, setOtpModalO
   return (
     <div className="container mx-auto">
       <Modal onClose={() => setLoginModalOpen(false)}>
-        <form onSubmit={formik.handleSubmit} className="w-[600px] p-8 bg-deepPurple rounded-lg shadow-lg mx-auto">
-          <h2 className="text-2xl mb-6 text-center font-bold text-white">Log in</h2>
+        <form onSubmit={formik.handleSubmit} className="w-[600px] p-8 bg-white  shadow-lg mx-auto">
+          <h2 className="text-2xl mb-6 text-center font-bold text-black">Log in</h2>
 
-          <label htmlFor="email" className="block text-white mb-2">
+          <label htmlFor="email" className="block text-black mb-2">
             Email<span className="text-red-500 wpforms-required-label" aria-hidden="true">*</span>
           </label>
           <input
@@ -105,14 +105,14 @@ const LoginModal: React.FC<LoginModalProps> = ({ setLoginModalOpen, setOtpModalO
             type="email"
             onChange={formik.handleChange}
             value={formik.values.email}
-            className="w-full px-3 py-2 mb-4 border rounded-lg focus:outline-none focus:ring focus:ring-indigo-500"
+            className="w-full px-3 py-2 mb-4 border-2 rounded-lg focus:outline-none focus:ring focus:ring-indigo-500"
           />
 
           {formik.touched.email && formik.errors.email && (
             <div className="text-red-500 mb-4">{formik.errors.email}</div>
           )}
 
-          <label htmlFor="password" className="block text-white mb-2">
+          <label htmlFor="password" className="block text-black mb-2">
             Password<span className="text-red-500 wpforms-required-label" aria-hidden="true">*</span>
           </label>
           <input
@@ -121,12 +121,12 @@ const LoginModal: React.FC<LoginModalProps> = ({ setLoginModalOpen, setOtpModalO
             type="password"
             onChange={formik.handleChange}
             value={formik.values.password}
-            className="w-full px-3 py-2 mb-4 border rounded-lg focus:outline-none focus:ring focus:ring-indigo-500"
+            className="w-full px-3 py-2 mb-4 border-2 rounded-lg focus:outline-none focus:ring focus:ring-indigo-500"
           />
           {formik.touched.password && formik.errors.password && (
             <div className="text-red-500 mb-4">{formik.errors.password}</div>
           )}
-          <label className="block text-white mb-2">
+          <label className="block text-black mb-2">
             <a onClick={handleForgotPassword} className="hover:cursor-pointer hover:text-gold">Forgot Password?</a>
           </label>
 
@@ -156,7 +156,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ setLoginModalOpen, setOtpModalO
         <EmailVerify
           setEmailVerify={setEmailVerify}
           setOtpModalOpen={setOtpModalOpen}
-          mode="institute"
+          mode="user"
         />
       )}
     </div>

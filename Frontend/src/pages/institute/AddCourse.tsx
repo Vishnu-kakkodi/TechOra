@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { useCreateCourseMutation } from '../../store/slices/institutionSlice';
 import { RootState } from '../../store';
+import InstituteSidebar from '../../components/sidebar/InstituteSidebar';
 
 // Interfaces
 interface CourseFormValues {
@@ -155,7 +156,9 @@ const AddCourse: React.FC = () => {
   };
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
+    <div className='flex'>
+      <InstituteSidebar/>
+      <div className="p-6 max-w-4xl mx-auto">
       <div className="flex items-center mb-6">
         <button
           onClick={() => navigate('/courses')}
@@ -360,6 +363,7 @@ const AddCourse: React.FC = () => {
           </Form>
         )}
       </Formik>
+    </div>
     </div>
   );
 };

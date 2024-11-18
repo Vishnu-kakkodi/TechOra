@@ -1,6 +1,7 @@
 import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
+import authRoutes from './routes/auth.routes'
 import userRoutes from './routes/user.routes'
 import adminRoutes from './routes/admin.routes'
 import institutionRoutes from './routes/institution.routes'
@@ -17,6 +18,7 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 
+app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/institution', institutionRoutes);

@@ -1,6 +1,5 @@
 import { BaseRepository } from "./base.repository";
 import { CartModel } from "../models/cart.model";
-import { CourseModel } from "../models/course.model";
 import { CartDocument } from "../interfaces/cart.interface";
 
 
@@ -10,7 +9,7 @@ export class CartRepository extends BaseRepository<CartDocument>{
     }
 
 
-    async findCart(userId: string): Promise<CartDocument[]>{
+    async findCart(userId: string | null): Promise<CartDocument[]>{
         try{
             return await this.model.find({
                 userId: userId
@@ -22,7 +21,7 @@ export class CartRepository extends BaseRepository<CartDocument>{
         }
     }
 
-    async createCart(userId: string, items: any[], totalItems: number, totalPrice: number): Promise<CartDocument>{
+    async createCart(userId: string | null, items: any[], totalItems: number, totalPrice: number): Promise<CartDocument>{
         try{
             const newcart = new this.model({
                 userId,

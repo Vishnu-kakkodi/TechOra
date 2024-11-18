@@ -12,7 +12,7 @@ import {
     ShoppingCart
 } from 'lucide-react';
 import InstituteSidebar from '../../components/sidebar/InstituteSidebar';
-import { useCourseListQuery } from '../../store/slices/institutionSlice';
+import { useCourseListQuery } from '../../store/slices/userSlice';
 import Footer from '../../components/footer/Footer';
 import Navbar from '../../components/header/Navbar';
 import ReactStars from 'react-stars';

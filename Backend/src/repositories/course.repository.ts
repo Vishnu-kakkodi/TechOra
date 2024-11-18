@@ -8,7 +8,7 @@ export class CourseRepository extends BaseRepository<CourseDocument> {
         super(CourseModel);
     }
 
-    async find(instituteId: any): Promise<CourseDocument[]> { 
+    async findDraft(instituteId: any): Promise<CourseDocument[]> { 
         try {
             console.log("Repoosos");
             
@@ -59,6 +59,16 @@ export class CourseRepository extends BaseRepository<CourseDocument> {
                 status: 'published'
             });
         }catch(error){
+            throw error;
+        }
+    }
+
+    async find(): Promise<CourseDocument[]> { 
+        try {
+            console.log("Repoosos");
+            
+            return await this.model.find({status:'published'});
+        } catch (error) {
             throw error;
         }
     }

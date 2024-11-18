@@ -9,21 +9,29 @@ export class TutorRepository extends BaseRepository<TutorDocument> {
         super(TutorModel);
     }
 
-    // async findByEmail(instituteEmail: string): Promise <InstituteDocument | null >{
-    //     try{
-    //         return await this.model.findOne({instituteEmail});
-    //     }catch(error){
-    //         throw error;
-    //     }
-    // }
+    async findByEmail(instituteEmail: string): Promise <InstituteDocument | null >{
+        try{
+            return await this.model.findOne({instituteEmail});
+        }catch(error){
+            throw error;
+        }
+    }
 
-    // async find(): Promise<InstituteDocument[]> { 
-    //     try {
-    //         return await this.model.find();
-    //     } catch (error) {
-    //         throw error;
-    //     }
-    // }
+    async find(): Promise<InstituteDocument[]> { 
+        try {
+            return await this.model.find();
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async findTutors(institutionId: string|null): Promise<TutorDocument[]> { 
+        try {
+            return await this.model.find({institutionId:institutionId});
+        } catch (error) {
+            throw error;
+        }
+    }
 
     
     // async findById(instituteId : string): Promise<InstituteDocument | null> { 

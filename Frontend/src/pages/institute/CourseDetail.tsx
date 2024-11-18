@@ -64,10 +64,8 @@ const CourseDetail = () => {
       </button>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Main Content */}
         <div className="lg:col-span-2">
-          {/* Video Player Section */}
-          <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6">
+          <div className="bg-white  overflow-hidden mb-6">
             {isVideoPlaying && currentVideo ? (
               <div className="aspect-video bg-gray-900 flex items-center justify-center">
               <video 
@@ -81,7 +79,7 @@ const CourseDetail = () => {
               <img 
                 src={course.thumbnail}
                 alt={course.title}
-                className="w-full h-full object-cover rounded-t-lg"
+                className="w-[500px] h-[300px] object-cover"
               />
             )}
           </div>

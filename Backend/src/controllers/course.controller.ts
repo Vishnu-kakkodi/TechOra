@@ -1,15 +1,14 @@
 import { Request, Response, NextFunction } from "express";
 import { CourseService } from "../services/course.service";
-import { CreateUserDto, CreateTutorDto } from "../dtos/institute.dtos";
 import { HttpException } from "../middleware/error.middleware";
-import { generateToken } from "../utils/generateToken";
 import { CreateCourseDto } from "../dtos/course.dtos";
 import { CourseDetailResponse, Module } from "../interfaces/course.interface";
+import { decodedToken } from "../helperFunction/authHelper";
 
 export class CourseController {
     private courseService: CourseService;
 
-    constructor(courseService: CourseService) { 
+    constructor(courseService: CourseService) {
         this.courseService = courseService;
     }
 
@@ -21,20 +20,20 @@ export class CourseController {
         try {
             console.log("Control")
             const courseData: CreateCourseDto = req.body;
-            
+
             if (req.file) {
-                courseData.thumbnail = (req.file as any).location; 
+                courseData.thumbnail = (req.file as any).location;
             }
 
             if (!courseData.institutionId) {
                 throw new HttpException(400, 'Institute ID is required');
             }
-    
+
             console.log('Course Data:', courseData);
             const course = await this.courseService.createCourse(courseData);
             res.status(201).json({
                 status: 'success',
-                message: 'Course created successfully', 
+                message: 'Course created successfully',
                 data: course
             });
         } catch (error) {
@@ -42,85 +41,114 @@ export class CourseController {
         }
     }
 
-    public draftCourse = async(
+    public draftCourse = async (
         req: Request,
         res: Response,
         next: NextFunction
-    ): Promise<void> =>{
-        const instituteCredential = req.cookies.instituteCredential;
-
-        const course = await this.courseService.draftCourse(instituteCredential._id)
+    ): Promise<void> => {
+        try{
+            const Token = req.cookies.institute
+        const token = Token.accessToken;
+        const requiredRole = "institute";
+        const instituteId: string | null = decodedToken(token, requiredRole);
+        const course = await this.courseService.draftCourse(instituteId)
 
         res.status(201).json({
             message: "Approved",
             data: course
         })
-    
+        }catch(error){
+            next(error);
+        }
+
     }
 
-    public createModule = async(
+    public createModule = async (
         req: Request,
         res: Response,
         next: NextFunction
-    ): Promise<void> =>{
-        const instituteCredential = req.cookies.instituteCredential;
+    ): Promise<void> => {
 
-        const courseData: Module = req.body;
+        try{
+            const courseData: Module = req.body;
 
         if (req.file) {
-            courseData.video= (req.file as any).location; 
+            courseData.video = (req.file as any).location;
         }
 
-        console.log(courseData,"oooooo");
-        
+        console.log(courseData, "oooooo");
 
-        const course = await this.courseService.createModule(courseData.draftId,courseData)
+
+        const course = await this.courseService.createModule(courseData.draftId, courseData)
         console.log(course, "Courseeeeeeeeeeeeeee")
 
         res.status(201).json({
             message: "Approved",
             data: course
         })
+        }catch(error){
+            next(error);
+        }
     }
 
-    public courseList = async(
+    public courseList = async (
         req: Request,
         res: Response,
         next: NextFunction
-    ): Promise<void> =>{
-        try{
-            const instituteCredential = req.cookies.instituteCredential;
-        const course = await this.courseService.courseList(instituteCredential._id);
+    ): Promise<void> => {
+        try {
+            const token = req.cookies.institute.accessToken;
+            const requiredRole = "institute";
+            const instituteId: string | null = decodedToken(token, requiredRole);
+            const course = await this.courseService.courseList(instituteId);
 
-        res.status(201).json({
-            message:"Course fetched successfully",
-            data: course
-        });
-        }catch(error){
+            res.status(201).json({
+                message: "Course fetched successfully",
+                data: course
+            });
+        } catch (error) {
             next(error)
         }
     }
 
-    public courseDetail = async(
+    public courseDetail = async (
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> => {
+        try {
+            const { courseId } = req.params
+            console.log(courseId, "{fdgfgsg}")
+            const course = await this.courseService.courseDetail(courseId);
+            console.log(course, "CourseDtatatat")
+
+            const response: CourseDetailResponse = {
+                message: "Success",
+                Data: course,
+            };
+
+
+            res.status(201).json(response)
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    public userCourseList = async (
         req: Request,
         res: Response,
         next: NextFunction
     ): Promise<void> =>{
         try{
-            const {courseId} = req.params
-            console.log(courseId,"{fdgfgsg}")
-            const course = await this.courseService.courseDetail(courseId);
-            console.log(course,"CourseDtatatat")
-
-            const response: CourseDetailResponse = {
-                message: "Success",
-                Data: course,
-              };
-
-
-            res.status(201).json(response)
+            console.log("RequestC");
+            
+            const course = await this.courseService.userCorseList();
+            res.status(201).json({
+                message: "Course fetched successfully",
+                data: course
+            });
         }catch(error){
-            next(error)
+            next(error);
         }
     }
 }

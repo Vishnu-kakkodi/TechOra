@@ -35,7 +35,7 @@ const InstitutionDashboard: React.FC = () => {
       </div>
 
       {tutorAdd && (
-  <TutorAdd setTutorAdd={setTutorAdd} instituteId={instituteData} />
+  <TutorAdd setTutorAdd={setTutorAdd}/>
 )}
     </div>
   )

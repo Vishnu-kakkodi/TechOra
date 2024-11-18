@@ -117,7 +117,7 @@ const InstituteSidebar: React.FC = () => {
               <span>Quiz List</span>
             </button>
             <button 
-              onClick={() => handleNavigate('/quizzes/add')}
+              onClick={() => handleNavigate('/institute/add-quiz')}
               className="flex items-center space-x-2 text-gray-300 hover:text-white w-full"
             >
               <PlusCircle className="w-5 h-5" />
@@ -140,14 +140,14 @@ const InstituteSidebar: React.FC = () => {
           </div>
           <div className="ml-5 space-y-3">
             <button 
-              onClick={() => handleNavigate('/tutors')}
+              onClick={() => handleNavigate('/institute/tutors')}
               className="flex items-center space-x-2 text-gray-300 hover:text-white w-full"
             >
               <GraduationCap className="w-5 h-5" />
               <span>Tutor List</span>
             </button>
             <button 
-              onClick={() => handleNavigate('/tutors/add')}
+              onClick={() => handleNavigate('/institute/tutor-add')}
               className="flex items-center space-x-2 text-gray-300 hover:text-white w-full"
             >
               <PlusCircle className="w-5 h-5" />

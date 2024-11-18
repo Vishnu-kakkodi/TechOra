@@ -110,10 +110,10 @@ const SignUpModal: React.FC<SignUpModalProps> = ({ setSignUpModalOpen, setOtpMod
   return (
     <div className="container mx-auto">
       <Modal onClose={() => setSignUpModalOpen(false)}>
-        <form onSubmit={formik.handleSubmit} className=" w-[600px] p-8 bg-deepPurple rounded-lg shadow-lg mx-auto">
-          <h2 className="text-2xl mb-6 text-center text-white font-bold text-gray-700">Sign Up</h2>
+        <form onSubmit={formik.handleSubmit} className=" w-[600px] p-8 bg-white  shadow-lg mx-auto">
+          <h2 className="text-2xl mb-6 text-center text-black font-bold text-gray-700">Sign Up</h2>
 
-          <label htmlFor="userName" className="text-white block text-gray-700">Username<span className="text-red-500 wpforms-required-label" aria-hidden="true">*</span></label>
+          <label htmlFor="userName" className="text-black block text-gray-700">Username<span className="text-red-500 wpforms-required-label" aria-hidden="true">*</span></label>
           <input
             id="userName"
             name="userName"
@@ -127,7 +127,7 @@ const SignUpModal: React.FC<SignUpModalProps> = ({ setSignUpModalOpen, setOtpMod
             <div className="text-red-500 mb-4">{formik.errors.userName}</div>
           )}
 
-          <label htmlFor="email" className="text-white block text-gray-700">Email<span className="text-red-500 wpforms-required-label" aria-hidden="true">*</span></label>
+          <label htmlFor="email" className="text-black block text-gray-700">Email<span className="text-red-500 wpforms-required-label" aria-hidden="true">*</span></label>
           <input
             id="email"
             name="email"
@@ -141,7 +141,7 @@ const SignUpModal: React.FC<SignUpModalProps> = ({ setSignUpModalOpen, setOtpMod
             <div className="text-red-500 mb-4">{formik.errors.email}</div>
           )}
 
-          <label htmlFor="password" className="text-white block text-gray-700">Password<span className="text-red-500 wpforms-required-label" aria-hidden="true">*</span></label>
+          <label htmlFor="password" className="text-black block text-gray-700">Password<span className="text-red-500 wpforms-required-label" aria-hidden="true">*</span></label>
           <input
             id="password"
             name="password"
@@ -155,7 +155,7 @@ const SignUpModal: React.FC<SignUpModalProps> = ({ setSignUpModalOpen, setOtpMod
             <div className="text-red-500 mb-4">{formik.errors.password}</div>
           )}
 
-          <label htmlFor="confirmPassword" className="text-white block text-gray-700">Confirm Password<span className="text-red-500 wpforms-required-label" aria-hidden="true">*</span></label>
+          <label htmlFor="confirmPassword" className="text-black block text-gray-700">Confirm Password<span className="text-red-500 wpforms-required-label" aria-hidden="true">*</span></label>
           <input
             id="confirmPassword"
             name="confirmPassword"
@@ -169,7 +169,7 @@ const SignUpModal: React.FC<SignUpModalProps> = ({ setSignUpModalOpen, setOtpMod
             <div className="text-red-500 mb-4">{formik.errors.confirmPassword}</div>
           )}
 
-          <label htmlFor="phoneNumber" className="text-white block text-gray-700">Phone Number<span className="text-red-500 wpforms-required-label" aria-hidden="true">*</span></label>
+          <label htmlFor="phoneNumber" className="text-black block text-gray-700">Phone Number<span className="text-red-500 wpforms-required-label" aria-hidden="true">*</span></label>
           <input
             id="phoneNumber"
             name="phoneNumber"

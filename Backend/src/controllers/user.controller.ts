@@ -1,13 +1,9 @@
 import { Request, Response, NextFunction } from "express";
 import { UserService } from "../services/user.service";
-import { CreateUserDto, UpdateUserDto } from "../dtos/user.dtos";
+import { CreateUserDto } from "../dtos/user.dtos";
 import { HttpException } from "../middleware/error.middleware";
-import nodemailer from 'nodemailer';
-import Mail from "nodemailer/lib//mailer";
-import { timeStamp } from "console";
 import { UserCookieData } from '../types/user.types';
-import { IUserDocument } from "../interfaces/user.interface";
-import { generateToken } from "../utils/generateToken";
+import { setCookie } from "../helperFunction/cookieUtils";
 
 
 export class UserController {
@@ -29,7 +25,7 @@ export class UserController {
 
             console.log("Request came here")
             const OTP = await this.userService.initiateUser(req.body.email);
-            console.log(OTP,"otp")
+            console.log(OTP, "otp")
 
             const userData = {
                 user: user,
@@ -107,7 +103,7 @@ export class UserController {
 
             const email = req.cookies.userData.user.email;
 
-            const userdata = req.cookies.userData.user;
+            const user:CreateUserDto = req.cookies.userData.user;
 
 
             if (!email) {
@@ -117,18 +113,18 @@ export class UserController {
             const response = await this.userService.resendOtp(email);
 
             if (response) {
-                const updatedUserData: CreateUserDto = {
-                    ...userdata,
+                const updatedUserData = {
+                    user: user,
                     otp: response,
-                    timeStamp: Date.now(),
+                    timeStamp: new Date().getTime()
                 };
 
                 res.cookie('userData', updatedUserData, {
                     httpOnly: true,
                     secure: true,
                     sameSite: 'strict',
-                    maxAge: 5 * 60 * 1000, 
-                  });
+                    maxAge: 5 * 60 * 1000,
+                });
             }
 
             res.status(201).json({ OTP: "Otp send successfully" })
@@ -148,14 +144,13 @@ export class UserController {
             console.log(req.body, "controller")
             console.log("Hai")
             const user = await this.userService.createUser(req.body);
-            res.cookie('userData', user, {
-                httpOnly: true,
-                secure: true,
-                sameSite: 'strict',
-                maxAge: 5 * 60 * 1000, 
-              });
-            console.log(user)
-            res.status(201).json({ user, message: 'Successfull' });
+            const { accessToken, refreshToken, ...userDetails } = user;
+            const Token = {
+                accessToken: accessToken,
+                refreshToken: refreshToken
+            }
+            setCookie(res, 'user', Token);
+            res.status(201).json({ userDetails, message: 'Successfull' });
         } catch (error) {
             next(error);
         }
@@ -171,14 +166,15 @@ export class UserController {
             if (!user) {
                 throw new HttpException(404, 'User not found');
             }
-            console.log(user,"User")
-            res.cookie('userData', user, {
-                httpOnly: true,
-                secure: true,
-                sameSite: 'strict',
-                maxAge: 25 * 60 * 1000, 
-              });
-            res.json({ user });
+            const { accessToken, refreshToken, ...userDetails } = user;
+            console.log(userDetails, "User")
+            const Token = {
+                accessToken: accessToken,
+                refreshToken: refreshToken
+            }
+            console.log(Token, "Token")
+            setCookie(res, 'user', Token);
+            res.json({ userDetails });
         } catch (error) {
             next(error);
         }
@@ -193,9 +189,14 @@ export class UserController {
         try {
             console.log(req.body, "controller");
             const response = await this.userService.verifyEmail(req.body.email);
+            const email: string = req.body.email
+            const data = {
+                response,
+                email
+            }
 
             if (response) {
-                res.cookie('forgotPassword', response, {
+                res.cookie('forgotPassword', data, {
                     httpOnly: true,
                     secure: true,
                     sameSite: 'strict',
@@ -218,15 +219,31 @@ export class UserController {
     ): Promise<void> {
         try {
             const { otp } = req.body;
-            console.log(otp, "controller")
+            console.log(otp, "controllerOTP")
             console.log("Hai")
-            const CookieOtp: string = req.cookies.forgotPassword;
+            const CookieOtp: string = req.cookies.forgotPassword.response;
+            const email: string = req.cookies.forgotPassword.email;
             console.log(CookieOtp);
             const response = await this.userService.verifyOtp(otp, CookieOtp);
             if (response) {
                 res.clearCookie('userData');
-                res.status(201).json({ message: 'Successfull' });
+                res.status(201).json({ message: 'Successfull', data: email });
             }
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async forgotPassword(
+        req: Request<{}, {}>,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
+        try {
+            const { email, password } = req.body;
+            console.log("Hai")
+            const response = await this.userService.forgotPassword(email, password);
+            res.status(201).json({ message: 'Successfull' });
         } catch (error) {
             next(error);
         }

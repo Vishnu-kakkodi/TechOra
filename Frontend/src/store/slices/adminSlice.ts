@@ -55,11 +55,51 @@ export const adminSlice = createApi({
 
     instituteApprove: builder.mutation<InstituteDocument, {instituteId: string}>({
       query: (instituteId) => ({
-        url: `/admin/institute-action/?id=${instituteId}`,
+        url: `/admin/institute-approve/?id=${instituteId}`,
         method: 'PATCH'
+      })
+    }),
+
+    instituteReject: builder.mutation<InstituteDocument, {instituteId: string}>({
+      query: (instituteId) => ({
+        url: `/admin/institute-reject/?id=${instituteId}`,
+        method: 'PATCH'
+      })
+    }),
+
+    instituteBlock: builder.mutation<InstituteDocument, {instituteId: string}>({
+      query: (instituteId) => ({
+        url: `/admin/institute-block/?id=${instituteId}`,
+        method: 'PATCH'
+      })
+    }),
+
+    instituteUnBlock: builder.mutation<InstituteDocument, {instituteId: string}>({
+      query: (instituteId) => ({
+        url: `/admin/institute-unblock/?id=${instituteId}`,
+        method: 'PATCH'
+      })
+    }),
+
+    documentDownload: builder.mutation({
+      query: (url) => ({
+        url: `/admin/download-document?url=${encodeURIComponent(url)}`,
+        method: "GET",
+        responseHandler: (response) => response.blob(),  
       })
     })
   }),
 });
 
-export const { useVerifyAdminMutation, useUserListQuery, useInstituteListQuery, useUserActionMutation, useInstituteViewMutation, useInstituteApproveMutation } = adminSlice;
+export const 
+{ useVerifyAdminMutation,
+  useUserListQuery,
+  useInstituteListQuery,
+  useUserActionMutation,
+  useInstituteViewMutation,
+  useInstituteApproveMutation,
+  useDocumentDownloadMutation,
+  useInstituteRejectMutation,
+  useInstituteBlockMutation,
+  useInstituteUnBlockMutation
+  } = adminSlice;

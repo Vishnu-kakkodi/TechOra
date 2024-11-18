@@ -17,11 +17,11 @@ export interface Institute extends BaseInterface{
 }
 
 export enum InstituteStatus {
-  Active = 'active',
-  Inactive = 'inactive',
-  Reject = 'reject',
-  Pending = 'pending',
-  Verify = 'verify'
+  Active = 'Active',
+  Inactive = 'Inactive',
+  Reject = 'Rejected',
+  Pending = 'Pending',
+  Verify = 'Verify'
 }
 
 export interface InstituteResponse {

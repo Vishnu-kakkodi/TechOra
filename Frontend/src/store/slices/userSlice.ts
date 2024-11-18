@@ -178,6 +178,17 @@ export const userSlice = createApi({
       invalidatesTags: ['User'],
     }),
 
+    forgotPassword: builder.mutation({
+      query: (body) => ({
+        url: '/users/forgot-password',
+        method: 'POST',
+        body: body,
+        credentials: 'include'
+
+      }),
+      invalidatesTags: ['User'],
+    }),
+
     cartPage: builder.query<cartResponse,null>({
       query: () =>({
         url: '/users/cart-items',
@@ -203,6 +214,15 @@ export const userSlice = createApi({
         credentials: 'include',
       })
     }),
+
+    courseList: builder.query({
+      query: () => ({
+        url: '/users/course-list',
+        method: 'GET',
+        credentials: 'include'
+      }),
+      providesTags: ['User'],
+     }),
   }),
 
 });
@@ -215,8 +235,10 @@ export const
    useLoginMutation, 
    useUserEmailVerifyMutation,
    useUserOtpVerifyMutation,
+   useForgotPasswordMutation,
    useCartPageQuery,
    useAddToCartMutation,
-   usePaymentMutation
+   usePaymentMutation,
+   useCourseListQuery
   } = userSlice;
 

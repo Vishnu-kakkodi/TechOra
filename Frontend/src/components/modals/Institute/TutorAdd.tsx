@@ -5,6 +5,7 @@ import * as Yup from 'yup';
 import { useCreateTutorMutation } from '../../../store/slices/institutionSlice';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../store';
+import { toast } from 'react-toastify';
 
 interface CreateTutorProps {
   setTutorAdd: (open: boolean) => void;
@@ -16,40 +17,33 @@ const TutorAdd: React.FC<CreateTutorProps> = ({ setTutorAdd, instituteId }) => {
     department: Yup.string().required('Department is required'),
     tutorname: Yup.string().required('Tutor name is required'),
     education: Yup.string().required('Education is required'),
-    experience: Yup.string().required('Experience is required'),
+    experiance: Yup.string().required('Experience is required'),
     gender: Yup.string().required('Gender is required'),
   });
 
   const [createTutor] = useCreateTutorMutation();
-
-
-  console.log(instituteId,"Dattttttttttttttttttttttttt")
 
   const formik = useFormik({
     initialValues: {
       department: '',
       tutorname: '',
       education: '',
-      experience: '',
+      experiance: '',
       gender: '',
     },
     validationSchema,
     onSubmit: async (values, { setSubmitting }) => {
-      if (instituteId) { 
         try {
           const response = await createTutor({
-            data: values,
-            instituteId: instituteId,
+            data: values
           });
+          toast.success("Tutor addded successfully")
           setTutorAdd(false);
         } catch (error) {
           console.log(error);
         } finally {
           setSubmitting(false);
         }
-      } else {
-        console.log("Institute ID is missing.");
-      }
     },
   });
   
@@ -127,24 +121,24 @@ const TutorAdd: React.FC<CreateTutorProps> = ({ setTutorAdd, instituteId }) => {
             </div>
 
             <div>
-              <label htmlFor="experience" className="block text-gray-700 font-medium mb-2">
+              <label htmlFor="experiance" className="block text-gray-700 font-medium mb-2">
                 Experience
               </label>
               <input
-                id="experience"
-                name="experience"
+                id="experiance"
+                name="experiance"
                 type="text"
-                value={formik.values.experience}
+                value={formik.values.experiance}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 className={`w-full px-4 py-2 border-2 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  formik.errors.experience && formik.touched.experience
+                  formik.errors.experiance && formik.touched.experiance
                     ? 'border-red-500 focus:ring-red-500'
                     : 'border-gray-300'
                 }`}
               />
-              {formik.errors.experience && formik.touched.experience && (
-                <p className="text-red-500 text-sm mt-1">{formik.errors.experience}</p>
+              {formik.errors.experiance && formik.touched.experiance && (
+                <p className="text-red-500 text-sm mt-1">{formik.errors.experiance}</p>
               )}
             </div>
 

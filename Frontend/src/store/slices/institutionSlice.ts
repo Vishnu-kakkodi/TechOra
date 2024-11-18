@@ -2,6 +2,7 @@ import { createApi, BaseQueryFn, FetchArgs, fetchBaseQuery, FetchBaseQueryError 
 import { InstituteDocument } from '../../../../Backend/src/interfaces/institute.interface';
 import { CourseDocument } from '../../../../Backend/src/interfaces/course.interface';
 import { CourseDetailResponse } from '../../types/courseType';
+import { TutorFormData } from '../../types/institutionTypes';
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 const baseQuery = fetchBaseQuery({ baseUrl: `${backendUrl}/api` });
@@ -42,6 +43,14 @@ export const institutionSlice = createApi({
       invalidatesTags: ['Institution'],
     }),
 
+    trackApplication: builder.mutation({
+      query: ({trackID}) => ({
+        url: '/institution/track-status',
+        method: 'POST',
+        body: {trackID}
+      }),
+    }),
+
     institutionLogin: builder.mutation({
       query: (institutionCredential) => ({
         url: '/institution/login',
@@ -52,11 +61,12 @@ export const institutionSlice = createApi({
       invalidatesTags: ['Institution'],
     }),
 
-    createTutor: builder.mutation<InstituteDocument, {data: any, instituteId: any}>({
-      query: ({data,instituteId}) => ({
-        url: `/institution/create-tutor/?id=${instituteId}`,
+    createTutor: builder.mutation<InstituteDocument, {data: TutorFormData}>({
+      query: ({data}) => ({
+        url: `/institution/create-tutor`,
         method: 'POST',
-        body: data
+        body: data,
+        credentials: 'include'
       }),
       invalidatesTags: ['Institution']
     }),
@@ -104,7 +114,26 @@ export const institutionSlice = createApi({
       method:'GET',
     }),
     providesTags: ['Institution'],
-   })
+   }),
+
+   tutorList: builder.query({
+    query: () => ({
+      url: '/institution/tutor-list',
+      method: 'GET',
+      credentials: 'include'
+    }),
+    providesTags: ['Institution'],
+  }),
+
+  addQuiz: builder.mutation<any, { body: FormData }>({
+    query: (payload) => ({
+      url: '/institution/create-quiz',
+      method: 'POST',
+      body: payload.body,
+      credentials: 'include'
+    }),
+    invalidatesTags: ['Institution'],
+  }),
 
   }),
 });
@@ -113,11 +142,14 @@ export const {
   useEmailVerifyMutation, 
   useOtpVerifyMutation, 
   useInstitutionLoginMutation, 
+  useTrackApplicationMutation,
   useVerifyInstitutionMutation, 
   useCreateTutorMutation, 
   useCreateCourseMutation,
   useDraftCourseListQuery,
   useCreateModuleMutation,
   useCourseListQuery,
-  useCoursedetailQuery
+  useCoursedetailQuery,
+  useTutorListQuery,
+  useAddQuizMutation
 } = institutionSlice;

@@ -1,14 +1,12 @@
-import { Institute, InstituteDocument, InstituteResponse, InstituteStatus } from "../interfaces/institute.interface";
+import { Institute, InstituteDocument, InstituteStatus } from "../interfaces/institute.interface";
 import { InstituteRepository } from "../repositories/institute.repository";
-import { CreateTutorDto, CreateUserDto } from "../dtos/institute.dtos";
+import { CreateUserDto } from "../dtos/institute.dtos";
 import nodemailer from 'nodemailer';
-import Mail from "nodemailer/lib//mailer";
-import helperFunction from "../helperFunction/authHelper";
+import {helperFunction} from "../helperFunction/authHelper";
 import { HttpException } from "../middleware/error.middleware";
 import generator from "../utils/generateApplicationID";
-import { application } from "express";
-import { Tutor } from "../interfaces/tutor.interface";
 import { TutorRepository } from "../repositories/tutor.repository";
+import { TutorDocument } from "../interfaces/tutor.interface";
 
 export class InstituteService {
     private instituteRepository: InstituteRepository;
@@ -16,6 +14,14 @@ export class InstituteService {
     constructor(){
         this.instituteRepository = new InstituteRepository();
         this.tutorRepository = new TutorRepository();
+    }
+
+    async trackStatus(trackID: string): Promise<InstituteDocument | null>{
+        try{
+            return await this.instituteRepository.findOne(trackID);
+        }catch(error){
+            throw error
+        }
     }
 
     async verifyEmail(email: string ): Promise<string[]>{
@@ -90,11 +96,18 @@ export class InstituteService {
                 applicationId
             }
             console.log(institutedata,"data")
-            const response =  await this.instituteRepository.create(institutedata);
-            console.log("response",response)
+            const institute =  await this.instituteRepository.create(institutedata);
+            console.log("response",institute)
 
-            // const accessToken = helperFunction.accesstoken(response.id,"institute");
-            // const refreshToken = helperFunction.refreshtoken(response.id, "institute");
+            const accessToken = helperFunction.accesstoken(institute.id,"institute");
+            const refreshToken = helperFunction.refreshtoken(institute.id, "institute");
+
+            return {
+                ...institute,
+                accessToken,
+                refreshToken,
+              };
+              
 
             // const institute = {
             //     id: response.id,
@@ -104,7 +117,6 @@ export class InstituteService {
             //     refreshToken
             //   };
 
-            return response;
         }catch(error){
             throw error
         }
@@ -127,16 +139,20 @@ export class InstituteService {
             const accessToken = helperFunction.accesstoken(institute.id,"institute");
             const refreshToken = helperFunction.refreshtoken(institute.id, "institute");
 
-            institute.accessToken = accessToken
-            institute.refreshToken = refreshToken
+            return { ...institute.toObject(), accessToken, refreshToken };
 
-            return institute
         }catch(error){
             throw error;
         }
     }
 
-    async createTutor(tutorData: CreateTutorDto): Promise<void>{
-        const response =  await this.tutorRepository.create(tutorData);
+    async createTutor(tutorData: any): Promise<void>{
+        const response =  await this.tutorRepository.create(tutorData)
+        return
+    }
+
+    async tutorList(institutionId: string | null): Promise<TutorDocument[]>{
+        const response =  await this.tutorRepository.findTutors(institutionId)
+        return response
     }
 }

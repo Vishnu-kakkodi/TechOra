@@ -17,7 +17,7 @@ const CourseList = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDepartment, setSelectedDepartment] = useState('all');
   const [selectedStatus, setSelectedStatus] = useState('all');
-  const [activeDropdown, setActiveDropdown] = useState<number | null>(null);
+  const [activeDropdowns, setActiveDropdowns] = useState<{ [key: string]: boolean }>({});
 
   const { data = {} } = useCourseListQuery(null);
   const course = data.data || [];
@@ -31,22 +31,25 @@ const CourseList = () => {
     navigate(`/courses/edit/${courseId}`);
   };
 
-  // const handleView = (courseId: string) => {
-  //   if (course) {
-  //     console.log("User list fetched successfully:", course);
-  //     navigate('/institute/courses-view', {state:{courseId:courseId}});
-  //   } else {
-  //     console.error("Error fetching course list:");
-  //   }
-  // };
+  const handleView = (courseId: string) => {
+    if (course) {
+      console.log("User list fetched successfully:", course);
+      navigate('/institute/courses-view', {state:{courseId:courseId}});
+    } else {
+      console.error("Error fetching course list:");
+    }
+  };
 
   const handleDelete = (courseId: number) => {
     // Implement delete functionality
     console.log('Delete course:', courseId);
   };
 
-  const toggleDropdown = (courseId: number) => {
-    setActiveDropdown(activeDropdown === courseId ? null : courseId);
+  const toggleDropdown = (courseId: string) => {
+    setActiveDropdowns(prev => ({
+      ...prev,
+      [courseId]: !prev[courseId]
+    }));
   };
 
   return (
@@ -112,10 +115,10 @@ const CourseList = () => {
       </div>
 
       {/* Course Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {course.map((course:any) => (
           <div 
-            key={course.id} 
+            key={course._id} 
             className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow duration-300"
           >
             <img
@@ -131,14 +134,14 @@ const CourseList = () => {
                 </div>
                 <div className="relative">
                   <button
-                    onClick={() => toggleDropdown(course.id)}
+                    onClick={() => toggleDropdown(course._id)}
                     className="p-1 hover:bg-gray-100 rounded-full"
                   >
                     <MoreVertical className="h-5 w-5 text-gray-500" />
                   </button>
                   
                   {/* Dropdown Menu */}
-                  {activeDropdown === course.id && (
+                  {activeDropdowns[course._id] && (
                     <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-10">
                       <div className="py-1">
                       <Link to={`/institute/course-view/${course._id}`}>
@@ -199,7 +202,6 @@ const CourseList = () => {
       </div>
     </div>
     </div>
-
   );
 };
 

@@ -1,3 +1,4 @@
+
 const jwt = require("jsonwebtoken");
 
 interface HelperFunction {
@@ -5,12 +6,19 @@ interface HelperFunction {
     refreshtoken: (userId: string, role: string) => string;
 }
 
+interface DecodedToken {
+    _id: string;
+    role: string;
+    iat?: number;
+    exp?: number;
+}
+
 const helperFunction: HelperFunction = {
     accesstoken: (userId: string, role: string): string => {
         return jwt.sign(
             { _id: userId, role: role }, 
             process.env.ACCESS_SECRET_KEY as string,
-            { expiresIn: "2m" }
+            { expiresIn: "40m" }
         );
     },
 
@@ -18,9 +26,23 @@ const helperFunction: HelperFunction = {
         return jwt.sign(
             { _id: userId, role: role },  
             process.env.REFRESH_SECRET_KEY as string,
-            { expiresIn: "1d" }
+            { expiresIn: "7d" } 
         );
     },
 };
 
-export default helperFunction;
+const decodedToken = (token: string, requiredRole: string):string | null =>{
+    try{
+        const decoded = jwt.verify(token, process.env.ACCESS_SECRET_KEY as string) as DecodedToken;
+        if(decoded.role !== requiredRole){
+            console.error(`Invalid role. Expected ${requiredRole}, found ${decoded.role}`);
+            return null;
+        }
+        return decoded._id;
+    } catch (error) {
+        console.error("Token decoding failed:", error);
+        return null;
+    }
+}
+
+export { helperFunction, decodedToken };

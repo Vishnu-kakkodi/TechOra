@@ -1,52 +1,59 @@
 import { Request, Response, NextFunction } from "express";
 import { CourseService } from "../services/course.service";
+import { decodedToken } from "../helperFunction/authHelper";
 
 
-export class CartController{
+export class CartController {
     private courseService: CourseService;
 
-    constructor(courseService: CourseService){
+    constructor(courseService: CourseService) {
         this.courseService = courseService
     }
 
-    public addToCart = async(
+    public addToCart = async (
         req: Request,
         res: Response,
         next: NextFunction
-    ): Promise<void> =>{
-        try{
-            console.log("jai",req.cookies.userData)
-            const userId: string = req.cookies.userData._id;
-            const { courseId } = req.body; 
-            console.log("UserId",userId,"courseId:",courseId)
-            const response = await this.courseService.addToCart(userId,courseId);
+    ): Promise<void> => {
+        try {
+            const Token = req.cookies.user
+            console.log(Token)
+            const token = Token.accessToken;
+            const requiredRole = "user";
+            const userId: string | null = decodedToken(token, requiredRole);
+            const { courseId } = req.body;
+            console.log("UserId", userId, "courseId:", courseId)
+            const response = await this.courseService.addToCart(userId, courseId);
             res.status(201).json({
-                message:"Cart item fetched successfully",
+                message: "Cart item fetched successfully",
                 Data: "data"
             });
 
-        }catch(error){
+        } catch (error) {
             next(error)
         }
     }
 
-    public getCartItems = async(
+    public getCartItems = async (
         req: Request,
         res: Response,
         next: NextFunction
-    ): Promise<void> =>{
-        try{
-            // console.log("userDataasdfsdf",req.cookies.userData)
-            const userData = req.cookies.userData
-            console.log(userData._id)
-            const items = await this.courseService.getCartItems(userData._id);
-            console.log(items,"Items")
+    ): Promise<void> => {
+        try {
+            const Token = req.cookies.user
+            console.log(Token)
+
+            const token = Token.accessToken;
+            const requiredRole = "user";
+            const userId: string | null = decodedToken(token, requiredRole);
+            const items = await this.courseService.getCartItems(userId);
+            console.log(items, "Items")
             res.status(201).json({
-                message:"Cart item fetched successfully",
+                message: "Cart item fetched successfully",
                 Data: items
             });
 
-        }catch(error){
+        } catch (error) {
             next(error);
         }
     }

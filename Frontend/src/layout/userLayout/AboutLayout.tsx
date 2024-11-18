@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
-// Import your images - update these paths according to your project structure
 import landingPageIMG from '../../assets/frontEnd/landingPageIMG.png';
 import coursePic from '../../assets/frontEnd/coursePic.jpg';
 import About from '../../assets/frontEnd/About.png';
 
 const AboutLayout = () => {
-  // Array of image objects to cycle through
   const images = [
     { src: About, alt: "About image" },
     { src: landingPageIMG, alt: "Landing page image" },
@@ -21,26 +19,25 @@ const AboutLayout = () => {
       );
     }, 4000);
 
-
     return () => clearInterval(intervalId);
   }, []);
 
   return (
-    <div>
-      <main className="container bg-gray-200 ml-2container">
-        <div className="flex items-center">
-          <div className="w-1/2 m-8">
+    <div className="bg-gray-200">
+      <main className="container mx-auto px-4">
+        <div className="flex flex-col md:flex-row items-center">
+          <div className="w-full md:w-1/2 flex justify-center mb-8 md:mb-0">
             <img 
               src={images[currentImageIndex].src}
               alt={images[currentImageIndex].alt}
-              className="mt-8 mb-8 ml-8 h-[300px] w-[500px] transition-opacity duration-500"
+              className="mt-8 mb-8 h-[200px] md:h-[300px] w-full md:w-[500px] object-cover transition-opacity duration-500 rounded-lg shadow-md"
             />
           </div>
-          <div className="w-1/2 ml-[10px] text-wrapper mr-[120px]">
-            <p className="text-[30px] font-bold text-left text-black mt-[10px] mb-6 font-jakarta capitalize">
+          <div className="w-full md:w-1/2 text-wrapper md:ml-8">
+            <h2 className="text-2xl md:text-[30px] font-bold text-left text-black mb-6 font-jakarta capitalize">
               About
-            </p>
-            <div className="text-[14px] text-justify text-left text-black mb-6 font-jakarta capitalize">
+            </h2>
+            <div className="text-sm md:text-[14px] text-justify text-black mb-6 font-jakarta">
               <p className="mb-4">
                 Super-learning encourages a mindset of continuous improvement and lifelong learning. The process is not just about short-term gains but establishing habits that support ongoing personal and professional development.
               </p>

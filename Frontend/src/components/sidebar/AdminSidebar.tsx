@@ -39,6 +39,13 @@ const Sidebar: React.FC = () => {
     } 
   };
 
+  const handleApprovedInstitution = () => {
+    if (institutes) {
+      console.log("Institute list fetched successfully:", institutes);
+      navigate('/admin/approved-institute');
+    } 
+  };
+
   const handleLogout = (): void => {
     dispatch(adminLogout());
     navigate('/admin/login');
@@ -74,12 +81,12 @@ const Sidebar: React.FC = () => {
           </button>
         </div>
 
-        <div className="mb-6 space-y-8">
+        <div className="mb-6 space-y-10">
           <div className="ml-0 mb-2 text-gray-500 text-sm uppercase">
             Institute Management
           </div>
           <div className='ml-5'>
-            <div className="space-y-2">
+            <div className="space-y-8">
               <button 
                 className="flex items-center space-x-2 text-gray-300 hover:text-white w-full"
               >
@@ -96,11 +103,11 @@ const Sidebar: React.FC = () => {
               </button>
               
               <button 
-                onClick={() => handleNavigate('/approved-institutes')}
+                onClick={handleApprovedInstitution}
                 className="flex items-center space-x-2 text-gray-300 hover:text-white w-full"
               >
                 <CheckCircle2 className="w-5 h-5" />
-                <span>Approved Institutes</span>
+                <span>Active Institutes</span>
               </button>
             </div>
           </div>

@@ -8,7 +8,7 @@ const tutorSchema = new Schema<TutorDocument>({
     education: {type: String, required: true},
     experiance: {type: String, required: true},
     gender: {type: String, required: true},
-    institute: {type: Schema.Types.ObjectId, ref: 'Institute', required: true},
+    institutionId: {type: Schema.Types.ObjectId, ref: 'Institute', required: true},
 },
 { timestamps: true }
 )

@@ -1,26 +1,11 @@
-import { Institute, InstituteDocument, InstituteResponse, InstituteStatus } from "../interfaces/institute.interface";
-import { InstituteRepository } from "../repositories/institute.repository";
-import { CreateTutorDto, CreateUserDto } from "../dtos/institute.dtos";
-import nodemailer from 'nodemailer';
-import Mail from "nodemailer/lib//mailer";
-import helperFunction from "../helperFunction/authHelper";
 import { HttpException } from "../middleware/error.middleware";
-import generator from "../utils/generateApplicationID";
-import { application } from "express";
-import { Tutor } from "../interfaces/tutor.interface";
-import { TutorRepository } from "../repositories/tutor.repository";
 import { CreateCourseDto } from "../dtos/course.dtos";
 import { CourseRepository } from "../repositories/course.repository";
 import { Course, CourseDocument, Module } from "../interfaces/course.interface";
 import { CartDocument } from "../interfaces/cart.interface";
 import { CartRepository } from "../repositories/cart.repository";
-import { UserRepository } from "../repositories/user.repository";
-import { CartModel } from "../models/cart.model";
 import mongoose from "mongoose";
 
-interface ModuleData extends Module{
-    draftId: string;
-}
 
 export class CourseService {
     private courseRepository: CourseRepository;
@@ -50,7 +35,7 @@ export class CourseService {
     async draftCourse(instituteId: any): Promise<any>{
         console.log("dfdd");
         
-        const data =  await this.courseRepository.find(instituteId)      
+        const data =  await this.courseRepository.findDraft(instituteId)      
         console.log(data,"Data");
         return data;
         
@@ -86,7 +71,7 @@ export class CourseService {
         }
       }
 
-      async addToCart(userId:string, courseId:string): Promise<void>{
+      async addToCart(userId:string | null, courseId:string): Promise<void>{
         try{
           console.log("cart")
           let cart = await this.cartRepository.findCart(userId);
@@ -116,12 +101,23 @@ export class CourseService {
         }
       }
 
-      async getCartItems(userId: string): Promise<CartDocument[]>{
+      async getCartItems(userId: string | null): Promise<CartDocument[]>{
         try{
           const data = await this.cartRepository.findCart(userId);
           return data
         }catch(error){
           throw error;
+        }
+      }
+
+      
+      async userCorseList(): Promise<any>{
+
+        try{
+          const data = await this.courseRepository.find()
+          return data
+        }catch(error){
+          throw error
         }
       }
     

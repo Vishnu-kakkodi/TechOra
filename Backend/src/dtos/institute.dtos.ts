@@ -1,3 +1,6 @@
+import { Types } from 'mongoose';
+
+
 export class CreateUserDto{
     collegeName!: string;
     instituteEmail!: string;
@@ -14,4 +17,6 @@ export class CreateTutorDto{
     education!: string;
     experiance!: string;
     gender!: string;
+    institutionId!: Types.ObjectId | string
+
 }

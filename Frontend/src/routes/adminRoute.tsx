@@ -9,6 +9,8 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../store';
 import AdminProtectedRoute from './ProtectedRoute/AdminProtectedRoute';
 import InstituteDetail from '../pages/admin/InstituteDetail';
+import AuthRoute from './AuthRoute';
+import ApprovedInstitutionPage from '../pages/admin/ApprovedInstitutionPage';
 
 
 
@@ -19,23 +21,28 @@ const AdminRoutes: React.FC = () => {
     <Routes>
       <Route path="/login" element={isAdminAuthenticated ? <Navigate to="/admin/dashboard" replace /> : <AdminLogin />} />
       <Route path="/dashboard" element={
-        <AdminProtectedRoute>
+        <AuthRoute role='admin'>
           <AdminDashboard />
-        </AdminProtectedRoute>
+        </AuthRoute>
       } />
       <Route path="/user-list" element={
-        <AdminProtectedRoute>
+        <AuthRoute role='admin'>
           <UserListingPage />
-        </AdminProtectedRoute>} />
+        </AuthRoute>} />
       <Route path="/institute-list" element={
-        <AdminProtectedRoute>
+        <AuthRoute role='admin'>
           <InstituteListingPage />
-        </AdminProtectedRoute>
+        </AuthRoute>
       } />
       <Route path="/institute-detail/:instituteId" element={
-        <AdminProtectedRoute>
+        <AuthRoute role='admin'>
           <InstituteDetail />
-        </AdminProtectedRoute>
+        </AuthRoute>
+      } />
+            <Route path="/approved-institute" element={
+        <AuthRoute role='admin'>
+          <ApprovedInstitutionPage />
+        </AuthRoute>
       } />
       <Route path="*" element={<ErrorPage />} />
 

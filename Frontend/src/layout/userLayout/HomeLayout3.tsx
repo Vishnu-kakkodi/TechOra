@@ -13,7 +13,7 @@ const HomeLayout3 = () => {
   return (
     <div>
       <hr className='boarder-t boareder-grey-300' />
-      <main className="container bg ml-2container">
+      <main className="container bg-custom-gradient ml-2container">
         <div className=' flex items-center h-[100vh]'>
           <div className="w-1/2 ml-[130px] mb-[120px]">
             <p className="text-[14px] font-bold text-left text-black mb-2 font-inter capitalize tracking-tight">

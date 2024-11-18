@@ -33,6 +33,9 @@ import CourseDetail from '../pages/institute/CourseDetail';
 import AddCourse from '../pages/institute/AddCourse';
 import CourseModules from '../pages/institute/CourseModules';
 import DraftCourses from '../pages/institute/DraftCourses';
+import AuthRoute from './AuthRoute';
+import TutorListPage from '../pages/institute/TutorListPage';
+import CreateQuiz from '../pages/institute/CreateQuiz';
 
 const InstituteRoutes: React.FC = () => {
 
@@ -59,54 +62,72 @@ const InstituteRoutes: React.FC = () => {
       <Route
         path="/dashboard"
         element={
-          <InstituteProtectedRoute>
+          <AuthRoute role='institute'>
             <InstituteDashboard />
-          </InstituteProtectedRoute>
+          </AuthRoute>
         }
       />
 
       <Route
         path="/courses"
         element={
-          <InstituteProtectedRoute>
+          <AuthRoute role='institute'>
             <CourseList />
-          </InstituteProtectedRoute>
+          </AuthRoute>
         }
       />
 
       <Route
         path="/course-view/:courseId"
         element={
-          <InstituteProtectedRoute>
+          <AuthRoute role='institute'>
             <CourseDetail />
-          </InstituteProtectedRoute>
+          </AuthRoute>
         }
       />
 
       <Route
         path="/course-add"
         element={
-          <InstituteProtectedRoute>
+          <AuthRoute role='institute'>
             <AddCourse />
-          </InstituteProtectedRoute>
+          </AuthRoute>
         }
       />
 
       <Route
         path="/upload-videos"
         element={
-          <InstituteProtectedRoute>
+          <AuthRoute role='institute'>
             <CourseModules />
-          </InstituteProtectedRoute>
+          </AuthRoute>
         }
       />
 
       <Route
         path="/course-drafts"
         element={
-          <InstituteProtectedRoute>
+          <AuthRoute role='institute'>
             <DraftCourses />
-          </InstituteProtectedRoute>
+          </AuthRoute>
+        }
+      />
+
+      <Route
+        path="/tutors"
+        element={
+          <AuthRoute role='institute'>
+            <TutorListPage />
+          </AuthRoute>
+        }
+      />
+
+      <Route
+        path="/add-quiz"
+        element={
+          <AuthRoute role='institute'>
+            <CreateQuiz />
+          </AuthRoute>
         }
       />
       <Route path="*" element={<ErrorPage />} />

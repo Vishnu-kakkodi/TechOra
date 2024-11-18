@@ -1,24 +1,90 @@
-import jwt from 'jsonwebtoken';
 
-const authMiddleware = (req: any, res: any, next: any) =>{
-    const token = req.headers.authentication?.split(" ")[1];
-    if(!token) return res.status(403).send("Token is required");
 
-    try{
-        const decoded = jwt.verify(token, process.env.ACCESS_SECRET_KEY as string);
-        req.user = decoded;
+import { Response, NextFunction } from "express";
+import jwt from "jsonwebtoken";
+import { AuthenticatedRequest } from "../types/auth.types";
+import { helperFunction } from "../helperFunction/authHelper";
 
+export const authMiddleware = (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): any => {
+  try {
+    const tokenToValidate = req.cookies.user;
+    if (!tokenToValidate) {
+      return res.status(401).json({
+        success: false,
+        message: "No authentication token provided",
+      });
+    }
+
+    const { accessToken, refreshToken } = tokenToValidate;
+    if (!accessToken) {
+      return res.status(401).json({
+        success: false,
+        message: "No access token provided",
+      });
+    }
+
+    const secretKey = process.env.ACCESS_SECRET_KEY as string;
+    console.log("Cookies:", req.cookies);
+
+    jwt.verify(accessToken, secretKey, (err: any, decoded: any) => {
+      if (err) {
+        if (err instanceof jwt.TokenExpiredError) {
+          console.log("Access token expired, attempting refresh");
+          if (!refreshToken) {
+            return res.status(401).json({
+              success: false,
+              message: "Access token expired, and no refresh token provided",
+            });
+          }
+
+          jwt.verify(
+            refreshToken, 
+            process.env.REFRESH_SECRET_KEY as string, 
+            (refreshErr: any, refreshDecoded: any) => {
+              if (refreshErr) {
+                console.log("Refresh token verification failed:", refreshErr);
+                return res.status(403).json({
+                  success: false,
+                  message: "Invalid refresh token",
+                });
+              }
+
+              const { _id, role } = refreshDecoded;
+              const newAccessToken = helperFunction.accesstoken(_id, role);
+
+              res.cookie('user', {
+                accessToken: newAccessToken,
+                refreshToken: refreshToken
+              }, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'strict'
+              });
+
+              req.user = { _id, role };
+              next();
+            }
+          );
+        } else {
+          return res.status(401).json({
+            success: false,
+            message: "Invalid access token",
+          });
+        }
+      } else {
+        req.user = decoded as AuthenticatedRequest["user"];
         next();
-    }catch(error){
-        res.status(401).send("Invalid Token");
-    }
+      }
+    });
+  } catch (error) {
+    console.error("Authentication middleware error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
 };
-
-const authorizeRole = (role: string) => (req: any, res: any,  next: any)=>{
-    if(req.user?.role !== role){
-        res.status(403).send("Access denied: insufficient permission");
-    }
-    next();
-};
-
-export { authMiddleware, authorizeRole};

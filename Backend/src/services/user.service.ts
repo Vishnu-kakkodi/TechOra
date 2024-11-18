@@ -1,16 +1,15 @@
 import { IUserDocument } from "../interfaces/user.interface";
 import { UserRepository } from "../repositories/user.repository";
-import { CreateUserDto, UpdateUserDto } from "../dtos/user.dtos";
+import { CreateUserDto } from "../dtos/user.dtos";
 import { HttpException } from "../middleware/error.middleware";
 import nodemailer from 'nodemailer';
-import Mail from "nodemailer/lib//mailer";
-import helperFunction from "../helperFunction/authHelper";
+import { helperFunction } from "../helperFunction/authHelper";
 
 export class UserService {
-    constructor(private readonly userRepository: UserRepository){}
+    constructor(private readonly userRepository: UserRepository) { }
 
-    async initiateUser(email:string): Promise<string>{
-        try{
+    async initiateUser(email: string): Promise<string> {
+        try {
             console.log("service side")
             const generateNumericOTP = (length: number): string => {
                 let otp = '';
@@ -57,56 +56,60 @@ export class UserService {
             return OTP
 
 
-        }catch(error){
+        } catch (error) {
             throw new HttpException(404, 'Email not found');
         }
     }
 
-    async createUser(userData: CreateUserDto): Promise<IUserDocument>{
-        try{
-            console.log(userData,"userData")
-            const response =  await this.userRepository.create(userData);
+    async createUser(userData: CreateUserDto): Promise<IUserDocument> {
+        try {
+            console.log(userData, "userData")
+            const user = await this.userRepository.create(userData);
 
-            console.log(response, "Response");
+            console.log(user, "Response");
 
-            const accessToken = helperFunction.accesstoken(response.id,"user");
-            const refreshToken = helperFunction.refreshtoken(response.id, "user");
+            const accessToken = helperFunction.accesstoken(user.id, "user");
+            const refreshToken = helperFunction.refreshtoken(user.id, "user");
 
-            console.log(accessToken,refreshToken,"AR")
+            console.log(accessToken, refreshToken, "AR")
 
 
-            return Object.assign({}, response, { accessToken, refreshToken });
+            user.accessToken = accessToken;
+            user.refreshToken = refreshToken;
 
-        }catch(error){
+            return user;
+
+        } catch (error) {
+            console.log(error)
             throw new HttpException(404, 'Email not found');
         }
     }
 
-    async getUser(email: string, password: string): Promise<IUserDocument | null>{
-        try{
-            const user =  await this.userRepository.findByEmail(email)
-            if(!user){
+    async getUser(email: string, password: string): Promise<IUserDocument | null> {
+        try {
+            const user = await this.userRepository.findByEmail(email)
+            if (!user) {
                 throw new HttpException(400, "User does not exist");
             }
-            if(user.password!==password){
+            if (user.password !== password) {
                 throw new HttpException(400, "Password mismatch");
             }
 
-            const accessToken = helperFunction.accesstoken(user.id,"user");
+            const accessToken = helperFunction.accesstoken(user.id, "user");
             const refreshToken = helperFunction.refreshtoken(user.id, "user");
-            
+
 
             return { ...user.toObject(), accessToken, refreshToken };
 
-        }catch(error){
+        } catch (error) {
             throw error;
         }
     }
 
-    async verifyEmail(email: string): Promise<string>{
-        try{
-            const user =  await this.userRepository.findByEmail(email)
-            if(!user){
+    async verifyEmail(email: string): Promise<string> {
+        try {
+            const user = await this.userRepository.findByEmail(email)
+            if (!user) {
                 throw new HttpException(400, "User does not exist");
             }
             const generateNumericOTP = (length: number): string => {
@@ -148,31 +151,47 @@ export class UserService {
             }
 
             await main(user.email);
-           
+
             return OTP;
 
-        }catch(error){
+        } catch (error) {
             throw error;
         }
     }
 
 
-    async verifyOtp(otp: string, CookieData: string){
-        try{
-            console.log(otp,CookieData)
+    async verifyOtp(otp: string, CookieData: string) {
+        try {
+            console.log(otp, CookieData)
             if (otp !== CookieData) {
                 throw new Error('Invalid OTP');
             } else if (otp === CookieData) {
                 return "Otp Verified"
             }
-        }catch(error){
+        } catch (error) {
             throw error;
         }
     }
 
 
-    async resendOtp(email: string): Promise<string>{
-        try{
+    async forgotPassword(email: string, password: string): Promise<any> {
+        try {
+            const user: IUserDocument | null = await this.userRepository.findByEmail(email)
+
+            if (user?.password !== undefined) {
+                user.password = password;
+            }
+
+            await user?.save();
+            return user
+        } catch (error) {
+            throw error;
+        }
+    }
+
+
+    async resendOtp(email: string): Promise<string> {
+        try {
 
             const generateNumericOTP = (length: number): string => {
                 let otp = '';
@@ -213,10 +232,10 @@ export class UserService {
             }
 
             await main(email);
-           
+
             return OTP;
 
-        }catch(error){
+        } catch (error) {
             throw error;
         }
     }

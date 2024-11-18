@@ -13,7 +13,7 @@ const config: Config = {
         gold: '#FFD700',
       },
       backgroundImage: {
-        'custom-gradient': 'linear-gradient(180deg, #852348 0%, #000000 100%)',
+        'custom-gradient': 'linear-gradient(180deg, #2D4059 0%, #4E6E58 100%)'
       },
       fontFamily: {
         jakarta: ['"Plus Jakarta Sans"', 'sans-serif'],
