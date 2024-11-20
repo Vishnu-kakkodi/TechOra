@@ -39,6 +39,13 @@ const Sidebar: React.FC = () => {
     } 
   };
 
+  const handleAllInstitutionList = () => {
+    if (institutes) {
+      console.log("Institute list fetched successfully:", institutes);
+      navigate('/admin/all-institute');
+    } 
+  };
+
   const handleApprovedInstitution = () => {
     if (institutes) {
       console.log("Institute list fetched successfully:", institutes);
@@ -88,6 +95,7 @@ const Sidebar: React.FC = () => {
           <div className='ml-5'>
             <div className="space-y-8">
               <button 
+              onClick={handleAllInstitutionList}
                 className="flex items-center space-x-2 text-gray-300 hover:text-white w-full"
               >
                 <Building2 className="w-5 h-5" />

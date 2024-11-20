@@ -12,6 +12,8 @@ import { auth, googleProvider } from '../../firebase/firebaseConfig';
 import * as Yup from 'yup';
 import { signInWithPopup, UserCredential, AuthError, GoogleAuthProvider } from 'firebase/auth';
 import EmailVerify from './EmailVerify';
+import About from '../../assets/frontEnd/About.png'
+import { ApiError } from '../../types/ApiError';
 
 interface LoginModalProps {
   setLoginModalOpen: (open: boolean) => void;
@@ -61,10 +63,6 @@ const LoginModal: React.FC<LoginModalProps> = ({ setLoginModalOpen, setOtpModalO
       .email('Invalid email address')
       .required('Email is required'),
     password: Yup.string()
-      .min(8, 'Password must contain at least 8 characters')
-      .matches(/[A-Z]/, 'Password must contain at least one uppercase letter')
-      .matches(/[a-z]/, 'Password must contain at least one lowercase letter')
-      .matches(/[0-9]/, 'Password must contain at least one number')
       .required('Password is required'),
   });
 
@@ -77,13 +75,14 @@ const LoginModal: React.FC<LoginModalProps> = ({ setLoginModalOpen, setOtpModalO
     onSubmit: async (values, { setSubmitting }) => {
       try {
         const response = await login(values).unwrap();
-        toast.success('Login successful!');
+        toast.success(response.message);
         setLoginModalOpen(false);
         dispatch(setCredentials({ ...response.user }));
         navigate('/home');
       } catch (error: unknown) {
-        const errorMessage = error instanceof Error ? error.message : 'Login failed. Please try again.';
-        toast.error(errorMessage);
+        console.log(error,"Error")
+        const ApiError = error as ApiError
+          toast.error(ApiError.data.message)
       } finally {
         setSubmitting(false);
       }
@@ -93,7 +92,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ setLoginModalOpen, setOtpModalO
   return (
     <div className="container mx-auto">
       <Modal onClose={() => setLoginModalOpen(false)}>
-        <form onSubmit={formik.handleSubmit} className="w-[600px] p-8 bg-white  shadow-lg mx-auto">
+          <form onSubmit={formik.handleSubmit} className="w-[600px] p-8 bg-white  shadow-lg mx-auto">
           <h2 className="text-2xl mb-6 text-center font-bold text-black">Log in</h2>
 
           <label htmlFor="email" className="block text-black mb-2">

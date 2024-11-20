@@ -9,7 +9,7 @@ import { useInstituteListQuery, useDocumentDownloadMutation } from '../../store/
 import { InstituteDocument } from '../../../../Backend/src/interfaces/institute.interface';
 import { useNavigate } from 'react-router-dom';
 
-const ApprovedInstitution = () => {
+const AllInstitutes = () => {
     const navigate = useNavigate();
     const { data: { institutes } = {}, refetch } = useInstituteListQuery(null);
     const [downloading, setDownloading] = useState<string | null>(null);
@@ -85,7 +85,7 @@ const ApprovedInstitution = () => {
                     </thead>
                     <tbody className="divide-y divide-gray-200">
                         {institutes ? (
-                            institutes.filter((institute: InstituteDocument) => institute.status === 'Active').map((institute: InstituteDocument) => (
+                            institutes.map((institute: InstituteDocument) => (
                                 <tr key={institute.id} className="hover:bg-gray-50 transition-colors">
                                     <td className="py-4 px-6">
                                         <div className="text-sm font-medium text-gray-900">{institute.applicationId}</div>
@@ -176,4 +176,4 @@ const ApprovedInstitution = () => {
     );
 };
 
-export default ApprovedInstitution;
+export default AllInstitutes;

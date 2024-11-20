@@ -41,7 +41,6 @@ const CourseList = () => {
   };
 
   const handleDelete = (courseId: number) => {
-    // Implement delete functionality
     console.log('Delete course:', courseId);
   };
 
@@ -56,7 +55,6 @@ const CourseList = () => {
     <div className='flex'>
     <InstituteSidebar />
         <div className="p-6">
-      {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold">Course List</h1>
@@ -69,9 +67,8 @@ const CourseList = () => {
         </button>
       </div>
 
-      {/* Filters */}
       <div className="flex gap-4 mb-6">
-        <div className="flex-1">
+        <div className="flex-0">
           <div className="relative">
             <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
             <input
@@ -85,7 +82,7 @@ const CourseList = () => {
         </div>
         
         {/* Department Filter */}
-        <div className="relative">
+        {/* <div className="relative">
           <select
             value={selectedDepartment}
             onChange={(e) => setSelectedDepartment(e.target.value)}
@@ -97,10 +94,10 @@ const CourseList = () => {
             <option value="business">Business</option>
           </select>
           <ChevronDown className="absolute right-2 top-2.5 h-4 w-4 text-gray-500 pointer-events-none" />
-        </div>
+        </div> */}
 
         {/* Status Filter */}
-        <div className="relative">
+        {/* <div className="relative">
           <select
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
@@ -111,10 +108,9 @@ const CourseList = () => {
             <option value="inactive">Inactive</option>
           </select>
           <ChevronDown className="absolute right-2 top-2.5 h-4 w-4 text-gray-500 pointer-events-none" />
-        </div>
+        </div> */}
       </div>
 
-      {/* Course Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {course.map((course:any) => (
           <div 
@@ -140,7 +136,6 @@ const CourseList = () => {
                     <MoreVertical className="h-5 w-5 text-gray-500" />
                   </button>
                   
-                  {/* Dropdown Menu */}
                   {activeDropdowns[course._id] && (
                     <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-10">
                       <div className="py-1">
@@ -152,7 +147,7 @@ const CourseList = () => {
                           View
                         </button>
                         </Link>
-                        <button
+                        {/* <button
                           onClick={() => handleEdit(course.id)}
                           className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                         >
@@ -166,7 +161,7 @@ const CourseList = () => {
                         >
                           <Trash2 className="mr-2 h-4 w-4" />
                           Delete
-                        </button>
+                        </button> */}
                       </div>
                     </div>
                   )}

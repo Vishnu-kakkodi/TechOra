@@ -25,7 +25,6 @@ const InstituteSidebar: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const {data: course} = useDraftCourseListQuery(null);
-  const institutionInfo = useAppSelector((state) => state.auth.institutionInfo);
 
   const { data: users, error } = useUserListQuery(null);
 
@@ -45,7 +44,7 @@ const InstituteSidebar: React.FC = () => {
   const handleUserList = () => {
     if (users) {
       console.log("User list fetched successfully:", users);
-      navigate('/admin/user-list');
+      navigate('/institute/user-list');
     } else if (error) {
       console.error("Error fetching user list:", error);
     }
@@ -65,7 +64,7 @@ const InstituteSidebar: React.FC = () => {
       <div className="p-4 border-b border-gray-800">
         <div className="mb-6 pt-5">
           <button 
-            onClick={() => handleNavigate('/dashboard')}
+            onClick={() => handleNavigate('/institute/dashboard')}
             className="flex items-center space-x-2 text-gray-300 hover:text-white"
           >
             <Home className="w-5 h-5" />
@@ -73,7 +72,6 @@ const InstituteSidebar: React.FC = () => {
           </button>
         </div>
 
-        {/* Course Management Section */}
         <div className="mb-6 space-y-4">
           <div className="text-gray-500 text-sm uppercase">
             Course Management
@@ -103,7 +101,6 @@ const InstituteSidebar: React.FC = () => {
           </div>
         </div>
 
-        {/* Quiz Management Section */}
         <div className="mb-6 space-y-4">
           <div className="text-gray-500 text-sm uppercase">
             Quiz Management
@@ -133,7 +130,6 @@ const InstituteSidebar: React.FC = () => {
           </div>
         </div>
 
-        {/* Tutor Management Section */}
         <div className="mb-6 space-y-4">
           <div className="text-gray-500 text-sm uppercase">
             Tutor Management
@@ -156,7 +152,6 @@ const InstituteSidebar: React.FC = () => {
           </div>
         </div>
 
-        {/* Students Section */}
         <div className="mb-6 space-y-4">
           <div className="text-gray-500 text-sm uppercase">
             Students
@@ -170,7 +165,6 @@ const InstituteSidebar: React.FC = () => {
           </button>
         </div>
 
-        {/* Logout Button */}
         <div className="mt-8">
           <button 
             onClick={handleLogout}

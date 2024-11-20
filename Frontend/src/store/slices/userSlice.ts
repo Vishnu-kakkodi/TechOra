@@ -1,61 +1,3 @@
-// import {createApi,fetchBaseQuery} from '@reduxjs/toolkit/query/react';
-// import {BaseQueryFn, FetchArgs, FetchBaseQueryError} from '@reduxjs/toolkit/query';
-// import { User, UserLogin } from '../../types/userTypes';
-// import { userApiServices } from '../../services/userApiService';
-
-// const backendUrl = import.meta.env.VITE_BACKEND_URL;
-
-// interface RegisterResponse{
-//     user: User;
-//     message: string;
-// }
-
-// const baseQuery = fetchBaseQuery({baseUrl: `${backendUrl}/api/`});
-
-// export  const userSlice = createApi({
-//     baseQuery:baseQuery as BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError>,
-//     tagTypes: ['User'],
-//     endpoints: (builder) =>({
-
-//         register:builder.mutation<RegisterResponse, Partial<User>>({
-//             query: (data) =>({
-//                     url: 'users/register',
-//                     method: "POST",
-//                     body: data
-//             }),
-
-//             transformResponse: (response: RegisterResponse)=>{
-//                 console.log("Transform response:",response);
-//                 return response;
-//             },
-//             transformErrorResponse: (error: FetchBaseQueryError) => {
-//                 console.log('Transform Error:', error);
-//                 return error;
-//               },
-//             invalidatesTags: [{ type: 'User' }],
-//         }),
-//         login:builder.mutation<RegisterResponse, Partial<UserLogin>>({
-//             query: (data) =>({
-//                     url: 'users/login',
-//                     method: "POST",
-//                     body: data
-//             }),
-
-//             transformResponse: (response: RegisterResponse)=>{
-//                 console.log("Transform response:",response);
-//                 return response;
-//             },
-//             transformErrorResponse: (error: FetchBaseQueryError) => {
-//                 console.log('Transform Error:', error);
-//                 return error;
-//               },
-//             invalidatesTags: [{ type: 'User' }],
-//         })
-//     }),
-// });
-
-// export const {useRegisterMutation,useLoginMutation} = userSlice;
-
 
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { BaseQueryFn, FetchArgs, FetchBaseQueryError } from '@reduxjs/toolkit/query';
@@ -65,7 +7,8 @@ import { cartResponse } from '../../types/cartType';
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 interface RegisterResponse {
-  user: User;
+  userDetails: User;
+  status: number;
   message: string;
 }
 
@@ -207,6 +150,15 @@ export const userSlice = createApi({
       })
     }),
 
+    removeCart: builder.mutation<string, { courseId: string }>({
+      query: ({courseId}) =>({
+        url: '/users/remove-cart',
+        method: 'PATCH',
+        credentials: 'include',
+        body: {courseId}
+      })
+    }),
+
     payment: builder.mutation({
       query: () =>({
         url: '/users/payment',
@@ -238,6 +190,7 @@ export const
    useForgotPasswordMutation,
    useCartPageQuery,
    useAddToCartMutation,
+   useRemoveCartMutation,
    usePaymentMutation,
    useCourseListQuery
   } = userSlice;

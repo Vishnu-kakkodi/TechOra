@@ -45,8 +45,8 @@ const OtpModal: React.FC<OtpModalProps> = ({ setOtpModalOpen, mode }) => {
           case 'signup':
             console.log("signupppp")
             const signupResponse = await verifyUser({ otp }).unwrap();
-            if (signupResponse.user) {
-              dispatch(setCredentials(signupResponse.user));
+            if (signupResponse.userDetails) {
+              dispatch(setCredentials(signupResponse.userDetails));
               toast.success('Account verified successfully!');
               navigate('/home');
             }

@@ -34,12 +34,10 @@ const Topbar = () => {
     <div className="ml-8 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="bg-white shadow-md rounded-lg p-4 sm:p-6 my-4 sm:my-8">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
-          {/* Course count */}
           <div className="text-gray-600 font-medium text-sm sm:text-base">
             We found <span className="text-red-800 font-bold">200</span> courses for you.
           </div>
 
-          {/* Sort dropdown */}
           <div className="relative" ref={dropdownRef}>
             <div className="flex items-center space-x-2">
               <span className="text-red-700 font-medium text-sm sm:text-base">Sort By:</span>
@@ -58,7 +56,6 @@ const Topbar = () => {
               </button>
             </div>
 
-            {/* Dropdown menu */}
             {isDropdownOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-20 border border-gray-200">
                 <div className="py-1">
@@ -67,7 +64,6 @@ const Topbar = () => {
                       key={option.value}
                       className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
                       onClick={() => {
-                        // Handle sort option selection
                         setIsDropdownOpen(false);
                       }}
                     >

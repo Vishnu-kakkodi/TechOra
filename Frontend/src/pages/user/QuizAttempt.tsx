@@ -23,10 +23,8 @@ const QuizAttempt: React.FC = () => {
   const [quiz, setQuiz] = useState<Quiz | null>(null);
 
   useEffect(() => {
-    // Check if quiz is passed via routing state
     const quizFromState = location.state?.quiz;
     if (!quizFromState) {
-      // Redirect back to quiz list if no quiz is selected
       navigate('/quiz-list');
       return;
     }

@@ -35,5 +35,17 @@ export class CartRepository extends BaseRepository<CartDocument>{
         }
     }
 
+    async remove(userId: string | null, courseId: string | null): Promise<void>{
+        try{
+            console.log("Here")
+             await this.model.updateOne(
+                { userId: userId },
+                { $pull: { items: { course: courseId } } }
+            )
+        }catch(error){
+            throw error
+        }
+    }
+
 
 }

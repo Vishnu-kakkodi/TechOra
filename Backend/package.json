@@ -11,9 +11,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.685.0",
+    "@aws-sdk/client-s3": "^3.696.0",
     "@types/nodemailer": "^6.4.16",
-    "aws-sdk": "^3.1691.0",
+    "aws-sdk": "^2.1692.0",
+    "bcrypt": "^5.1.1",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
@@ -30,6 +31,7 @@
     "springedge": "^1.0.6"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
     "@types/cookie-parser": "^1.4.7",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",

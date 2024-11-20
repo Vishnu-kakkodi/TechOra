@@ -11,6 +11,7 @@ import AdminProtectedRoute from './ProtectedRoute/AdminProtectedRoute';
 import InstituteDetail from '../pages/admin/InstituteDetail';
 import AuthRoute from './AuthRoute';
 import ApprovedInstitutionPage from '../pages/admin/ApprovedInstitutionPage';
+import AllInstitutePage from '../pages/admin/AllInstitutePage';
 
 
 
@@ -39,9 +40,15 @@ const AdminRoutes: React.FC = () => {
           <InstituteDetail />
         </AuthRoute>
       } />
-            <Route path="/approved-institute" element={
+      <Route path="/approved-institute" element={
         <AuthRoute role='admin'>
           <ApprovedInstitutionPage />
+        </AuthRoute>
+      } />
+
+      <Route path="/all-institute" element={
+        <AuthRoute role='admin'>
+          <AllInstitutePage />
         </AuthRoute>
       } />
       <Route path="*" element={<ErrorPage />} />

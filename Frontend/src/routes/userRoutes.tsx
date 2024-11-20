@@ -21,9 +21,6 @@ const UserRoutes: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // if (!isUserAuthenticated) {
-    //   navigate('/');
-    // }
   }, [isUserAuthenticated, navigate]);
   return (
     <Routes>

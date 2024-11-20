@@ -16,7 +16,6 @@ const Account = () => {
       <h1 className="text-2xl font-bold mb-6">Account Settings</h1>
       
       <div className="bg-white rounded-lg shadow">
-        {/* Tab Navigation */}
         <div className="border-b">
           <nav className="flex">
             {tabs.map(({ id, label, icon: Icon }) => (
@@ -36,7 +35,6 @@ const Account = () => {
           </nav>
         </div>
 
-        {/* Content Area */}
         <div className="p-6">
           {activeTab === 'profile' && (
             <div className="space-y-6">

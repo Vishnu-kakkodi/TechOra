@@ -3,7 +3,7 @@ import React, { useState, useRef, ChangeEvent } from 'react';
 import { Plus, Trash2, GripVertical, AlertCircle, Image as ImageIcon, Clock, RefreshCcw, Upload, X } from 'lucide-react';
 import InstituteSidebar from '../../components/sidebar/InstituteSidebar';
 import { useAddQuizMutation } from '../../store/slices/institutionSlice';
-import { Formik, Form, Field, ErrorMessage, FormikHelpers } from 'formik';
+import { Formik, Form, Field, FormikHelpers } from 'formik';
 import { QuestionType, QuizStatus, Question, QuizData, QuestionBoxProps, Option } from '../../types/quizType'
 
 const CreateQuiz: React.FC = () => {
@@ -326,9 +326,7 @@ const CreateQuiz: React.FC = () => {
                       </div>
                     </div>
 
-                    {/* Quiz Form Section */}
                     <div className="bg-white rounded-lg shadow p-6">
-                      {/* Basic Quiz Information */}
                       <div className="grid grid-cols-2 gap-4 mb-4">
                         <Field
                           type="text"
@@ -348,7 +346,6 @@ const CreateQuiz: React.FC = () => {
                         </select>
                       </div>
 
-                      {/* Quiz Settings */}
                       <div className="grid grid-cols-3 gap-4 mb-4">
                         <div className="flex items-center gap-2 border rounded-lg px-4 py-2">
                           <Clock className="h-5 w-5 text-gray-400" />
@@ -388,7 +385,6 @@ const CreateQuiz: React.FC = () => {
                       />
                     </div>
 
-                    {/* Current Question Section */}
                     {quizData.questions[currentQuestionIndex] && (
                       <div className="bg-white rounded-lg shadow my-4">
                         <div className="p-6">
@@ -418,7 +414,6 @@ const CreateQuiz: React.FC = () => {
                                 </div>
                               </div>
 
-                              {/* Question Content */}
                               <div className="space-y-4">
                                 <Field
                                   type="text"
@@ -428,7 +423,6 @@ const CreateQuiz: React.FC = () => {
                                   onChange={(e: any) => updateQuestion(currentQuestionIndex, 'question', e.target.value)}
                                 />
 
-                                {/* Question Options */}
                                 {quizData.questions[currentQuestionIndex].type === 'multiple-choice' && (
                                   <div className="space-y-2">
                                     {quizData.questions[currentQuestionIndex].options.map((option, optionIndex) => (
@@ -451,7 +445,6 @@ const CreateQuiz: React.FC = () => {
                                   </div>
                                 )}
 
-                                {/* True/False Options */}
                                 {quizData.questions[currentQuestionIndex].type === 'true-false' && (
                                   <div className="space-y-2">
                                     {['True', 'False'].map((value, index) => (
@@ -482,7 +475,6 @@ const CreateQuiz: React.FC = () => {
                                   </div>
                                 )}
 
-                                {/* Short Answer */}
                                 {quizData.questions[currentQuestionIndex].type === 'short-answer' && (
                                   <Field
                                     type="text"
@@ -494,7 +486,6 @@ const CreateQuiz: React.FC = () => {
                                   />
                                 )}
 
-                                {/* Question Explanation */}
                                 <Field
                                   type="textarea"
                                   name="explanation"
@@ -511,7 +502,6 @@ const CreateQuiz: React.FC = () => {
                       </div>
                     )}
 
-                    {/* Add Question Button */}
                     <button
                       onClick={addQuestion}
                       className="w-full py-2 px-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center disabled:bg-gray-300 disabled:cursor-not-allowed"
@@ -521,7 +511,6 @@ const CreateQuiz: React.FC = () => {
                       Add Question
                     </button>
 
-                    {/* Action Buttons */}
                     <div className="mt-6 flex justify-end gap-4">
                       <button
                         type="submit"
@@ -539,7 +528,6 @@ const CreateQuiz: React.FC = () => {
 
             </Formik>
 
-            {/* Question Navigator Sidebar */}
             <div className="w-64">
               <div className="bg-white rounded-lg shadow p-4 sticky top-4">
                 <h2 className="text-lg font-semibold mb-4">Questions ({quizData.questions.length}/{maxQuestions})</h2>
@@ -555,7 +543,6 @@ const CreateQuiz: React.FC = () => {
                   ))}
                 </div>
 
-                {/* Quiz Summary */}
                 <div className="mt-4 p-4 bg-gray-50 rounded-lg">
                   <h3 className="text-sm font-medium text-gray-700 mb-2">Quiz Summary</h3>
                   <div className="space-y-2 text-sm text-gray-600">
@@ -585,7 +572,6 @@ const CreateQuiz: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Validation Warnings */}
                 {quizData.status === 'published' && (
                   <div className="mt-4">
                     {quizData.questions.length === 0 && (
@@ -610,7 +596,6 @@ const CreateQuiz: React.FC = () => {
   );
 };
 
-// Updated isQuestionComplete function
 const isQuestionComplete = (question: Question): boolean => {
   if (!question.question) return false;
 

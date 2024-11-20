@@ -4,6 +4,8 @@ import { CreateUserDto } from "../dtos/user.dtos";
 import { HttpException } from "../middleware/error.middleware";
 import { UserCookieData } from '../types/user.types';
 import { setCookie } from "../helperFunction/cookieUtils";
+import STATUS_CODES from "../constants/statusCode";
+import MESSAGES from "../constants/message";
 
 
 export class UserController {
@@ -15,21 +17,24 @@ export class UserController {
         next: NextFunction
     ): Promise<void> {
         try {
-
-            const user: CreateUserDto = {
+            const userDetail: CreateUserDto = {
                 userName: req.body.userName,
                 email: req.body.email,
                 password: req.body.password,
                 phoneNumber: req.body.phoneNumber,
             }
+            if(!userDetail){
+                throw new HttpException(STATUS_CODES.BAD_REQUEST,MESSAGES.ERROR.BAD_REQUEST)
+            }
+            const user = await this.userService.initiateUser(userDetail);
 
-            console.log("Request came here")
-            const OTP = await this.userService.initiateUser(req.body.email);
-            console.log(OTP, "otp")
+            if(!user){
+                throw new HttpException(STATUS_CODES.BAD_REQUEST,MESSAGES.ERROR.BAD_REQUEST)
+            }
 
             const userData = {
                 user: user,
-                otp: OTP,
+                otp: user.OTP,
                 timeStamp: new Date().getTime()
             }
             res.cookie('userData', userData, {
@@ -39,10 +44,16 @@ export class UserController {
                 maxAge: 5 * 60 * 1000
             });
 
-            res.status(201).json({ OTP: "Otp send successfully" })
+            res.status(STATUS_CODES.SUCCESS).json({
+                success: true,
+                message: MESSAGES.SUCCESS.OTP_SEND,
+              });
 
         } catch (error) {
-            console.error('Error', error);
+            res.status(STATUS_CODES.SERVER_ERROR).json({
+                success: false,
+                message: MESSAGES.ERROR.SERVER_ERROR,
+              });
         }
     }
 
@@ -52,44 +63,30 @@ export class UserController {
         next: NextFunction
     ): Promise<void> {
         try {
+
             const { otp } = req.body;
-            console.log(req.cookies);
-
-
             const CookieData = req.cookies.userData;
-
             if (!CookieData) {
-                throw new Error('No user data found');
+                throw new HttpException(STATUS_CODES.GONE,MESSAGES.ERROR.TIME_EXPIRED);
             }
 
-            const userdata: UserCookieData = CookieData;
-            console.log(otp)
-            console.log(userdata.otp)
-
-            if (otp !== userdata.otp) {
-                throw new Error('Invalid OTP');
-            } else if (otp === userdata.otp) {
-                const user = await this.userService.createUser(userdata.user);
+            const user = await this.userService.createUser(CookieData,otp);
+            if(user){
                 res.clearCookie('userData');
 
-                res.cookie('userCredential', user, {
-                    httpOnly: true,
-                    secure: true,
-                    sameSite: 'strict',
-                    maxAge: 10 * 60 * 1000
-                });
-                res.status(201).json({
-                    message: 'User verified and created successfully',
-                    user
-                });
+                const { accessToken, refreshToken, ...userDetails } = user;
+                const Token = {
+                    accessToken: accessToken,
+                    refreshToken: refreshToken
+                }
+                setCookie(res, 'user', Token);
+                res.status(201).json({ userDetails, status: STATUS_CODES.CREATED, message: MESSAGES.SUCCESS.USER_CREATED });
             }
         } catch (error) {
-            console.error('Error', error);
-            if (error instanceof Error) {
-                res.status(500).json({ message: error.message });
-            } else {
-                res.status(500).json({ message: 'An unknown error occurred' });
-            }
+            res.status(STATUS_CODES.SERVER_ERROR).json({
+                success: false,
+                message: MESSAGES.ERROR.SERVER_ERROR,
+              });
         }
     }
 
@@ -134,28 +131,6 @@ export class UserController {
         }
     }
 
-
-    async createUser(
-        req: Request<{}, {}, CreateUserDto>,
-        res: Response,
-        next: NextFunction
-    ): Promise<void> {
-        try {
-            console.log(req.body, "controller")
-            console.log("Hai")
-            const user = await this.userService.createUser(req.body);
-            const { accessToken, refreshToken, ...userDetails } = user;
-            const Token = {
-                accessToken: accessToken,
-                refreshToken: refreshToken
-            }
-            setCookie(res, 'user', Token);
-            res.status(201).json({ userDetails, message: 'Successfull' });
-        } catch (error) {
-            next(error);
-        }
-    }
-
     async getUser(
         req: Request<{ email: string, password: string }>,
         res: Response,
@@ -167,12 +142,10 @@ export class UserController {
                 throw new HttpException(404, 'User not found');
             }
             const { accessToken, refreshToken, ...userDetails } = user;
-            console.log(userDetails, "User")
             const Token = {
                 accessToken: accessToken,
                 refreshToken: refreshToken
             }
-            console.log(Token, "Token")
             setCookie(res, 'user', Token);
             res.json({ userDetails });
         } catch (error) {
@@ -241,7 +214,6 @@ export class UserController {
     ): Promise<void> {
         try {
             const { email, password } = req.body;
-            console.log("Hai")
             const response = await this.userService.forgotPassword(email, password);
             res.status(201).json({ message: 'Successfull' });
         } catch (error) {

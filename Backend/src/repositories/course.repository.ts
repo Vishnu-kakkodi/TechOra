@@ -44,6 +44,8 @@ export class CourseRepository extends BaseRepository<CourseDocument> {
                 updatedAt: new Date(),
             } as Module);
 
+            existingCourse.status = 'published'
+
             await existingCourse.save();
             return existingCourse.toObject();
         } catch (error) {

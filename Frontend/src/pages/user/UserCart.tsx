@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Trash2 } from 'lucide-react';
 import Navbar from '../../components/header/Navbar';
 import Footer from '../../components/footer/Footer';
-import { useCartPageQuery, usePaymentMutation } from '../../store/slices/userSlice';
+import { useCartPageQuery, usePaymentMutation, useRemoveCartMutation } from '../../store/slices/userSlice';
 import { CartItem } from '../../types/cartType';
+import { toast } from 'react-toastify';
 
 interface UserCartProps {
   onRemoveItem?: (id: string) => void;
@@ -11,10 +12,15 @@ interface UserCartProps {
 }
 
 const UserCart: React.FC<UserCartProps> = ({ onRemoveItem, onCheckout }) => {
-  const { data: cartData, isLoading, isError } = useCartPageQuery(null);
+  const { data: cartData, refetch  } = useCartPageQuery(null);
   const cartItems = cartData?.Data[0];
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
   const [payment] = usePaymentMutation();
+  const [removecart] = useRemoveCartMutation();
+
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
 
   const handleItemSelect = (id: string) => {
     const newSelected = new Set(selectedItems);
@@ -39,7 +45,13 @@ const UserCart: React.FC<UserCartProps> = ({ onRemoveItem, onCheckout }) => {
     ? selectedItemsDetails.reduce((sum, item) => sum + item.price, 0) 
     : 0;
 
-  const handleRemoveItem = (id: string) => {
+  const handleRemoveItem = async (id: string) => {
+
+    const res = await removecart({courseId:id}).unwrap();
+    if(res){
+      toast.success("Course removed");
+      refetch();
+    }
     setSelectedItems(prev => {
       const newSelected = new Set(prev);
       newSelected.delete(id);
@@ -58,8 +70,6 @@ const UserCart: React.FC<UserCartProps> = ({ onRemoveItem, onCheckout }) => {
       <div className="flex-grow bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <h1 className="text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-8">Shopping Cart</h1>
-
-          {/* Order Summary for Mobile */}
           <div className="lg:hidden mb-6">
             <div className="bg-white rounded-lg shadow-sm p-4">
               <h2 className="text-lg font-bold mb-3">Order Summary</h2>
@@ -69,14 +79,14 @@ const UserCart: React.FC<UserCartProps> = ({ onRemoveItem, onCheckout }) => {
                     {selectedItemsDetails.map((item) => (
                       <div key={item.course._id} className="flex justify-between text-sm">
                         <span className="text-gray-600 truncate mr-2">{item.course.title}</span>
-                        <span className="font-medium">${item.price.toFixed(2)}</span>
+                        <span className="font-medium">{item.price.toFixed(2)}</span>
                       </div>
                     ))}
                   </div>
                   <div className="border-t mt-3 pt-3">
                     <div className="flex justify-between font-bold">
                       <span>Total</span>
-                      <span>${total.toFixed(2)}</span>
+                      <span>{total.toFixed(2)}</span>
                     </div>
                   </div>
                   <button
@@ -134,7 +144,7 @@ const UserCart: React.FC<UserCartProps> = ({ onRemoveItem, onCheckout }) => {
                               <p className="text-sm text-gray-600">by {item.course.instructor}</p>
                             </div>
                             <div className="flex items-center justify-between sm:flex-col sm:items-end">
-                              <div className="text-lg font-bold">${item.price.toFixed(2)}</div>
+                              <div className="text-lg font-bold">{item.price.toFixed(2)}</div>
                               <button
                                 onClick={() => handleRemoveItem(item.course._id)}
                                 className="text-red-500 hover:text-red-700 flex items-center gap-1 sm:mt-2"
@@ -158,12 +168,11 @@ const UserCart: React.FC<UserCartProps> = ({ onRemoveItem, onCheckout }) => {
               {cartItems?.items.length === 0 && (
                 <div className="text-center py-12 bg-white rounded-lg shadow-sm">
                   <h2 className="text-xl font-semibold text-gray-600">Your cart is empty</h2>
-                  <p className="text-gray-500 mt-2">Browse our courses to add items to your cart</p>
+                  <p className="text-gray-500 mt-2">Add courses to your cart</p>
                 </div>
               )}
             </div>
 
-            {/* Desktop Order Summary */}
             <div className="hidden lg:block">
               <div className="bg-white rounded-lg shadow-sm p-6 sticky top-6">
                 <h2 className="text-xl font-bold mb-4">Order Summary</h2>
@@ -173,13 +182,13 @@ const UserCart: React.FC<UserCartProps> = ({ onRemoveItem, onCheckout }) => {
                       {selectedItemsDetails.map((item) => (
                         <div key={item.course._id} className="flex justify-between text-sm">
                           <span className="text-gray-600 truncate mr-2">{item.course.title}</span>
-                          <span>${item.price.toFixed(2)}</span>
+                          <span>{item.price.toFixed(2)}</span>
                         </div>
                       ))}
                       <div className="border-t pt-4">
                         <div className="flex justify-between font-bold">
                           <span>Total</span>
-                          <span>${total.toFixed(2)}</span>
+                          <span>{total.toFixed(2)}</span>
                         </div>
                       </div>
                       <button
@@ -188,9 +197,6 @@ const UserCart: React.FC<UserCartProps> = ({ onRemoveItem, onCheckout }) => {
                       >
                         Proceed to Checkout
                       </button>
-                      <p className="text-xs text-gray-500 text-center mt-2">
-                        Secure checkout powered by Stripe
-                      </p>
                     </>
                   ) : (
                     <div className="text-center py-4 text-gray-500">

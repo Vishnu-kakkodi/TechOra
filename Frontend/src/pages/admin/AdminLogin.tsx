@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { useVerifyAdminMutation } from '../../store/slices/adminSlice';
 import { setAdminCredentials } from '../../store/slices/authSlice';
 import * as Yup from 'yup';
+import AdminLogin from '../../assets/frontEnd/AdminLogin.jpg'
 
 
 
@@ -48,8 +49,8 @@ const AdminLoginModal: React.FC = () => {
   });
 
   return (
-    <div className="container mx-auto ">
-      <form onSubmit={formik.handleSubmit} className="w-[600px] m-[200px] p-8 bg-deepPurple rounded-lg shadow-lg mx-auto">
+    <div className="w-full h-screen container flex items-center justify-center relative " style={{ backgroundImage: `url(${AdminLogin})` }}>
+      <form onSubmit={formik.handleSubmit} className="w-[600px] p-8 bg-deepPurple/30 rounded-lg shadow-lg backdrop-blur-sm">
         <h2 className="text-2xl mb-6 text-center font-bold text-white">Admin Login</h2>
 
         <label htmlFor="email" className="block text-white mb-2">

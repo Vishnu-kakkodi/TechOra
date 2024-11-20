@@ -1,9 +1,14 @@
 
 import { Request, Response, NextFunction } from "express";
 
-export class HttpException extends Error{
+interface CatchError {
+    status: number;
+    message: string;
+}
+
+export class 
+HttpException implements CatchError{
     constructor(public status: number, public message: string){
-        super(message);
     }
 }
 
@@ -16,5 +21,10 @@ export const errorMiddleware = (
     const status = error.status || 500;
     const message = error.message || 'Something went wrong';
 
-    res.status(status).json({status,message});
+    res.status(status).json({status:status,message:message});
 }
+
+
+
+
+

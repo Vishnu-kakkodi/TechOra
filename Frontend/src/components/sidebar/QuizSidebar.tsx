@@ -27,7 +27,6 @@ const QuizSidebar: React.FC<CourseSidebarProps> = ({ onSearch, onFilterChange })
 
   return (
     <>
-      {/* Menu Toggle Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="lg:hidden fixed top-[60px] left-2 z-50 p-2 bg-white rounded-lg shadow-lg"
@@ -39,12 +38,10 @@ const QuizSidebar: React.FC<CourseSidebarProps> = ({ onSearch, onFilterChange })
         )}
       </button>
 
-      {/* Sidebar Container */}
       <div
         className={`fixed lg:relative inset-y-0 left-0 z-40 w-80 transform transition-transform duration-300 ease-in-out bg-gray-50 
           ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}
       >
-        {/* Overlay for mobile */}
         {isOpen && (
           <div
             className="fixed inset-0 bg-black bg-opacity-50 lg:hidden -z-10"
@@ -52,10 +49,8 @@ const QuizSidebar: React.FC<CourseSidebarProps> = ({ onSearch, onFilterChange })
           />
         )}
 
-        {/* Sidebar Content */}
         <div className="h-full overflow-y-auto pt-16 lg:pt-0">
           <div className="p-6">
-            {/* Search Section */}
             <div className="mb-8">
               <h2 className="text-lg font-bold mb-4">Search</h2>
               <div className="relative">
@@ -70,7 +65,6 @@ const QuizSidebar: React.FC<CourseSidebarProps> = ({ onSearch, onFilterChange })
               </div>
             </div>
 
-            {/* Course Categories Section */}
             <div className="mb-8">
               <h2 className="text-lg font-bold mb-2">Quiz Categories</h2>
               <div className="bg-white border rounded-lg p-4">
@@ -86,7 +80,6 @@ const QuizSidebar: React.FC<CourseSidebarProps> = ({ onSearch, onFilterChange })
               </div>
             </div>
 
-            {/* Popular Colleges Section */}
             <div className="mb-8">
               <h2 className="text-lg font-bold mb-2">Popular Colleges</h2>
               <div className="bg-white border rounded-lg p-4">

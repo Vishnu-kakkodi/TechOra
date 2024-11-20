@@ -57,4 +57,28 @@ export class CartController {
             next(error);
         }
     }
+
+    public removeCart = async (
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> => {
+        try {
+            console.log("Remove request initiated");
+            
+            const Token = req.cookies.user
+            const token = Token.accessToken;
+            const requiredRole = "user";
+            const userId: string | null = decodedToken(token, requiredRole);
+            const { courseId } = req.body;
+            console.log("UserId", userId, "courseId:", courseId)
+            const response = await this.courseService.removeCart(userId, courseId);
+            res.status(201).json({
+                message: "Cart item removed successfully",
+            });
+
+        } catch (error) {
+            next(error)
+        }
+    }
 }

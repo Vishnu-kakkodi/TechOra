@@ -7,7 +7,6 @@ const HomeLayout2 = () => {
     <div>
       <hr className='border-t border-grey-300' />
       <main className="container mx-auto px-4">
-        {/* First Section */}
         <div className='flex flex-col md:flex-row items-center mb-12'>
           <div className='w-full md:w-1/2 flex justify-center mb-6 md:mb-0'>
             <img 
@@ -28,7 +27,6 @@ const HomeLayout2 = () => {
           </div>
         </div>
 
-        {/* Second Section */}
         <div className='flex flex-col-reverse md:flex-row items-center'>
           <div className="w-full md:w-1/2 md:mr-8 text-wrapper">
             <h2 className="text-2xl md:text-[30px] font-bold text-left text-black mb-6 font-jakarta capitalize">

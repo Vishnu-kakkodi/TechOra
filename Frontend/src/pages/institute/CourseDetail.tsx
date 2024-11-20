@@ -11,7 +11,6 @@ import {
 } from 'lucide-react';
 import InstituteSidebar from '../../components/sidebar/InstituteSidebar';
 import { useCoursedetailQuery } from '../../store/slices/institutionSlice';
-import { Course, CourseDocument } from '../../types/courseType';
 
 const CourseDetail = () => {
   const { courseId } = useParams<{ courseId: string }>();
@@ -54,7 +53,6 @@ const CourseDetail = () => {
     <div className='flex' >
       <InstituteSidebar />
       <div className="container mx-auto p-6 max-w-7xl">
-      {/* Back Button */}
       <button 
         onClick={() => window.history.back()}
         className="flex items-center text-gray-600 hover:text-gray-800 mb-6"
@@ -84,7 +82,6 @@ const CourseDetail = () => {
             )}
           </div>
 
-          {/* Course Info */}
           <div className="mb-6">
             <h1 className="text-3xl font-bold mb-4">{course.title}</h1>
             <div className="flex flex-wrap gap-4 text-sm text-gray-600 mb-4">
@@ -104,7 +101,6 @@ const CourseDetail = () => {
             <p className="text-gray-600">{course.description}</p>
           </div>
 
-          {/* Course Modules */}
           <div className="space-y-4">
             <h2 className="text-xl font-bold mb-4">Course Modules</h2>
             {course.modules.map((module: any) => (
@@ -149,7 +145,6 @@ const CourseDetail = () => {
           </div>
         </div>
 
-        {/* Sidebar */}
         <div className="lg:col-span-1">
           <div className="bg-white rounded-lg shadow-md p-6">
             <div className="mb-6">

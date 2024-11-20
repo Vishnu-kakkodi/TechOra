@@ -8,5 +8,5 @@ interface User {
 export interface UserCookieData extends User {
     user: User,
     otp: string;
-    timestamp: Date;
+    timestamp: number;
 }

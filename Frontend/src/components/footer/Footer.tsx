@@ -40,10 +40,8 @@ const Footer: React.FC<FooterProps> = ({ companyName = "TechOra" }) => {
 
   return (
     <footer className="bg-gray-50 border-t">
-      {/* Main Footer Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
-          {/* Company Info */}
           <div className="space-y-6">
             <div>
               <h2 className="text-2xl font-bold text-gray-900">{companyName}</h2>
@@ -67,7 +65,6 @@ const Footer: React.FC<FooterProps> = ({ companyName = "TechOra" }) => {
               </div>
             </div>
 
-            {/* Social Links */}
             <div className="flex gap-4">
               <a href="#" className="text-gray-600 hover:text-blue-600 transition-colors">
                 <Facebook className="h-5 w-5" />
@@ -84,9 +81,7 @@ const Footer: React.FC<FooterProps> = ({ companyName = "TechOra" }) => {
             </div>
           </div>
 
-          {/* Quick Links Sections */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:col-span-2 gap-8">
-            {/* Company Links */}
             <div>
               <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider">Company</h3>
               <ul className="mt-4 space-y-3">
@@ -101,7 +96,6 @@ const Footer: React.FC<FooterProps> = ({ companyName = "TechOra" }) => {
               </ul>
             </div>
 
-            {/* Support Links */}
             <div>
               <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider">Support</h3>
               <ul className="mt-4 space-y-3">
@@ -116,7 +110,6 @@ const Footer: React.FC<FooterProps> = ({ companyName = "TechOra" }) => {
               </ul>
             </div>
 
-            {/* Legal Links */}
             <div>
               <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider">Legal</h3>
               <ul className="mt-4 space-y-3">
@@ -132,7 +125,6 @@ const Footer: React.FC<FooterProps> = ({ companyName = "TechOra" }) => {
             </div>
           </div>
 
-          {/* Newsletter Subscription */}
           <div className="space-y-6">
             <div>
               <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider">
@@ -163,7 +155,6 @@ const Footer: React.FC<FooterProps> = ({ companyName = "TechOra" }) => {
         </div>
       </div>
 
-      {/* Footer Bottom */}
       <div className="border-t border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="md:flex md:items-center md:justify-between">

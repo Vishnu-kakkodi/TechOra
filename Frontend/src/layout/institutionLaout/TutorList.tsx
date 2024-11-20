@@ -45,7 +45,6 @@ const TutorList: React.FC<TutorListProps> = ({ itemsPerPage = 10 }) => {
     setCurrentPage(page);
   };
 
-  // Generate array of page numbers to display
   const getPageNumbers = () => {
     const pages = [];
     for (let i = 1; i <= totalPages; i++) {
@@ -56,7 +55,6 @@ const TutorList: React.FC<TutorListProps> = ({ itemsPerPage = 10 }) => {
 
   return (
     <div className="w-full bg-white p-4 rounded-lg shadow">
-      {/* Header with Search */}
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-semibold text-gray-800">Tutors List</h2>
         <div className="flex gap-4 items-center">
@@ -73,7 +71,6 @@ const TutorList: React.FC<TutorListProps> = ({ itemsPerPage = 10 }) => {
         </div>
       </div>
       
-      {/* Table */}
       <div className="overflow-x-auto mb-4">
         <table className="min-w-full bg-white">
           <thead>
@@ -125,9 +122,7 @@ const TutorList: React.FC<TutorListProps> = ({ itemsPerPage = 10 }) => {
         </table>
       </div>
 
-      {/* Pagination */}
       <div className="border-t border-gray-200 px-4 py-3 flex items-center justify-between">
-        {/* Mobile pagination controls */}
         <div className="flex-1 flex justify-between sm:hidden">
           <button
             onClick={() => handlePageChange(currentPage - 1)}
@@ -145,7 +140,6 @@ const TutorList: React.FC<TutorListProps> = ({ itemsPerPage = 10 }) => {
           </button>
         </div>
 
-        {/* Desktop pagination controls */}
         <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
           <div>
             <p className="text-sm text-gray-700">

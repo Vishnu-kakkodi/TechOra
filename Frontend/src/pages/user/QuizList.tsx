@@ -76,7 +76,6 @@ const QuizList: React.FC = () => {
     <div className="max-w-4xl mx-auto mt-8 p-6 bg-gray-50 min-h-screen">
       <h1 className="text-3xl font-bold text-center mb-8 text-gray-800">Available Quizzes</h1>
       
-      {/* Filters */}
       <div className="mb-6 flex space-x-4">
         <select 
           className="p-2 border rounded"
@@ -108,7 +107,6 @@ const QuizList: React.FC = () => {
             className="bg-white rounded-lg shadow-md hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-1 cursor-pointer"
             onClick={() => setSelectedQuiz(quiz)}
           >
-            {/* Quiz card content remains the same */}
             <div className="p-6 flex items-center justify-between">
               <div className="flex-grow">
                 <h2 className="text-xl font-semibold text-gray-800 mb-2">{quiz.title}</h2>
@@ -144,7 +142,6 @@ const QuizList: React.FC = () => {
         ))}
       </div>
 
-      {/* Quiz Details Modal */}
       {selectedQuiz && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-8 max-w-md w-full">

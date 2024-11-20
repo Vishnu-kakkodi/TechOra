@@ -110,6 +110,18 @@ export class CourseService {
         }
       }
 
+      async removeCart(userId: string | null, courseId:string): Promise<void>{
+        try{
+          const cart = await this.cartRepository.findCart(userId);
+          if(cart){
+            await this.cartRepository.remove(userId,courseId)
+          }
+
+        }catch(error){
+          throw error;
+        }
+      }
+
       
       async userCorseList(): Promise<any>{
 

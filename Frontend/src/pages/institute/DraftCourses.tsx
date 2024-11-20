@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Plus, FileEdit, Trash2, Video, ChevronDown, Search } from 'lucide-react';
+import { Trash2, ChevronDown, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useDraftCourseListQuery } from '../../store/slices/institutionSlice';
 
 import InstituteSidebar from '../../components/sidebar/InstituteSidebar';
+import { Course } from '../../types/courseType';
 
 const DraftCourses = () => {
 
@@ -24,7 +25,6 @@ const DraftCourses = () => {
   const handleEdit = (courseId:string) => {
     navigate('/institute/upload-videos', {state: {draftId: courseId}})
     console.log('Form submitted:');
-    // Add your form submission logic here
   };
 
   const [selectedCourse, setSelectedCourse] = React.useState();
@@ -69,7 +69,6 @@ const DraftCourses = () => {
   };
 
   const handleDelete = (courseId: number) => {
-    // Implement delete functionality
     console.log('Delete course:', courseId);
   };
 
@@ -83,7 +82,6 @@ const DraftCourses = () => {
     <InstituteSidebar />
         {/* <div className="p-6"> */}
     <div className="p-6 max-w-6xl mx-auto">
-      {/* Header */}
 
       <div className="flex justify-between items-center mb-6">
         <div>
@@ -97,7 +95,6 @@ const DraftCourses = () => {
         </button>
       </div>
 
-      {/* Filters */}
       <div className="flex gap-4 mb-6">
         <div className="flex-1">
           <div className="relative">
@@ -112,7 +109,6 @@ const DraftCourses = () => {
           </div>
         </div>
         
-        {/* Department Filter */}
         <div className="relative">
           <select
             value={selectedDepartment}
@@ -127,7 +123,6 @@ const DraftCourses = () => {
           <ChevronDown className="absolute right-2 top-2.5 h-4 w-4 text-gray-500 pointer-events-none" />
         </div>
 
-        {/* Status Filter */}
         <div className="relative">
           <select
             value={selectedStatus}
@@ -142,9 +137,8 @@ const DraftCourses = () => {
         </div>
       </div>
 
-      {/* Draft Courses Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {course.map((course:any) => (
+        {course.filter((course: Course) => course.status !== 'published').map((course:any) => (
           <div key={course.id} className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
             <img
               src={course.thumbnail}
@@ -161,7 +155,6 @@ const DraftCourses = () => {
                 </div>
               </div>
 
-              {/* Action Buttons */}
               <div className="flex justify-between mt-6 pt-4 border-t border-gray-200">
                 <button
                   // onClick={() => handleDeleteCourse(course.id)}

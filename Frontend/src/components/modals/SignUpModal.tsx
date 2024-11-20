@@ -1,55 +1,12 @@
-// import React, { useState } from 'react';
-// import { useFormik } from 'formik';
-// import { User } from '../../types/userTypes';
-// import Modal from '../../components/modals/Modal'
-// import { useNavigate } from 'react-router-dom';
-// import { authService } from '../../services/authService';
-// import { toast } from 'react-toastify';
 
-
-// interface SignUpModalProps {
-//   setModalOpen: (open: boolean) => void
-// }
-
-
-
-// const SignUpModal: React.FC<SignUpModalProps> = ({ setModalOpen }) => {
-
-//   const navigate = useNavigate()
-
-//   const formik = useFormik<User>({
-//     initialValues: {
-//       userName: '',
-//       email: '',
-//       password: '',
-//       confirmPassword: '',
-//       phoneNumber: ''
-//     },
-//     onSubmit: async (values, {setSubmitting})=>{
-//       try{
-//         const  registrationData = values;
-//         const response = await authService.register(registrationData);
-
-//         toast.success('Registration successful!');
-//       }catch(error){
-//         console.log(error,"Error")
-//       }
-//     }
-//   });
-
-
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { User } from '../../types/userTypes';
 import Modal from '../../components/modals/Modal';
-import { useNavigate } from 'react-router-dom';
-// import { authService } from '../../services/userApiService';
 import { toast } from 'react-toastify';
-import { useDispatch } from 'react-redux';
-import { setCredentials } from '../../store/slices/authSlice';
-import OtpModal from '../modals/OtpModal';
 import { useInitiateSignupMutation } from '../../store/slices/userSlice';
+import { ApiError } from '../../types/ApiError';
 
 
 interface SignUpModalProps {
@@ -96,11 +53,12 @@ const SignUpModal: React.FC<SignUpModalProps> = ({ setSignUpModalOpen, setOtpMod
       try {
         setOtpModalOpen(true)
         setSignUpModalOpen(false);
-        await initiateSignup(values).unwrap();
-      } catch (error: any) {
-        console.error(error, "Error occured");
-
-        toast.error(error.message || 'Registration failed. Please try again.');
+        const response = await initiateSignup(values).unwrap();
+        toast.success(response.message)
+      } catch (error: unknown) {
+        console.log(error,"Error")
+        const ApiError = error as ApiError
+          toast.error(ApiError.data.message)
       } finally {
         setSubmitting(false);
       }
