@@ -160,11 +160,24 @@ export const userSlice = createApi({
     }),
 
     payment: builder.mutation({
-      query: () =>({
+      query: ({orderDetails}) => ({
         url: '/users/payment',
         method: 'POST',
         credentials: 'include',
-      })
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: {orderDetails}, 
+      }),
+    }),
+
+    paymentSuccess: builder.mutation({
+      query: (orderId) => ({
+        url: '/users/payment-success',
+        method: 'POST',
+        credentials: 'include',
+        body: {orderId}, 
+      }),
     }),
 
     courseList: builder.query({
@@ -192,6 +205,7 @@ export const
    useAddToCartMutation,
    useRemoveCartMutation,
    usePaymentMutation,
+   usePaymentSuccessMutation,
    useCourseListQuery
   } = userSlice;
 

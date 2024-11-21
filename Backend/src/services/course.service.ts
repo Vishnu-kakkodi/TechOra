@@ -83,11 +83,11 @@ export class CourseService {
             subTotal:(course?.price) || 0, 
         };
 
-        if(cart && cart.length > 0){
-          cart[0].items.push(newItem);
-          cart[0].totalItems += 1;
-          cart[0].totalPrice += course?.price || 0;
-          await cart[0].save();
+        if(cart){
+          cart.items.push(newItem);
+          cart.totalItems += 1;
+          cart.totalPrice += course?.price || 0;
+          await cart.save();
         }else{
           await this.cartRepository.createCart(
             userId,
@@ -101,7 +101,7 @@ export class CourseService {
         }
       }
 
-      async getCartItems(userId: string | null): Promise<CartDocument[]>{
+      async getCartItems(userId: string | null): Promise<CartDocument | null>{
         try{
           const data = await this.cartRepository.findCart(userId);
           return data

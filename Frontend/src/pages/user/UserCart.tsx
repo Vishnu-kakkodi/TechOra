@@ -5,18 +5,31 @@ import Footer from '../../components/footer/Footer';
 import { useCartPageQuery, usePaymentMutation, useRemoveCartMutation } from '../../store/slices/userSlice';
 import { CartItem } from '../../types/cartType';
 import { toast } from 'react-toastify';
+import {loadStripe, Stripe} from '@stripe/stripe-js';
+import { orderItems } from '../../types/userSide/orderType';
 
 interface UserCartProps {
   onRemoveItem?: (id: string) => void;
   onCheckout?: (selectedItems: CartItem[] | undefined) => void;
 }
 
+interface SelectedItemDetails {
+  id: string;
+  TotalPrice: number;
+}
+
+interface StripeSessionResponse {
+  id: string;
+}
+
 const UserCart: React.FC<UserCartProps> = ({ onRemoveItem, onCheckout }) => {
   const { data: cartData, refetch  } = useCartPageQuery(null);
-  const cartItems = cartData?.Data[0];
+  const cartItems = cartData?.Data;
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
   const [payment] = usePaymentMutation();
   const [removecart] = useRemoveCartMutation();
+
+  console.log(cartData,"cartItemsss")
 
   useEffect(() => {
     refetch();
@@ -41,9 +54,25 @@ const UserCart: React.FC<UserCartProps> = ({ onRemoveItem, onCheckout }) => {
   };
 
   const selectedItemsDetails: CartItem[] = cartItems?.items.filter(item => selectedItems.has(item.course._id)) ?? [];
+  console.log(selectedItemsDetails)
   const total = selectedItemsDetails.length > 0 
     ? selectedItemsDetails.reduce((sum, item) => sum + item.price, 0) 
     : 0;
+
+    const orderItems = selectedItemsDetails.map((item) => ({
+      courseId: item.course._id.toString(),
+      name: item.course.title,
+      description: item.course.description,
+      thumbnail:item.course.thumbnail,
+      price: item.price
+  }));
+
+  console.log(orderItems)
+
+  const orderDetails = {
+    orderItems,
+    total
+  }
 
   const handleRemoveItem = async (id: string) => {
 
@@ -61,7 +90,32 @@ const UserCart: React.FC<UserCartProps> = ({ onRemoveItem, onCheckout }) => {
   };
 
   const handleCheckout = async () => {
-    onCheckout?.(selectedItemsDetails);
+    const stripe = await loadStripe("pk_test_51QNDQKGEFHCzggCSwTwIr16xAKbs3fvWWrDx2gIHy97ldM7yvXRv1Br5AEd2RI4xhEkVBrrfW2f7ZtBziCqbDsS300AGTVPbgi");
+    if (!stripe) {
+      console.error('Stripe failed to load');
+      return;
+    }
+  
+    try {
+      console.log(orderDetails,"Details")
+      const response = await payment({orderDetails});
+      
+      if (response.data && response.data.id) {
+        const result = await stripe.redirectToCheckout({
+          sessionId: response.data.id
+        });
+  
+        if (result.error) {
+          console.error('Checkout Error:', result.error);
+          toast.error('Checkout failed');
+        }
+      } else {
+        toast.error('Failed to create checkout session');
+      }
+    } catch (error) {
+      console.error('Checkout Process Error:', error);
+      toast.error('An error occurred during checkout');
+    }
   };
 
   return (

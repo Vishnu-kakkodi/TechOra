@@ -69,5 +69,13 @@ export interface Cart {
 
 export interface cartResponse {
     message: string;
-    Data: Cart[];
+    Data: {
+        _id: string;
+        userId: string;
+        items: CartItem[];
+        totalItems: number;
+        totalPrice: number;
+        createdAt: string;
+        updatedAt: string;
+    }
 }

@@ -8,6 +8,8 @@ import institutionRoutes from './routes/institution.routes'
 import { errorMiddleware } from "./middleware/error.middleware";
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
+import Stripe from 'stripe';
+const stripe = require("stripe")(process.env.STRIPE_SECRET)
 dotenv.config();
 const app = express();
 app.use(cors({

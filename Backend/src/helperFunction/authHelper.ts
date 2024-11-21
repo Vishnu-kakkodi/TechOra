@@ -31,17 +31,19 @@ const helperFunction: HelperFunction = {
     },
 };
 
-const decodedToken = (token: string, requiredRole: string):string | null =>{
+const decodedToken = (token: string, requiredRole: string):string =>{
     try{
+        console.log(token)
         const decoded = jwt.verify(token, process.env.ACCESS_SECRET_KEY as string) as DecodedToken;
         if(decoded.role !== requiredRole){
             console.error(`Invalid role. Expected ${requiredRole}, found ${decoded.role}`);
-            return null;
+            return "null";
         }
+        console.log(decoded._id)
         return decoded._id;
     } catch (error) {
         console.error("Token decoding failed:", error);
-        return null;
+        return "null";
     }
 }
 

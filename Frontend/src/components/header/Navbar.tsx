@@ -33,7 +33,7 @@ const Navbar = () => {
           </div>
 
           <nav className="hidden md:flex items-center space-x-6">
-            {['Course', 'Quiz', 'Leaderboard', 'Cart'].map((item) => (
+            {['Course', 'Quiz', 'Leaderboard', 'Cart', 'Account'].map((item) => (
               <Link
                 key={item}
                 to={`/${item.toLowerCase()}`}
@@ -69,7 +69,7 @@ const Navbar = () => {
             <div className="pb-2">
               <SearchBar data={searchData} />
             </div>
-            {['Course', 'Quiz', 'Leaderboard', 'Cart'].map((item) => (
+            {['Course', 'Quiz', 'Leaderboard', 'Cart', 'Account'].map((item) => (
               <Link
                 key={item}
                 to={`/${item.toLowerCase()}`}

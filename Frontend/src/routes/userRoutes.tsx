@@ -14,6 +14,7 @@ import Account from '../pages/user/Account';
 import ForgotPasswordPage from '../components/modals/ForgotPassword';
 import QuizList from '../pages/user/QuizList';
 import QuizAttempt from '../pages/user/QuizAttempt';
+import PaymentSuccess from '../pages/user/PaymentSuccess';
 
 const UserRoutes: React.FC = () => {
 
@@ -84,6 +85,15 @@ const UserRoutes: React.FC = () => {
         element={
           <AuthRoute role={'user'}>
             <Account />
+          </AuthRoute>
+        }
+      />
+
+      <Route
+        path="/success"
+        element={
+          <AuthRoute role={'user'}>
+            <PaymentSuccess />
           </AuthRoute>
         }
       />
