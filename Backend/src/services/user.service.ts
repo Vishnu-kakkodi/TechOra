@@ -3,14 +3,16 @@ import { UserRepository } from "../repositories/user.repository";
 import { CreateUserDto } from "../dtos/user.dtos";
 import { HttpException } from "../middleware/error.middleware";
 import nodemailer from 'nodemailer';
-import { helperFunction } from "../helperFunction/authHelper";
+import { decodedToken, helperFunction } from "../helperFunction/authHelper";
 import STATUS_CODES from '../constants/statusCode';
 import MESSAGES from '../constants/message';
 import { generateNumericOTP } from "../utils/gererateNumericOTP";
 import { emailSend } from "../utils/emailSend";
 import bcrypt from 'bcrypt';
 import { PasswordUtils } from "../utils/passwordUtils";
-import { UserCookieData } from "../types/user.types";
+import { MyCourses, UpdatePassword, UserCookieData } from "../types/user.types";
+import { CourseRepository } from "../repositories/course.repository";
+import { CourseDocument } from "../interfaces/course.interface";
 
 interface userDetail extends CreateUserDto {
     OTP: string;
@@ -18,7 +20,9 @@ interface userDetail extends CreateUserDto {
 
 
 export class UserService {
-    constructor(private readonly userRepository: UserRepository) { }
+    constructor(private readonly userRepository: UserRepository,
+        private readonly courseRepository: CourseRepository
+        ) { }
 
     async initiateUser(userDetail: CreateUserDto): Promise<userDetail> {
         try {
@@ -26,11 +30,11 @@ export class UserService {
             userDetail.password = hashPassword;
             const OTP = generateNumericOTP(4);
             console.log(OTP);
-            await emailSend(userDetail.email, OTP);
+            const subject:string = "Authentication OTP"
+            await emailSend(userDetail.email, subject, OTP);
             return { ...userDetail, OTP }
         } catch (error) {
-            throw new HttpException(STATUS_CODES.SERVER_ERROR, MESSAGES.ERROR.SERVER_ERROR);
-        }
+            throw error        }
     }
 
     async createUser(cookieData: UserCookieData, OTP: string): Promise<IUserDocument> {
@@ -48,16 +52,15 @@ export class UserService {
             }
 
             const user = await this.userRepository.create(userDetail);
-            const accessToken = helperFunction.accesstoken(user.id, "user");
-            const refreshToken = helperFunction.refreshtoken(user.id, "user");
-            user.accessToken = accessToken;
-            user.refreshToken = refreshToken;
+            // const accessToken = helperFunction.accesstoken(user.id, "user");
+            // const refreshToken = helperFunction.refreshtoken(user.id, "user");
+            // user.accessToken = accessToken;
+            // user.refreshToken = refreshToken;
             return user;
 
 
         } catch (error) {
-            throw new HttpException(STATUS_CODES.SERVER_ERROR, MESSAGES.ERROR.SERVER_ERROR);
-        }
+            throw error        }
     }
 
     async getUser(email: string, password: string): Promise<IUserDocument | null> {
@@ -85,8 +88,7 @@ export class UserService {
             return { ...user.toObject(), accessToken, refreshToken };
 
         } catch (error) {
-            throw error;
-        }
+            throw error        }
     }
 
     async verifyEmail(email: string): Promise<string> {
@@ -138,8 +140,7 @@ export class UserService {
             return OTP;
 
         } catch (error) {
-            throw error;
-        }
+            throw error        }
     }
 
 
@@ -152,8 +153,7 @@ export class UserService {
                 return "Otp Verified"
             }
         } catch (error) {
-            throw error;
-        }
+            throw error        }
     }
 
 
@@ -167,8 +167,7 @@ export class UserService {
             await user?.save();
             return user
         } catch (error) {
-            throw error;
-        }
+            throw error        }
     }
 
 
@@ -218,7 +217,99 @@ export class UserService {
             return OTP;
 
         } catch (error) {
-            throw error;
+            throw error        }
+    }
+
+    async changePassword(credential:UpdatePassword, token:string): Promise<any>{
+        try{
+            const currentPassword = credential.currentPassword;
+            const newPassword = credential.newPassword;
+            const confirmPassword = credential.confirmPassword;
+            const requiredRole = "user";
+            const userId = decodedToken(token, requiredRole);
+            const user = await this.userRepository.findById(userId);
+            if(!user){
+                throw new HttpException(STATUS_CODES.NOT_FOUND,MESSAGES.ERROR.USER_NOT_FOUND);
+            }
+            if(user){
+                const validPassword = await PasswordUtils.comparePassword(currentPassword, user.password);
+                if(!validPassword){
+                    console.log("Error")
+                    throw new HttpException(STATUS_CODES.UNAUTHORIZED, MESSAGES.ERROR.INVALID_CURRENT_PASSWORD)
+                }
+                if(currentPassword===confirmPassword){
+                    throw new HttpException(STATUS_CODES.BAD_REQUEST,MESSAGES.ERROR.SAME_PASSWORD)
+                }
+                const hashPassword = await PasswordUtils.hashPassword(confirmPassword);
+
+                user.password = hashPassword;
+
+                await user.save();
+
+                return
+
+
+            }
+        }catch(error){
+            throw error
         }
+    }
+
+    async myCourses(token:string,page:number,limit:number,search:string): Promise<{ courses: CourseDocument[] | null; total: number;}> {
+        try{
+            const skip = (page - 1) * limit;
+            let query:any = {};
+            const requiredRole = "user";
+            const userId = decodedToken(token, requiredRole);
+            if (search && search.trim() !== '') {
+                query.$or = [
+                    { title: { $regex: search, $options: 'i' } }
+                ];
+            }
+            const user = await this.userRepository.findById(userId);
+            if(!user){
+                throw new HttpException(STATUS_CODES.NOT_FOUND,MESSAGES.ERROR.USER_NOT_FOUND);
+            }
+            const MyCourses = user?.purchasedCourses
+            return await this.courseRepository.findMyCourse(MyCourses,query,skip,limit)
+        }catch(error){
+            throw error        }
+    }
+
+
+    async profilePhoto(userId:string, fileLocation:string): Promise<IUserDocument | null> {
+        try {
+            const user = await this.userRepository.findById(userId)
+            if (!user) {
+                throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.USER_NOT_FOUND);
+            }
+
+            if (user) {
+                if (user.status === 'inactive') {
+                    throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.ACCOUNT_LOCKED);
+                }
+                user.profilePhoto = fileLocation;
+                user.save();
+            }
+
+
+            return { ...user.toObject()};
+
+        } catch (error) {
+            throw error        }
+    }
+
+    async updateProfile(userId: string, updateData: {
+        userName?: string;
+        phoneNumber?: string;
+        address?: string;
+    }): Promise<IUserDocument | null> {
+        try {
+            const updatedUser = await this.userRepository.UpdateProfile(userId,updateData );
+            return updatedUser;
+
+            
+        } catch (error) {
+            throw error        }
     }
 }

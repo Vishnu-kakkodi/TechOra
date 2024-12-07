@@ -1,23 +1,37 @@
 import { Request, Response, NextFunction } from "express";
 import { OrderService } from "../services/order.service";
-import Stripe from 'stripe';
 import dotenv from 'dotenv';
 import { decodedToken } from "../helperFunction/authHelper";
-import { Thumbnail } from "aws-sdk/clients/medialive";
-import { description } from "aws-sdk/clients/frauddetector";
+import { HttpException } from "../middleware/error.middleware";
+import STATUS_CODES from "../constants/statusCode";
+import MESSAGES from "../constants/message";
 
 dotenv.config();
 const stripe = require('stripe')(process.env.STRIPE_SECRET, {
     apiVersion: process.env.STRIPE_API_VERSION,
 });
 
-interface OrderBody {
+interface NewOrderBody {
     orderDetails: {
         orderItems: [{ courseId: string, name: string, description: string, thumbnail: string, price: number }],
         total: number
     }
 }
 
+interface ExistingOrderBody {
+    orderDetails: {
+        orderId: string;
+        orderItems: [{ courseId: string, name: string, description: string, thumbnail: string, price: number }],
+        total: number
+    }
+}
+
+type OrderBody = NewOrderBody | ExistingOrderBody;
+
+
+function isExistingOrder(order: OrderBody): order is ExistingOrderBody {
+    return 'orderId' in order.orderDetails;
+}
 
 
 export class OrderController {
@@ -38,15 +52,26 @@ export class OrderController {
             if (!Array.isArray(orderItems) || typeof total !== 'number') {
                 throw new Error('Invalid order details');
             }
-            const Token = req.cookies.user
+            const Token = req.cookies.user;
             const token = Token.accessToken;
+            if(!token){
+                throw new HttpException(STATUS_CODES.UNAUTHORIZED,MESSAGES.ERROR.UNAUTHORIZED)
+            }
             const requiredRole = "user";
             const userId = decodedToken(token, requiredRole);
-            const order = await this.orderService.createOrder(
-                userId,
-                orderItems,
-                total
-            );
+            let order;
+            if (isExistingOrder(req.body)) {
+                order = await this.orderService.getOrderById(req.body.orderDetails.orderId);
+                if (!order) {
+                    throw new Error('Order not found');
+                }
+            } else {
+                order = await this.orderService.createOrder(
+                    userId,
+                    orderItems,
+                    total
+                );
+            }
 
 
             const lineItems = orderItems.map(product => ({
@@ -69,29 +94,13 @@ export class OrderController {
                 success_url: `http://localhost:5173/success?orderId=${order._id}`,
                 cancel_url: `http://localhost:5173/cancel?orderId=${order._id}`,
             });
-            // const session = await stripe.checkout.sessions.create({
-            //     payment_method_types: ["card"],
-            //     line_items: [{
-            //         price_data: {
-            //             currency: "inr",
-            //             product_data: {
-            //                 name: "Checkout Amount"
-            //             },
-            //             unit_amount: Math.round(total * 100)
-            //         },
-            //         quantity: 1
-            //     }],
-            //     mode: "payment",
-            //     success_url: `http://localhost:5173/success?orderId=${order._id}`,
-            //     cancel_url: `http://localhost:5173/cancel?orderId=${order._id}`,
-            // });
             res.json({
                 id: session.id,
             });
 
 
         } catch (error) {
-            next(error);
+            next(error)
         }
     }
 
@@ -106,6 +115,9 @@ export class OrderController {
             const orderId= req.body.orderId;
             const Token = req.cookies.user
             const token = Token.accessToken;
+            if(!token){
+                throw new HttpException(STATUS_CODES.UNAUTHORIZED,MESSAGES.ERROR.UNAUTHORIZED)
+            }
             const requiredRole = "user";
             const userId = decodedToken(token, requiredRole);
 
@@ -115,7 +127,32 @@ export class OrderController {
             });
 
         } catch (error) {
-            next(error);
+            next(error)
+        }
+    }
+
+    async orderList(
+        req: Request<{}, {}>,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
+        try {
+            const orderId= req.body.orderId;
+            const Token = req.cookies.user
+            const token = Token.accessToken;
+            if(!token){
+                throw new HttpException(STATUS_CODES.UNAUTHORIZED,MESSAGES.ERROR.UNAUTHORIZED)
+            }
+            const requiredRole = "user";
+            const userId = decodedToken(token, requiredRole);            
+            
+            const order = await this.orderService.orderList(userId);
+            res.json({
+                order
+            });
+
+        } catch (error) {
+            next(error)
         }
     }
 

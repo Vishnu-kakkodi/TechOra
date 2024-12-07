@@ -8,6 +8,10 @@ const MESSAGES = {
       LOGOUT_SUCCESS: "Logout successful.",
       PASSWORD_CHANGED: "Password has been successfully changed.",
       OTP_SEND: "Otp send successfully.",
+      QUIZ_CREATED: "Quiz created.",
+      QUIZ_UPDATED: "Quiz updated.",
+      QUIZ_FETCHED: "Quiz fetched successfully.",
+      COURSE_CREATED: "Course created successfully."
     },
   
     ERROR: {
@@ -15,6 +19,8 @@ const MESSAGES = {
       TIME_EXPIRED: "Time expired, Try again.",
       EMAIL_ALREADY_EXISTS: "Email already exists.",
       INVALID_CREDENTIALS: "Invalid email or password.",
+      INVALID_CURRENT_PASSWORD: "Incorrect current password.",
+      SAME_PASSWORD: "New password cannot be the same as the current password.",
       INVALID_OTP: "Invalid otp.",
       UNAUTHORIZED: "Unauthorized access.",
       FORBIDDEN: "You do not have permission to access this resource.",
@@ -23,6 +29,8 @@ const MESSAGES = {
       TOKEN_EXPIRED: "Authentication token has expired.",
       ACCOUNT_LOCKED: "Your account has been locked. Please contact support.",
       OTP_EXPIRED: "OTP has expired. Please request a new one.",
+      ALREADY_ADDED_TO_CART: 'Course already exists in cart',
+      DATA_NOTFOUND: "Data not found.",
     },
   
     VALIDATION: {

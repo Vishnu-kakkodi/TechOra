@@ -11,7 +11,15 @@ import { DownloadDocResponse } from "../controllers/admin.controller";
 import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
 import { Readable } from 'stream';
 import dotenv from 'dotenv';
+import { emailSend } from "../utils/emailSend";
+import { FilterQuery } from 'mongoose';
 dotenv.config();
+
+export type SearchQueryType = FilterQuery<{
+    userName: string;
+    email: string;
+    phoneNumber: string;
+  }>;
 
 
 AWS.config.update({
@@ -59,21 +67,57 @@ export class AdminService {
     }
 
 
-    async getUser(): Promise<IUserDocument[]> {
+    async getUser(page:number,limit:number,search:string,status:string): Promise<{ users: IUserDocument[]; total: number }> {
         console.log("Hai request");
 
         try {
-            return await this.userRepository.find();
+            const skip = (page - 1) * limit;
+            let query:any = {};
+
+            if (search && search.trim() !== '') {
+                query.$or = [
+                    { userName: { $regex: search, $options: 'i' } },
+                    { email: { $regex: search, $options: 'i' } },
+                    { phoneNumber: { $regex: search, $options: 'i' } }
+                ];
+            }
+
+            if (status && status.trim() !== '') {
+                console.log('Status received:', status);
+                
+                query.status = { $regex: new RegExp(`^${status}$`, 'i') };
+            }
+    
+            console.log("Query:", query);
+
+            return await this.userRepository.find(query,skip,limit);
         } catch (error) {
             throw error;
         }
     }
 
-    async getInstitutes(): Promise<InstituteDocument[]> {
+    async getInstitutes(page:number,limit:number,search:string,filter:string): Promise<{ institutes: InstituteDocument[]; total: number }> {
         console.log("Hai request");
 
         try {
-            return await this.instituteRepository.find();
+            const skip = (page - 1) * limit;
+            let query:any = {};
+
+            if (search && search.trim() !== '') {
+                query.$or = [
+                    { collegeName: { $regex: search, $options: 'i' } },
+                    { instituteEmail: { $regex: search, $options: 'i' } },
+                    { collegeCode: { $regex: search, $options: 'i' } },
+                    { applicationId: { $regex: search, $options: 'i' } }
+
+                ];
+            }
+
+            if(filter){
+                query.status = filter
+            }
+    
+            return await this.instituteRepository.find(query,skip,limit);
         } catch (error) {
             throw error;
         }
@@ -123,7 +167,7 @@ export class AdminService {
     }
 
     
-    async InstituteReject(instituteId: string): Promise<InstituteDocument> {
+    async InstituteReject(instituteId: string, rejectReason:string): Promise<InstituteDocument> {
         try {
             const institute = await this.instituteRepository.findById(instituteId);
 
@@ -134,6 +178,11 @@ export class AdminService {
             institute.status = InstituteStatus.Reject;
 
             await institute.save();
+
+            const subject:string = "Application Rejected"
+
+            await emailSend(institute.instituteEmail,subject,rejectReason);
+
 
             console.log(institute, "Updated Institute");
 
@@ -178,6 +227,22 @@ export class AdminService {
             await institute.save();
 
             console.log(institute, "Updated Institute");
+
+            return institute;
+        } catch (error) {
+            console.error("Error updating institution status:", error);
+            throw error;
+        }
+    }
+
+    
+    async InstituteView(instituteId: string): Promise<InstituteDocument> {
+        try {
+            const institute = await this.instituteRepository.findById(instituteId);
+
+            if (!institute) {
+                throw new HttpException(400, "Institute not found");
+            }
 
             return institute;
         } catch (error) {

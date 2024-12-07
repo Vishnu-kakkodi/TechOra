@@ -1,28 +1,76 @@
 
-import React, { useState, useRef, ChangeEvent } from 'react';
-import { Plus, Trash2, GripVertical, AlertCircle, Image as ImageIcon, Clock, RefreshCcw, Upload, X } from 'lucide-react';
+import React, { ReactNode, useState } from 'react';
+import { Plus, Trash2, GripVertical, AlertCircle, Clock, RefreshCcw } from 'lucide-react';
 import InstituteSidebar from '../../components/sidebar/InstituteSidebar';
 import { useAddQuizMutation } from '../../store/slices/institutionSlice';
-import { Formik, Form, Field, FormikHelpers } from 'formik';
+import { Formik, Form, Field, FieldProps } from 'formik';
 import { QuestionType, QuizStatus, Question, QuizData, QuestionBoxProps, Option } from '../../types/quizType'
+import { toast } from 'react-toastify';
+import * as Yup from 'yup';
+import { useNavigate } from 'react-router-dom';
+
+const QuizValidationSchema = Yup.object().shape({
+  title: Yup.string().required('Quiz title is required'),
+  duration: Yup.number().positive('Duration must be positive').required('Duration is required'),
+  maxAttempts: Yup.number().positive('Max attempts must be positive').required('Max attempts is required'),
+  // maxQuestions: Yup.number().min(1, 'At least one question').max(20, 'Maximum 20 questions').required('Max questions is required'),
+  department: Yup.string().required('Department selection is required'),
+  stack: Yup.string().required('Stack is required'),
+  difficultyLevel: Yup.string().required('Difficulty level is required'),
+  positiveScore: Yup.number().min(1, 'Minimum score is 1').max(4, 'Maximum score is 4').required('Positive score is required'),
+  negativeScore: Yup.number().min(0, 'Minimum negative score is 0').max(1, 'Maximum negative score is 1').required('Negative score is required'),
+  passingScore: Yup.number().positive('Passing score must be positive').required('Passing score is required'),
+  description: Yup.string().required('Quiz description is required'),
+  startDate: Yup.date().required('Start date is required')
+});
+
+interface ErrorMessageProps {
+  name: string;
+}
+
+interface InputWrapperProps {
+  children: ReactNode;
+  name: string;
+}
+
+const ErrorMessage: React.FC<ErrorMessageProps> = ({ name }) => {
+  return (
+    <div className="text-red-500 text-sm mt-1 pl-4">
+      <Field name={name}>
+        {({ form }: FieldProps) => {
+          const { touched, errors } = form;
+          return touched[name] && errors[name] ? (
+            <span className="block">{errors[name] as string}</span>
+          ) : null;
+        }}
+      </Field>
+    </div>
+  );
+};
+
+const InputWrapper: React.FC<InputWrapperProps> = ({ children, name }) => {
+  return (
+    <div className="relative">
+      {children}
+      <ErrorMessage name={name} />
+    </div>
+  );
+};
+
 
 const CreateQuiz: React.FC = () => {
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const [maxQuestions, setMaxQuestions] = useState<number>(1);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
   const [showMaxAlert, setShowMaxAlert] = useState<boolean>(false);
   const [addQuiz] = useAddQuizMutation();
-  const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
-  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string>('');
+  const [questionModal, setQuestionModal] = useState<boolean>(false);
+  const navigate = useNavigate();
 
-
-  const [quizData, setQuizData] = useState<QuizData>({
+  const initialQuizData: QuizData = {
     title: '',
     description: '',
     duration: '30',
     maxAttempts: '3',
-    thumbnailQuiz: null,
     questions: [{
       id: 1,
       question: '',
@@ -34,12 +82,19 @@ const CreateQuiz: React.FC = () => {
       ],
       explanation: '',
       type: 'multiple-choice',
-      status: 'draft'
     }],
     status: 'draft',
-    totalQuestions: 1
-  });
+    totalQuestions: 1,
+    department: '',
+    stack: '',
+    difficultyLevel: '',
+    positiveScore: 1,
+    negativeScore: 1,
+    passingScore: 1,
+    startDate: ''
+  };
 
+  const [quizData, setQuizData] = useState<QuizData>(initialQuizData);
 
   const addQuestion = (): void => {
     if (quizData.questions.length >= maxQuestions) {
@@ -56,7 +111,6 @@ const CreateQuiz: React.FC = () => {
         : [],
       explanation: '',
       type: quizData.questions[0].type,
-      status: 'draft'
     };
 
     setQuizData(prev => ({
@@ -70,7 +124,8 @@ const CreateQuiz: React.FC = () => {
   const removeQuestion = (index: number): void => {
     setQuizData(prev => ({
       ...prev,
-      questions: prev.questions.filter((_, i) => i !== index)
+      questions: prev.questions.filter((_, i) => i !== index),
+      totalQuestions: prev.totalQuestions - 1
     }));
     if (currentQuestionIndex >= index && currentQuestionIndex > 0) {
       setCurrentQuestionIndex(currentQuestionIndex - 1);
@@ -142,132 +197,25 @@ const CreateQuiz: React.FC = () => {
     </button>
   );
 
-  const handleThumbnailUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    if (!file.type.startsWith('image/')) {
-      alert('Please upload an image file');
-      return;
-    }
-
-    const maxSize = 5 * 1024 * 1024;
-    if (file.size > maxSize) {
-      alert('File size must be less than 5MB');
-      return;
-    }
-
-    setThumbnailFile(file);
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setThumbnailPreview(reader.result as string);
-    };
-    reader.readAsDataURL(file);
-  };
-
-  // const removeThumbnail = () => {
-  //   setThumbnailFile(null);
-  //   setThumbnailPreview(null);
-  //   if (fileInputRef.current) {
-  //     fileInputRef.current.value = '';
-  //   }
-  // };
-
-  const initialValues: QuizData = {
-    title: '',
-    description: '',
-    duration: '30',
-    maxAttempts: '3',
-    thumbnailQuiz: null,
-    questions: [{
-      id: 1,
-      question: '',
-      options: [
-        { text: '', isCorrect: false },
-        { text: '', isCorrect: false },
-        { text: '', isCorrect: false },
-        { text: '', isCorrect: false }
-      ],
-      explanation: '',
-      type: 'multiple-choice',
-      status: 'draft'
-    }],
-    status: 'draft',
-    totalQuestions: 1
-  };
-  const handleSubmit = async (
-    values: QuizData,
-    { setSubmitting }: FormikHelpers<QuizData>
-  ): Promise<void> => {
+  const handleSubmit = async (values: QuizData): Promise<void> => {
     try {
-      const formData = new FormData();
-
-      console.log(quizData)
-
-      Object.entries(values).forEach(([key, value]) => {
-        if (key !== 'thumbnail' && value !== null && value !== undefined) {
-          formData.append(key, value.toString());
-        }
-      });
-
-      formData.append('title', values.title);
-
-      if (values.description) {
-        formData.append('description', values.description);
+      const quizPayload = {
+        ...values,
+        questions: quizData.questions,
+        totalQuestions: quizData.questions.length,
+        positiveScore: Number(values.positiveScore),
+        negativeScore: Number(values.negativeScore),
+        passingScore: Number(values.passingScore)
+      };
+      console.log('Quiz created successfully:', quizPayload);
+      const response = await addQuiz(quizPayload).unwrap();
+      if (response) {
+        toast.success(response.message);
+        navigate('/institute/quizzes');
       }
-
-      if (values.duration) {
-        formData.append('duration', values.duration.toString());
-      }
-
-      if (values.maxAttempts) {
-        formData.append('maxAttempts', values.maxAttempts.toString());
-      }
-
-      if (values.thumbnailQuiz) {
-        formData.append('thumbnailQuiz', values.thumbnailQuiz);
-      }
-
-
-      formData.append('totalQuestions', values.questions.length.toString());
-
-      formData.append('status', values.status);
-
-      const entries = Array.from(formData.entries());
-      entries.forEach(([key, value]) => {
-        console.log(key, value);
-      });
-      const response = await addQuiz({
-        body: formData
-      }).unwrap();
-
-      console.log('Quiz created successfully:', response);
-
     } catch (error) {
       console.error('Failed to create quiz:', error);
-    } finally {
-      setSubmitting(false);
     }
-  };
-
-  const handleImageChange = (
-    setFieldValue: (field: string, value: any) => void,
-    event: ChangeEvent<HTMLInputElement>
-  ): void => {
-    const file = event.currentTarget.files?.[0];
-    if (file) {
-      setFieldValue('thumbnail', file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewUrl(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const removeImage = (setFieldValue: (field: string, value: any) => void): void => {
-    setFieldValue('thumbnail', null);
-    setPreviewUrl('');
   };
 
   return (
@@ -277,224 +225,424 @@ const CreateQuiz: React.FC = () => {
         <div className="max-w-5xl mx-auto">
           <div className="flex gap-6">
             <Formik
-              initialValues={initialValues}
+              initialValues={initialQuizData}
+              validationSchema={QuizValidationSchema}
               onSubmit={handleSubmit}
+              validateOnChange={true}
+              validateOnBlur={true}
             >
-              {({ isSubmitting, setFieldValue, errors, touched }) => (
-                <Form className="space-y-8">
+              {({ isSubmitting, touched, errors }) => (
+                <Form className="space-y-8 flex-1">
                   <div className="flex-1">
                     <div className="mb-6">
                       <h1 className="text-2xl font-bold mb-4">Create New Quiz</h1>
-                      <div className="mt-4 border-t pt-4">
-                        <h3 className="text-lg font-medium mb-2">Quiz Thumbnail</h3>
-                        <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg">
-                          {previewUrl ? (
-                            <div className="relative">
-                              <img
-                                src={previewUrl}
-                                alt="Preview"
-                                className="h-48 w-96 object-cover rounded-lg"
-                              />
-                              <button
-                                type="button"
-                                onClick={() => removeImage(setFieldValue)}
-                                className="absolute top-2 right-2 p-1 bg-white rounded-full shadow-md hover:bg-gray-100"
-                              >
-                                <X className="h-4 w-4" />
-                              </button>
-                            </div>
-                          ) : (
-                            <div className="space-y-1 text-center">
-                              <Upload className="mx-auto h-12 w-12 text-gray-400" />
-                              <div className="flex text-sm text-gray-600">
-                                <label className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500">
-                                  <span>Upload a file</span>
-                                  <input
-                                    type="file"
-                                    name="thumbnailQuiz"
-                                    className="sr-only"
-                                    accept="image/*"
-                                    onChange={(event) => handleImageChange(setFieldValue, event)}
-                                  />
-                                </label>
-                                <p className="pl-1">or drag and drop</p>
-                              </div>
-                              <p className="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
-                            </div>
-                          )}
-                        </div>
-                      </div>
                     </div>
 
                     <div className="bg-white rounded-lg shadow p-6">
                       <div className="grid grid-cols-2 gap-4 mb-4">
-                        <Field
-                          type="text"
-                          name="title"
-                          placeholder="Quiz Title"
-                          className="text-lg font-semibold px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          // value={quizData.title}
-                          // onChange={(e: any) => setQuizData(prev => ({ ...prev, title: e.target.value }))}
-                        />
-                        <select
-                          value={quizData.status}
-                          onChange={(e) => setQuizData(prev => ({ ...prev, status: e.target.value as QuizStatus }))}
-                          className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        >
-                          <option value="draft">Draft</option>
-                          <option value="published">Published</option>
-                        </select>
+                        <InputWrapper name="title">
+                          <label 
+                            htmlFor="title" 
+                            className="block text-sm font-medium text-gray-700 mb-1"
+                          >
+                            Quiz Title
+                          </label>
+                          <Field
+                            type="text"
+                            id="title"
+                            name="title"
+                            placeholder="Enter quiz title"
+                            className="text-lg font-semibold px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          />
+                        </InputWrapper>
+                        
+                        <InputWrapper name="status">
+                          <label 
+                            htmlFor="status" 
+                            className="block text-sm font-medium text-gray-700 mb-1"
+                          >
+                            Quiz Status
+                          </label>
+                          <select
+                            id="status"
+                            value={quizData.status}
+                            onChange={(e) => setQuizData(prev => ({ ...prev, status: e.target.value as QuizStatus }))}
+                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          >
+                            <option value="draft">Draft</option>
+                            <option value="published">Published</option>
+                          </select>
+                        </InputWrapper>
                       </div>
 
                       <div className="grid grid-cols-3 gap-4 mb-4">
-                        <div className="flex items-center gap-2 border rounded-lg px-4 py-2">
-                          <Clock className="h-5 w-5 text-gray-400" />
+                          <InputWrapper name="duration">
+                            <label 
+                              htmlFor="duration" 
+                              className="block text-sm font-medium text-gray-700 mb-1"
+                              >
+                              Quiz Duration (minutes)
+                            </label>
+                            <Field
+                              type="number"
+                              id="duration"
+                              name="duration"
+                              placeholder="Duration (minutes)"
+                              min="1"
+                              className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                          </InputWrapper>
+                        
+                          <InputWrapper name="maxAttempts">
+                            <label 
+                              htmlFor="maxAttempts" 
+                              className="block text-sm font-medium text-gray-700 mb-1"
+                              >
+                              Max No. of Attempts
+                            </label>
+                            <Field
+                              type="number"
+                              id="maxAttempts"
+                              name="maxAttempts"
+                              placeholder="Max Attempts"
+                              min="1"
+                              className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              />
+                          </InputWrapper>
+                        
+                        <InputWrapper name="maxQuestions">
+                          <label 
+                            htmlFor="maxQuestions" 
+                            className="block text-sm font-medium text-gray-700 mb-1"
+                          >
+                            Max No. of Questions
+                          </label>
                           <Field
                             type="number"
-                            name="duration"
-                            placeholder="Duration (minutes)"
+                            id="maxQuestions"
+                            placeholder="Max Questions"
+                            name="maxQuestions"
                             min="1"
-                            className="w-full focus:outline-none"
+                            max="20"
+                            value={maxQuestions}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setMaxQuestions(parseInt(e.target.value))}
+                            className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                           />
-                        </div>
-                        <div className="flex items-center gap-2 border rounded-lg px-4 py-2">
-                          <RefreshCcw className="h-5 w-5 text-gray-400" />
+                        </InputWrapper>
+                        
+                        <InputWrapper name="department">
+                          <label 
+                            htmlFor="department" 
+                            className="block text-sm font-medium text-gray-700 mb-1"
+                          >
+                            Academic Department
+                          </label>
+                          <Field
+                            as="select"
+                            id="department"
+                            name="department"
+                            className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          >
+                            <option value="">Select Department</option>
+                            <option value="computer-science">Computer Science</option>
+                            <option value="mathematics">Mathematics</option>
+                            <option value="business">Business</option>
+                            <option value="hotel-management">Hotel Management</option>
+                          </Field>
+                        </InputWrapper>
+                        
+                        <InputWrapper name="stack">
+                          <label 
+                            htmlFor="stack" 
+                            className="block text-sm font-medium text-gray-700 mb-1"
+                          >
+                            Technology Stack
+                          </label>
+                          <Field
+                            type="text"
+                            id="stack"
+                            name="stack"
+                            placeholder="Enter technology stack"
+                            className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          />
+                        </InputWrapper>
+                        
+                        <InputWrapper name="difficultyLevel">
+                          <label 
+                            htmlFor="difficultyLevel" 
+                            className="block text-sm font-medium text-gray-700 mb-1"
+                          >
+                            Difficulty Level
+                          </label>
+                          <Field
+                            as="select"
+                            id="difficultyLevel"
+                            name="difficultyLevel"
+                            className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          >
+                            <option value="">Select Difficulty Level</option>
+                            <option value="easy">Easy</option>
+                            <option value="medium">Medium</option>
+                            <option value="hard">Hard</option>
+                          </Field>
+                        </InputWrapper>
+                        
+                        <InputWrapper name="positiveScore">
+                          <label 
+                            htmlFor="positiveScore" 
+                            className="block text-sm font-medium text-gray-700 mb-1"
+                          >
+                            Points for Correct Answer
+                          </label>
                           <Field
                             type="number"
-                            name="maxAttempts"
-                            placeholder="Max Attempts"
+                            id="positiveScore"
+                            name="positiveScore"
+                            placeholder="Score for correct"
                             min="1"
-                            className="w-full focus:outline-none"
+                            max="4"
+                            className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                           />
-                        </div>
+                        </InputWrapper>
+                        
+                        <InputWrapper name="negativeScore">
+                          <label 
+                            htmlFor="negativeScore" 
+                            className="block text-sm font-medium text-gray-700 mb-1"
+                          >
+                            Penalty for Wrong Answer
+                          </label>
+                          <Field
+                            type="number"
+                            id="negativeScore"
+                            name="negativeScore"
+                            placeholder="Score for wrong"
+                            min="0"
+                            max="1"
+                            className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          />
+                        </InputWrapper>
+                        
+                        <InputWrapper name="passingScore">
+                          <label 
+                            htmlFor="passingScore" 
+                            className="block text-sm font-medium text-gray-700 mb-1"
+                          >
+                            Minimum Passing Score
+                          </label>
+                          <Field
+                            type="number"
+                            id="passingScore"
+                            name="passingScore"
+                            placeholder="Passing Score"
+                            min="1"
+                            max="100"
+                            className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          />
+                        </InputWrapper>
+                      </div>
+                      
+                      <InputWrapper name="description">
+                        <label 
+                          htmlFor="description" 
+                          className="block text-sm font-medium text-gray-700 mb-1"
+                        >
+                          Quiz Description
+                        </label>
                         <Field
-                          type="number"
-                          placeholder="Max Questions"
-                          min="1"
-                          max="20"
-                          className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          as="textarea"
+                          id="description"
+                          name="description"
+                          placeholder="Provide a detailed description of the quiz"
+                          className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
+                          rows={3}
                         />
+                      </InputWrapper>
+
+                      <div className="mb-4">
+                        <label 
+                          htmlFor="startDate" 
+                          className="block text-sm font-medium text-gray-700 mb-1"
+                        >
+                          Quiz Start Date
+                        </label>
+                        <InputWrapper name="startDate">
+                          <Field
+                            type="date"
+                            id="startDate"
+                            name="startDate"
+                            className="w-[200px] px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          />
+                        </InputWrapper>
                       </div>
 
-                      <Field
-                        type="textarea"
-                        name="description"
-                        placeholder="Quiz Description"
-                        className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
-                        rows={3}
-                      />
+                      <div className="flex justify-between items-center gap-4">
+                        <h3 className="text-lg font-medium">Question Type</h3>
+                        <label htmlFor="questionType" className="sr-only">Select Question Type</label>
+                        <Field
+                          as="select"
+                          id="questionType"
+                          name="type"
+                          value={quizData.questions[currentQuestionIndex].type}
+                          onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                            handleQuestionTypeChange(currentQuestionIndex, e.target.value as QuestionType)
+                          }
+                          className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                          <option value="multiple-choice">Multiple Choice</option>
+                          <option value="true-false">True/False</option>
+                        </Field>
+                        <button
+                          type="button"
+                          onClick={() => setQuestionModal(true)}
+                          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                        >
+                          Continue to Questions
+                        </button>
+                      </div>
                     </div>
 
-                    {quizData.questions[currentQuestionIndex] && (
-                      <div className="bg-white rounded-lg shadow my-4">
-                        <div className="p-6">
-                          <div className="flex items-center gap-4">
-                            <GripVertical className="text-gray-400" />
-                            <div className="flex-1">
-                              <div className="flex items-center justify-between mb-4">
-                                <h3 className="text-lg font-medium">Question {currentQuestionIndex + 1}</h3>
-                                <div className="flex items-center gap-4">
-                                  <Field
-                                    as="select"
-                                    name="type"
-                                    value={quizData.questions[currentQuestionIndex].type}
-                                    onChange={(e: any) => handleQuestionTypeChange(currentQuestionIndex, e.target.value as QuestionType)}
-                                    className="px-2 py-1 border rounded-lg"
-                                  >
-                                    <option value="multiple-choice">Multiple Choice</option>
-                                    <option value="true-false">True/False</option>
-                                    <option value="short-answer">Short Answer</option>
-                                  </Field>
-                                  <button
-                                    onClick={() => removeQuestion(currentQuestionIndex)}
-                                    className="p-2 text-gray-500 hover:text-red-500 rounded-lg"
-                                  >
-                                    <Trash2 className="h-4 w-4" />
-                                  </button>
-                                </div>
+                    {questionModal && quizData.questions[currentQuestionIndex] && (
+                      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                        <div className="bg-white rounded-lg shadow-lg w-full max-w-3xl mx-4 p-6">
+                          <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-lg font-medium">Question {currentQuestionIndex + 1}</h3>
+                            <button
+                              type="button"
+                              onClick={() => setQuestionModal(false)}
+                              className="text-gray-500 hover:text-gray-700"
+                            >
+                              ×
+                            </button>
+                          </div>
+
+                          <div className="space-y-4">
+                            <textarea
+                              placeholder="Enter your question"
+                              name="question"
+                              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              value={quizData.questions[currentQuestionIndex].question}
+                              onChange={(e) => updateQuestion(currentQuestionIndex, 'question', e.target.value)}
+                              rows={3}
+                            />
+
+                            {quizData.questions[currentQuestionIndex].type === 'multiple-choice' && (
+                              <div className="space-y-2">
+                                {quizData.questions[currentQuestionIndex].options.map((option, optionIndex) => (
+                                  <div key={optionIndex} className="flex items-center gap-2">
+                                    <input
+                                      type="checkbox"
+                                      checked={option.isCorrect}
+                                      onChange={(e) =>
+                                        updateOption(currentQuestionIndex, optionIndex, 'isCorrect', e.target.checked)
+                                      }
+                                      className="w-4 h-4 rounded border-gray-300 focus:ring-blue-500"
+                                    />
+                                    <input
+                                      type="text"
+                                      placeholder={`Option ${optionIndex + 1}`}
+                                      className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                      value={option.text}
+                                      onChange={(e) =>
+                                        updateOption(currentQuestionIndex, optionIndex, 'text', e.target.value)
+                                      }
+                                    />
+                                  </div>
+                                ))}
                               </div>
+                            )}
 
-                              <div className="space-y-4">
-                                <Field
-                                  type="text"
-                                  placeholder="Enter your question"
-                                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                  value={quizData.questions[currentQuestionIndex].question}
-                                  onChange={(e: any) => updateQuestion(currentQuestionIndex, 'question', e.target.value)}
-                                />
-
-                                {quizData.questions[currentQuestionIndex].type === 'multiple-choice' && (
-                                  <div className="space-y-2">
-                                    {quizData.questions[currentQuestionIndex].options.map((option, optionIndex) => (
-                                      <div key={optionIndex} className="flex items-center gap-2">
-                                        <Field
-                                          type="checkbox"
-                                          checked={option.isCorrect}
-                                          onChange={(e: any) => updateOption(currentQuestionIndex, optionIndex, 'isCorrect', e.target.checked)}
-                                          className="w-4 h-4"
-                                        />
-                                        <Field
-                                          type="text"
-                                          placeholder={`Option ${optionIndex + 1}`}
-                                          className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                          value={option.text}
-                                          onChange={(e: any) => updateOption(currentQuestionIndex, optionIndex, 'text', e.target.value)}
-                                        />
-                                      </div>
-                                    ))}
+                            {quizData.questions[currentQuestionIndex].type === 'true-false' && (
+                              <div className="space-y-2">
+                                {['True', 'False'].map((value, index) => (
+                                  <div key={index} className="flex items-center gap-2">
+                                    <input
+                                      type="radio"
+                                      name={`correct-${currentQuestionIndex}`}
+                                      checked={quizData.questions[currentQuestionIndex].options[index]?.isCorrect}
+                                      onChange={() => {
+                                        const newOptions = [
+                                          { text: 'True', isCorrect: index === 0 },
+                                          { text: 'False', isCorrect: index === 1 }
+                                        ];
+                                        setQuizData(prev => ({
+                                          ...prev,
+                                          questions: prev.questions.map((q, i) =>
+                                            i === currentQuestionIndex
+                                              ? { ...q, options: newOptions }
+                                              : q
+                                          )
+                                        }));
+                                      }}
+                                      className="w-4 h-4 border-gray-300 focus:ring-blue-500"
+                                    />
+                                    <span className="text-gray-700">{value}</span>
                                   </div>
-                                )}
+                                ))}
+                              </div>
+                            )}
 
-                                {quizData.questions[currentQuestionIndex].type === 'true-false' && (
-                                  <div className="space-y-2">
-                                    {['True', 'False'].map((value, index) => (
-                                      <div key={index} className="flex items-center gap-2">
-                                        <Field
-                                          type="radio"
-                                          name={`correct-${quizData.questions[currentQuestionIndex].id}`}
-                                          checked={quizData.questions[currentQuestionIndex].options[index]?.isCorrect}
-                                          onChange={() => {
-                                            const newOptions = [
-                                              { text: 'True', isCorrect: index === 0 },
-                                              { text: 'False', isCorrect: index === 1 }
-                                            ];
-                                            setQuizData(prev => ({
-                                              ...prev,
-                                              questions: prev.questions.map((q, i) =>
-                                                i === currentQuestionIndex
-                                                  ? { ...q, options: newOptions }
-                                                  : q
-                                              )
-                                            }));
-                                          }}
-                                          className="w-4 h-4"
-                                        />
-                                        <span>{value}</span>
-                                      </div>
-                                    ))}
-                                  </div>
-                                )}
+                            {quizData.questions[currentQuestionIndex].type === 'short-answer' && (
+                              <input
+                                type="text"
+                                placeholder="Correct Answer"
+                                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                value={quizData.questions[currentQuestionIndex].options[0]?.text || ''}
+                                onChange={(e) =>
+                                  updateOption(currentQuestionIndex, 0, 'text', e.target.value)
+                                }
+                              />
+                            )}
 
-                                {quizData.questions[currentQuestionIndex].type === 'short-answer' && (
-                                  <Field
-                                    type="text"
-                                    name=""
-                                    placeholder="Correct Answer"
-                                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    value={quizData.questions[currentQuestionIndex].options[0]?.text || ''}
-                                    onChange={(e: any) => updateOption(currentQuestionIndex, 0, 'text', e.target.value)}
-                                  />
-                                )}
+                            <textarea
+                              placeholder="Explanation (Optional) - Provide explanation for the correct answer"
+                              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              value={quizData.questions[currentQuestionIndex].explanation}
+                              onChange={(e) =>
+                                updateQuestion(currentQuestionIndex, 'explanation', e.target.value)
+                              }
+                              rows={3}
+                            />
+                            {/* {touched.questions?.[currentQuestionIndex]?.question &&
+                              errors.questions?.[currentQuestionIndex]?.question && (
+                                <div className="text-red-500 text-sm mt-1">
+                                  {errors.questions[currentQuestionIndex].question}
+                                </div>
+                              )} */}
 
-                                <Field
-                                  type="textarea"
-                                  name="explanation"
-                                  placeholder="Explanation (Optional) - Provide explanation for the correct answer"
-                                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                  value={quizData.questions[currentQuestionIndex].explanation || ''}
-                                  onChange={(e: any) => updateQuestion(currentQuestionIndex, 'explanation', e.target.value)}
-                                  rows={3}
-                                />
+                            {showMaxAlert && (
+                              <div className="bg-yellow-50 border border-yellow-400 text-yellow-800 px-4 py-3 rounded relative">
+                                <span className="block sm:inline">
+                                  Maximum questions limit reached. Cannot add more questions.
+                                </span>
+                              </div>
+                            )}
+
+                            <div className="flex justify-between gap-4 mt-6">
+                              <button
+                                type="button"
+                                onClick={() => removeQuestion(currentQuestionIndex)}
+                                className="px-4 py-2 text-red-600 border border-red-300 rounded-lg hover:bg-red-50"
+                                disabled={quizData.questions.length <= 1}
+                              >
+                                Delete Question
+                              </button>
+                              <div className="flex gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => setQuestionModal(false)}
+                                  className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
+                                >
+                                  Close
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={addQuestion}
+                                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-gray-300"
+                                  disabled={quizData.questions.length >= maxQuestions}
+                                >
+                                  Add Another Question
+                                </button>
                               </div>
                             </div>
                           </div>
@@ -502,30 +650,25 @@ const CreateQuiz: React.FC = () => {
                       </div>
                     )}
 
-                    <button
-                      onClick={addQuestion}
-                      className="w-full py-2 px-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center disabled:bg-gray-300 disabled:cursor-not-allowed"
-                      disabled={quizData.questions.length >= maxQuestions}
-                    >
-                      <Plus className="h-4 w-4 mr-2" />
-                      Add Question
-                    </button>
-
                     <div className="mt-6 flex justify-end gap-4">
+                      <button
+                        type="button"
+                        className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
+                        onClick={() => window.history.back()}
+                      >
+                        Cancel
+                      </button>
                       <button
                         type="submit"
                         disabled={isSubmitting}
-                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-gray-300"
                       >
-                        {isSubmitting ? 'Creating...' : 'Create Course'}
-                        Publish Quiz
+                        {isSubmitting ? 'Creating...' : 'Create Quiz'}
                       </button>
                     </div>
                   </div>
-
                 </Form>
               )}
-
             </Formik>
 
             <div className="w-64">
@@ -538,18 +681,20 @@ const CreateQuiz: React.FC = () => {
                       index={index}
                       isActive={currentQuestionIndex === index}
                       isComplete={isQuestionComplete(question)}
-                      onClick={() => setCurrentQuestionIndex(index)}
+                      onClick={() => {
+                        setCurrentQuestionIndex(index);
+                        setQuestionModal(true);
+                      }}
                     />
                   ))}
                 </div>
 
-                <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                {/* <div className="mt-4 p-4 bg-gray-50 rounded-lg">
                   <h3 className="text-sm font-medium text-gray-700 mb-2">Quiz Summary</h3>
                   <div className="space-y-2 text-sm text-gray-600">
                     <div className="flex justify-between">
                       <span>Status:</span>
-                      <span className={`font-medium ${quizData.status === 'published' ? 'text-green-600' : 'text-yellow-600'
-                        }`}>
+                      <span className={`font-medium ${quizData.status === 'published' ? 'text-green-600' : 'text-yellow-600'}`}>
                         {quizData.status.charAt(0).toUpperCase() + quizData.status.slice(1)}
                       </span>
                     </div>
@@ -567,32 +712,16 @@ const CreateQuiz: React.FC = () => {
                     </div>
                     <div className="flex justify-between">
                       <span>Completed:</span>
-                      <span>{quizData.questions.filter(q => isQuestionComplete(q)).length}</span>
+                      <span>{quizData.questions.filter(isQuestionComplete).length}</span>
                     </div>
                   </div>
-                </div>
-
-                {quizData.status === 'published' && (
-                  <div className="mt-4">
-                    {quizData.questions.length === 0 && (
-                      <div className="text-red-500 text-sm">
-                        ⚠️ Published quizzes must have at least one question
-                      </div>
-                    )}
-                    {!quizData.questions.every(isQuestionComplete) && (
-                      <div className="text-red-500 text-sm">
-                        ⚠️ All questions must be complete before publishing
-                      </div>
-                    )}
-                  </div>
-                )}
+                </div> */}
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-
   );
 };
 

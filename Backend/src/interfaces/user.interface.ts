@@ -1,4 +1,4 @@
-import { Document } from "mongoose";
+import { Document, Types } from "mongoose";
 import { BaseInterface } from "./base.interface";
 
 export enum UserStatus {
@@ -15,6 +15,8 @@ export interface IUser extends BaseInterface{
     status: UserStatus;
     accessToken: string;
     refreshToken: string;
+    purchasedCourses: Types.ObjectId[];
+    profilePhoto: string;
 }
 
 export type IUserDocument = IUser & Document;   

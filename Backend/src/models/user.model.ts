@@ -7,7 +7,13 @@ const userSchema = new Schema<IUserDocument>(
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     phoneNumber: { type: String, required: true },
-    status: { type: String, enum: Object.values(UserStatus), default: UserStatus.Active }
+    status: { type: String, enum: Object.values(UserStatus), default: UserStatus.Active },
+    purchasedCourses: [{ 
+      type: Schema.Types.ObjectId,
+      ref: 'Course',  
+      default: [] 
+    }],
+    profilePhoto: { type: String, required: false },
   },
   { timestamps: true }
 );

@@ -5,8 +5,10 @@ import UserRoutes from './routes/userRoutes';
 import AdminRoutes from './routes/adminRoute';
 import InstituteRoutes from './routes/institutionRoute';
 import { ToastContainer } from 'react-toastify';
+import { useAxiosInterceptor } from './utils/axiosInstance';
 
 function App() {
+  useAxiosInterceptor();
   return (
     <>
      <Routes>

@@ -46,6 +46,34 @@ const quizSchema = new Schema({
     type: String,
     required: true
   },
+  department:{
+    type: String,
+    required: true
+  },
+  difficultyLevel:{
+    type: String,
+    required: true
+  },
+  passingScore:{
+    type: Number,
+    required: true
+  },
+  positiveScore:{
+    type: Number,
+    required: true
+  },
+  negativeScore:{
+    type: Number,
+    required: true
+  },
+  stack:{
+    type: String,
+    required: true
+  },
+  startDate:{
+    type: String,
+    required: true
+  },
   institutionId: {
     type: Schema.Types.ObjectId,
     ref: 'Institute',
@@ -59,10 +87,6 @@ const quizSchema = new Schema({
     type: Number,
     required: true,
     default: 3
-  },
-  thumbnailQuiz: { 
-    type: String, 
-    required: true 
   },
   questions: {
     type: [questionSchema],

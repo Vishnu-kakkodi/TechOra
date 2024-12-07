@@ -40,7 +40,7 @@ export class AdminController {
                 accessToken: accessToken,
                 refreshToken: refreshToken
             }
-            setCookie(res, 'admin', Token);
+            setCookie(res,'admin',Token);
 
             res.status(200).json({ admin, message: "Admin verified successfully" });
         } catch (error) {
@@ -55,13 +55,24 @@ export class AdminController {
     ): Promise<void> {
         try {
             console.log("Request came")
-            const users = await this.adminService.getUser();
-            if (!users || users.length === 0) {
+            const page = parseInt(req.query.page as string) || 1;
+            const limit = parseInt(req.query.limit as string) || 4;
+            const search = (req.query.search as string);
+            const filter = (req.query.filter as string);
+            console.log(page,limit,search,"Field")
+            const {users,total} = await this.adminService.getUser(page,limit,search,filter);
+            if (!users) {
                 throw new HttpException(404, "No users found");
             }
             console.log(users)
-            res.status(200).json({ users });
-        } catch (error) {
+            res.json({
+                users,
+                total,
+                page,
+                limit,
+                totalPages: Math.ceil(total / limit)
+              });        
+            } catch (error) {
             next(error);
         }
     }
@@ -74,12 +85,22 @@ export class AdminController {
     ): Promise<void> {
         try {
             console.log("Request Institute")
-            const institutes = await this.adminService.getInstitutes();
+            const page = parseInt(req.query.page as string) || 1;
+            const limit = parseInt(req.query.limit as string) || 4;
+            const search = (req.query.search as string);
+            const filter = (req.query.filter as string);
+            const {institutes,total} = await this.adminService.getInstitutes(page,limit,search,filter);
             if (!institutes || institutes.length === 0) {
                 throw new HttpException(404, "No users found");
             }
             console.log(institutes)
-            res.status(200).json({ institutes });
+            res.json({
+                institutes,
+                total,
+                page,
+                limit,
+                totalPages: Math.ceil(total / limit)
+              }); 
         } catch (error) {
             next(error);
         }
@@ -128,16 +149,18 @@ export class AdminController {
         req: Request,
         res: Response,
         next: NextFunction
-    ): Promise<void>{
-        try{
+    ): Promise<void> {
+        try {
             const instituteId = req.query.id as string;
-            const updatedInstitute = await this.adminService.InstituteReject(instituteId);
+            const { rejectReason } = req.body
+            console.log(rejectReason, "Reson")
+            const updatedInstitute = await this.adminService.InstituteReject(instituteId, rejectReason);
             console.log("institute:", instituteId);
             res.status(200).json({
                 message: "Application rejected",
                 institute: updatedInstitute,
             });
-        }catch (error) {
+        } catch (error) {
             next(error)
         }
     }
@@ -146,16 +169,16 @@ export class AdminController {
         req: Request,
         res: Response,
         next: NextFunction
-    ): Promise<void>{
-        try{
+    ): Promise<void> {
+        try {
             const instituteId = req.query.id as string;
-        const updatedInstitute = await this.adminService.InstituteBlock(instituteId);
-        console.log("institute:", instituteId);
-        res.status(200).json({
-            message: "Institute Blocked",
-            institute: updatedInstitute,
-        });
-        }catch(error){
+            const updatedInstitute = await this.adminService.InstituteBlock(instituteId);
+            console.log("institute:", instituteId);
+            res.status(200).json({
+                message: "Institute Blocked",
+                institute: updatedInstitute,
+            });
+        } catch (error) {
             next(error)
         }
     }
@@ -164,16 +187,16 @@ export class AdminController {
         req: Request,
         res: Response,
         next: NextFunction
-    ): Promise<void>{
-        try{
+    ): Promise<void> {
+        try {
             const instituteId = req.query.id as string;
-        const updatedInstitute = await this.adminService.InstituteUnBlock(instituteId);
-        console.log("institute:", instituteId);
-        res.status(200).json({
-            message: "Institute Unblocked",
-            institute: updatedInstitute,
-        });
-        }catch(error){
+            const updatedInstitute = await this.adminService.InstituteUnBlock(instituteId);
+            console.log("institute:", instituteId);
+            res.status(200).json({
+                message: "Institute Unblocked",
+                institute: updatedInstitute,
+            });
+        } catch (error) {
             next(error)
         }
     }
@@ -193,7 +216,7 @@ export class AdminController {
 
             const key = this.getKeyFromUrl(url);
 
-            console.log(key,"Key");
+            console.log(key, "Key");
 
             if (!key) {
                 res.status(400).json({ error: 'Invalid URL format' });
@@ -212,7 +235,7 @@ export class AdminController {
             res.setHeader('Cache-Control', 'no-cache');
             res.setHeader('Pragma', 'no-cache');
 
-           console.log( data.Body)
+            console.log(data.Body)
             res.send(data.Body);
         } catch (error) {
             next(error);
@@ -221,15 +244,57 @@ export class AdminController {
 
     private getKeyFromUrl(url: string): string | null {
         try {
-          const urlObj = new URL(url);
-          const pathname = urlObj.pathname.startsWith('/') 
-            ? urlObj.pathname.slice(1) 
-            : urlObj.pathname;
-          console.log(pathname)
-          return pathname
+            const urlObj = new URL(url);
+            const pathname = urlObj.pathname.startsWith('/')
+                ? urlObj.pathname.slice(1)
+                : urlObj.pathname;
+            console.log(pathname)
+            return pathname
         } catch (error) {
-          console.error('Error parsing URL:', error);
-          return null;
+            console.error('Error parsing URL:', error);
+            return null;
         }
-      }
+    }
+
+    async InstituteView(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
+        try {
+            const instituteId = req.query.id as string;
+            console.log(instituteId);
+            
+            const institute = await this.adminService.InstituteView(instituteId);
+            console.log("institute:", instituteId);
+            res.status(200).json({
+                message: "Data fetched successfully",
+                data: institute,
+            });
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async Logout(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
+        try {
+            res.clearCookie('admin', {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'strict',
+                path: '/',
+            });
+
+            res.status(200).json({
+                success: true,
+                message: 'Logged out successfully'
+            });
+        } catch (error) {
+            next(error)
+        }
+    }
 }

@@ -4,14 +4,21 @@ import { BaseInterface } from "./base.interface";
 export interface CourseDetailResponse {
     message: string;
     Data: Course | null;
+    purchased: string[] | undefined;
+  }
+
+  export interface CourseDetailResponseInstitute {
+    message: string;
+    Data: Course | null;
   }
 
 export interface Module {
+    id:Types.ObjectId;
     title: string;
     description: string;
     duration: number;
     video: string;
-    status: 'draft' | 'published';
+    status: 'list' | 'unlist';
     createdAt?: Date;
     updatedAt?: Date;
     draftId?: any;
@@ -29,9 +36,11 @@ export interface Course extends BaseInterface {
     status: 'draft' | 'published';
     thumbnail?: string;
     institutionId: Types.ObjectId | string;
+    reviewId: Types.ObjectId | string;
     modules: Module[];
     totalModules: number;
     totalDuration: number;
+    isListed:boolean;
 }
 
 export type CourseDocument = Course & Document;

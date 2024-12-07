@@ -2,6 +2,8 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { userLogout } from '../../store/slices/authSlice';
 import { useAppDispatch } from '../../store/hook';
+import { useUserLogoutCallMutation } from '../../store/slices/userSlice';
+import { toast } from 'react-toastify';
 
 
 interface LogoutButtonProps{
@@ -16,8 +18,12 @@ const LogoutButton: React.FC<LogoutButtonProps>=({
 
     const navigate = useNavigate();
     const dispatch = useAppDispatch()
+    const [userLogoutCall] = useUserLogoutCallMutation();
 
-    const handleLogout = () => {
+
+    const handleLogout = async () => {
+        const response = await userLogoutCall().unwrap();
+        toast.success("Logout successfully");
         dispatch(userLogout())
         navigate('/');
     }

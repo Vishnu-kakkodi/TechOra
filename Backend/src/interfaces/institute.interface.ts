@@ -14,6 +14,7 @@ export interface Institute extends BaseInterface{
     documentUrl: string;
     accessToken?: string;
     refreshToken?: string;
+    totalStudents: number;
 }
 
 export enum InstituteStatus {
@@ -30,6 +31,7 @@ export interface InstituteResponse {
     instituteEmail: string;
     applicationId: string;
     status: InstituteStatus;
+    totalStudents: number;
   }
   
 

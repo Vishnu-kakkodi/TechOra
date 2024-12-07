@@ -11,6 +11,13 @@ import { CourseController } from "../controllers/course.controller";
 import { OrderService } from "../services/order.service";
 import { OrderRepository } from "../repositories/order.repository";
 import { OrderController } from "../controllers/order.controller";
+import { QuizController } from "../controllers/quiz.controller";
+import { QuizService } from "../services/quiz.service";
+import { QuizRepository } from "../repositories/quiz.repository";
+import upload from "../bucketConfig";
+import { ReviewRepository } from "../repositories/review.repository";
+import { ReviewService } from "../services/review.service";
+import { ReviewController } from "../controllers/review.controller";
 
 
 
@@ -18,18 +25,31 @@ const router =  Router();
 const userRepository = new UserRepository();
 const courseRepository = new CourseRepository();
 const cartRepository = new CartRepository();
-const userService = new UserService(userRepository);
+const userService = new UserService(userRepository,courseRepository);
 const userController = new UserController(userService);
-const courseService = new CourseService(courseRepository, cartRepository)
+const quizRepository = new QuizRepository()
+const quizService = new QuizService(quizRepository)
+const quizController = new QuizController(quizService)
+const courseService = new CourseService(courseRepository, cartRepository, userRepository)
 const cartController = new CartController(courseService)
-const courseController = new CourseController(courseService)
+const courseController = new CourseController(courseService,quizService)
 const orderRepository = new OrderRepository()
-const orderService = new OrderService(orderRepository,cartRepository)
+const orderService = new OrderService(orderRepository,cartRepository,userRepository)
 const orderController = new OrderController(orderService)
+const reviewRepository = new ReviewRepository()
+const reviewService = new ReviewService(reviewRepository)
+const reviewController = new ReviewController(reviewService)
 
 
 router.get('/cart-items',authMiddleware,cartController.getCartItems.bind(cartController));
 router.get('/course-list',authMiddleware,courseController.userCourseList.bind(courseController));
+router.get('/order-list',authMiddleware,orderController.orderList.bind(orderController));
+router.get('/course-detail/:courseId',authMiddleware,courseController.courseDetail.bind(courseController));
+router.get('/my-courses',authMiddleware,userController.myCourses.bind(userController));
+router.get('/quiz-list',authMiddleware,quizController.quizList.bind(quizController));
+router.get('/review',authMiddleware,reviewController.Review.bind(reviewController));
+
+
 
 
 router.post('/initiate-register',userController.initiateUser.bind(userController));
@@ -45,6 +65,17 @@ router.patch('/remove-cart',authMiddleware,cartController.removeCart.bind(cartCo
 router.post('/payment',authMiddleware,orderController.createOrder.bind(cartController));
 router.post('/payment',authMiddleware,orderController.createOrder.bind(cartController));
 router.post('/payment-success',authMiddleware,orderController.paymentSuccess.bind(orderController));
+router.post('/profile-photo',upload.single('profilePhoto'),authMiddleware,userController.profilePhoto.bind(userController));
+router.put('/profile-update',authMiddleware,userController.profileUpdate.bind(userController));
+router.post('/create-review',authMiddleware,reviewController.createReview.bind(reviewController));
+router.patch('/change-password',authMiddleware,userController.changePassword.bind(userController));
+
+
+
+router.post('/logout', userController.Logout.bind(userController));
+
+
+
 
 
 

@@ -12,3 +12,15 @@ export class CreateCourseDto {
     thumbnail!: string;  
     institutionId!: Types.ObjectId | string
 }
+
+export class UpdateCourseDto {
+    title!: string;
+    department!: string;
+    instructor!: string;
+    duration!: string;
+    description!: string;
+    startDate!: string;
+    price!: number;
+    status!: 'draft' | 'published';
+    courseId!: string;
+}

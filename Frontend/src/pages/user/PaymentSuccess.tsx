@@ -162,7 +162,7 @@ const PaymentSuccess: React.FC = () => {
                             </p>
                         </div>
                         <div className="text-right">
-                            <p className="text-2xl font-bold text-gray-900">Total: ${order.totalPrice.toFixed(2)}</p>
+                            <p className="text-2xl font-bold text-gray-900">Total: ₹{order.totalPrice.toFixed(2)}</p>
                         </div>
                     </div>
 

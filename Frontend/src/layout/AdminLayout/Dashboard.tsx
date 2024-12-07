@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import {
@@ -9,35 +9,68 @@ import {
   CheckCircle,
   XCircle,
   Clock,
-  Search
+  Search,
+  Minus,
+  X,
+  HelpCircle,
+  AlertCircle
 } from 'lucide-react';
+import useDebouncedValue from '../../hooks/debounceHook';
+import { useInstituteListQuery } from '../../store/slices/adminSlice';
+import { InstituteDocument } from '../../../../Backend/src/interfaces/institute.interface';
+import InstitutionPieChart from './InstitutionPieChart';
 
 const Dashboard: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(4);
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState('');
+  const debouncedSearchTerm = useDebouncedValue(search, 500);
+
+  const {
+    data: { institutes, total } = {},
+    isLoading,
+    error,
+    refetch
+  } = useInstituteListQuery({
+    page,
+    limit,
+    search: debouncedSearchTerm,
+    filter
+  });
+
+  console.log(institutes)
+
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearchTerm]);
+
   const stats = {
-    totalInstitutions: 156,
+    totalInstitutions: 24,
+
+    // totalInstitutions: (institutes.length) + 1,
     pendingApprovals: 23,
     activeInstitutions: 124,
     totalTutors: 892,
     totalStudents: 12435
   };
 
-  const recentInstitutions = [
-    { id: 1, name: "College of Engineering Trivandrum", status: "approved", date: "2024-03-15", tutors: 45, students: 1200 },
-    { id: 2, name: "TKM College of Engineering", status: "pending", date: "2024-03-14", tutors: 0, students: 0 },
-    { id: 3, name: "Government Engineering College Thrissur", status: "rejected", date: "2024-03-13", tutors: 0, students: 0 },
-    { id: 4, name: "Model Engineering College", status: "approved", date: "2024-03-12", tutors: 32, students: 850 }
-  ];
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'approved':
+      case 'Active':
         return <CheckCircle className="w-5 h-5 text-green-500" />;
-      case 'rejected':
-        return <XCircle className="w-5 h-5 text-red-500" />;
+      case 'Rejected':
+        return <X className="w-5 h-5 text-red-500" />;
+      case 'Inactive':
+        return <Minus className="w-5 h-5 text-gray-500" />;
+      case 'Pending':
+        return <Clock className="w-5 h-5 text-yellow-500" />;
+      case 'Verify':
+        return <HelpCircle className="w-5 h-5 text-purple-500" />;
       default:
-        return <Clock className="w-5 h-5 text-blue-500" />;
+        return <AlertCircle className="w-5 h-5 text-blue-500" />;
     }
   };
 
@@ -52,6 +85,18 @@ const Dashboard: React.FC = () => {
     }
   };
 
+  const handleNextPage = () => {
+    if (page * limit < total) {
+      setPage(page + 1);
+    }
+  };
+
+  const handlePreviousPage = () => {
+    if (page > 1) {
+      setPage(page - 1);
+    }
+  };
+
   return (
     <div className="p-6 max-w-[1400px] mx-auto">
       <div className="flex justify-between items-center mb-8">
@@ -61,8 +106,8 @@ const Dashboard: React.FC = () => {
             type="text"
             placeholder="Search institutions..."
             className="pl-10 pr-4 py-2 border rounded-lg w-[300px]"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
           />
           <Search className="w-5 h-5 text-gray-400 absolute left-3 top-[50%] transform -translate-y-[50%]" />
         </div>
@@ -120,7 +165,12 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow-sm border">
+      <div className='flex justify-between'>
+      <div className="mt-10 mb-10">
+        <InstitutionPieChart />
+      </div>
+
+      <div className="bg-white rounded-lg shadow-sm border ml-10">
         <div className="p-4 border-b">
           <h2 className="text-xl font-semibold text-gray-800">Recent Institutions</h2>
         </div>
@@ -131,18 +181,18 @@ const Dashboard: React.FC = () => {
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Institution Name</th>
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Status</th>
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Date</th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Tutors</th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Students</th>
+                {/* <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Tutors</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Students</th> */}
                 {/* <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Actions</th> */}
               </tr>
             </thead>
             <tbody className="divide-y">
-              {recentInstitutions.map((institution) => (
+              {institutes?.map((institution: InstituteDocument) => (
                 <tr key={institution.id} className="hover:bg-gray-50">
                   <td className="px-4 py-3">
                     <div className="flex items-center">
                       <Building2 className="w-5 h-5 text-gray-400 mr-2" />
-                      <span className="font-medium text-gray-800">{institution.name}</span>
+                      <span className="font-medium text-gray-800">{institution.collegeName}</span>
                     </div>
                   </td>
                   <td className="px-4 py-3">
@@ -153,9 +203,13 @@ const Dashboard: React.FC = () => {
                       </span>
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-gray-600">{institution.date}</td>
-                  <td className="px-4 py-3 text-gray-600">{institution.tutors}</td>
-                  <td className="px-4 py-3 text-gray-600">{institution.students}</td>
+                  <td className="px-4 py-3 text-gray-600">{new Date(institution.createdAt).toLocaleDateString('en-GB', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric',
+                  })}</td>
+                  {/* <td className="px-4 py-3 text-gray-600">20</td>
+                  <td className="px-4 py-3 text-gray-600">25</td> */}
                   {/* <td className="px-4 py-3">
                     <button className="text-blue-500 hover:text-blue-700">View Details</button>
                   </td> */}
@@ -164,9 +218,58 @@ const Dashboard: React.FC = () => {
             </tbody>
           </table>
         </div>
+        <div className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6 mt-4">
+        <div className="flex flex-1 justify-between sm:hidden">
+          <button
+            onClick={handlePreviousPage}
+            disabled={page === 1}
+            className="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
+          >
+            Previous
+          </button>
+          <button
+            onClick={handleNextPage}
+            disabled={page * limit >= total}
+            className="relative ml-3 inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
+        <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+          <div>
+            <p className="text-sm text-gray-700">
+              Showing <span className="font-medium">{(page - 1) * limit + 1}</span> to{' '}
+              <span className="font-medium">{Math.min(page * limit, total)}</span> of{' '}
+              <span className="font-medium">{total}</span> results
+            </p>
+          </div>
+          <div>
+            <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+              <button
+                onClick={handlePreviousPage}
+                disabled={page === 1}
+                className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50"
+              >
+                Previous
+              </button>
+              <button className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0">
+                {page}
+              </button>
+              <button
+                onClick={handleNextPage}
+                disabled={page * limit >= total}
+                className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50"
+              >
+                Next
+              </button>
+            </nav>
+          </div>
+        </div>
       </div>
-
-      {/* <div className="flex justify-end mt-6 space-x-4">
+      </div>
+      </div>
+{/* 
+      <div className="flex justify-end mt-6 space-x-4">
         <button className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
           View All Institutions
         </button>

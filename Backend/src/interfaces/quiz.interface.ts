@@ -1,41 +1,42 @@
 import { Document, Types } from "mongoose";
 import { BaseInterface } from "./base.interface";
 
-export type QuestionType = 'multiple' | 'boolean' | 'text';
+export type QuestionType = 'multiple-choice' | 'true-false' | 'short-answer';
+export type QuizStatus = 'draft' | 'published';
+
+export interface Option {
+    text: string;
+    isCorrect: boolean;
+}
 
 export interface Question {
-    id: string;
+    _id: Types.ObjectId;
     question: string;
-    type: QuestionType;
-    options: string[];
-    correctAnswer: number | string;
+    options: Option[];
     explanation?: string;
+    type: QuestionType;
 }
 
-export interface Quiz extends BaseInterface {
+export interface QuizData extends BaseInterface {
+    institutionId?: Types.ObjectId,
     title: string;
     description: string;
-    stack: 'English' | 'Maths' | 'Science' | 'General';
-    difficulty: 'Hard' | 'Medium' | 'Easy';
-    department: string;
-    institutionId: Types.ObjectId | string;
-    duration: number; 
-    startDate?: Date;
-    endDate?: Date;
-    status: 'draft' | 'published';
-    thumbnailQuiz?: string;
-    questionType: QuestionType;
-    maxQuestions: number;
-    passingScore?: number;
+    duration: string;
+    maxAttempts: string;
     questions: Question[];
+    status: QuizStatus;
     totalQuestions: number;
-    createdAt: Date;
-    updatedAt: Date;
+    department?: string;
+    stack?: string;
+    difficultyLevel?: string;
+    positiveScore?: number;
+    negativeScore?: number;
+    passingScore?: number;
+    startDate?: string;
 }
 
-export type QuizDocument = Quiz & Document;
+
+export type QuizDocument = QuizData & Document;
 
 
-export type CreateQuizDTO = Omit<Quiz, 'id' | 'createdAt' | 'updatedAt' | 'totalQuestions'>;
 
-export type UpdateQuizDTO = Partial<CreateQuizDTO>;

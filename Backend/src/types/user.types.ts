@@ -1,3 +1,5 @@
+import { CourseDocument } from "../interfaces/course.interface";
+
 interface User {
     userName: string;
     email: string;
@@ -10,3 +12,14 @@ export interface UserCookieData extends User {
     otp: string;
     timestamp: number;
 }
+
+export interface UpdatePassword{
+    currentPassword:string;
+    newPassword:string;
+    confirmPassword:string;
+}
+
+
+export interface MyCourses {
+    course: CourseDocument[];
+  }

@@ -2,12 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { ChevronDown } from 'lucide-react';
 
 const Topbar = () => {
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const dropdownRef = useRef(null);
 
-  const toggleDropdown = () => {
-    setIsDropdownOpen(!isDropdownOpen);
-  };
 
   // Close dropdown when clicking outside
   // useEffect(() => {

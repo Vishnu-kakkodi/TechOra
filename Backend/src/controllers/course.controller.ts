@@ -1,15 +1,20 @@
 import { Request, Response, NextFunction } from "express";
 import { CourseService } from "../services/course.service";
 import { HttpException } from "../middleware/error.middleware";
-import { CreateCourseDto } from "../dtos/course.dtos";
-import { CourseDetailResponse, Module } from "../interfaces/course.interface";
+import { CreateCourseDto, UpdateCourseDto } from "../dtos/course.dtos";
+import { CourseDetailResponse, CourseDetailResponseInstitute, Module } from "../interfaces/course.interface";
 import { decodedToken } from "../helperFunction/authHelper";
+import STATUS_CODES from "../constants/statusCode";
+import MESSAGES from "../constants/message";
+import { QuizService } from "../services/quiz.service";
 
 export class CourseController {
     private courseService: CourseService;
+    private quizService: QuizService;
 
-    constructor(courseService: CourseService) {
+    constructor(courseService: CourseService, quizService: QuizService) {
         this.courseService = courseService;
+        this.quizService = quizService;
     }
 
     public createCourse = async (
@@ -18,22 +23,27 @@ export class CourseController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            console.log("Control")
             const courseData: CreateCourseDto = req.body;
+
+            if (!courseData) {
+                throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
+            }
 
             if (req.file) {
                 courseData.thumbnail = (req.file as any).location;
+            } else {
+                throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
             }
 
             if (!courseData.institutionId) {
                 throw new HttpException(400, 'Institute ID is required');
             }
 
-            console.log('Course Data:', courseData);
             const course = await this.courseService.createCourse(courseData);
+
             res.status(201).json({
-                status: 'success',
-                message: 'Course created successfully',
+                status: STATUS_CODES.SUCCESS,
+                message: MESSAGES.SUCCESS.COURSE_CREATED,
                 data: course
             });
         } catch (error) {
@@ -46,18 +56,19 @@ export class CourseController {
         res: Response,
         next: NextFunction
     ): Promise<void> => {
-        try{
-            const Token = req.cookies.institute
-        const token = Token.accessToken;
-        const requiredRole = "institute";
-        const instituteId: string | null = decodedToken(token, requiredRole);
-        const course = await this.courseService.draftCourse(instituteId)
-
-        res.status(201).json({
-            message: "Approved",
-            data: course
-        })
-        }catch(error){
+        try {
+            const token = req.cookies.institute.accessToken
+            if(!token){
+                throw new HttpException(STATUS_CODES.UNAUTHORIZED,MESSAGES.ERROR.UNAUTHORIZED)
+            }
+            const requiredRole = "institute";
+            const instituteId: string | null = decodedToken(token, requiredRole);
+            const course = await this.courseService.draftCourse(instituteId)
+            res.status(201).json({
+                message: "Approved",
+                data: course
+            })
+        } catch (error) {
             next(error);
         }
 
@@ -69,24 +80,22 @@ export class CourseController {
         next: NextFunction
     ): Promise<void> => {
 
-        try{
+        try {
             const courseData: Module = req.body;
-
-        if (req.file) {
-            courseData.video = (req.file as any).location;
-        }
-
-        console.log(courseData, "oooooo");
-
-
-        const course = await this.courseService.createModule(courseData.draftId, courseData)
-        console.log(course, "Courseeeeeeeeeeeeeee")
-
-        res.status(201).json({
-            message: "Approved",
-            data: course
-        })
-        }catch(error){
+            if (!courseData) {
+                throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
+            }
+            if (req.file) {
+                courseData.video = (req.file as any).location;
+            } else {
+                throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
+            }
+            const course = await this.courseService.createModule(courseData.draftId, courseData)
+            res.status(201).json({
+                message: "Approved",
+                data: course
+            })
+        } catch (error) {
             next(error);
         }
     }
@@ -98,13 +107,23 @@ export class CourseController {
     ): Promise<void> => {
         try {
             const token = req.cookies.institute.accessToken;
+            if(!token){
+                throw new HttpException(STATUS_CODES.UNAUTHORIZED,MESSAGES.ERROR.UNAUTHORIZED)
+            }
             const requiredRole = "institute";
             const instituteId: string | null = decodedToken(token, requiredRole);
-            const course = await this.courseService.courseList(instituteId);
-
+            const page = parseInt(req.query.page as string) || 1;
+            const limit = parseInt(req.query.limit as string) || 4;
+            const search = (req.query.search as string);
+            const filter = (req.query.filter as string);
+            const sort = (req.query.sort as string);
+            const {course,total} = await this.courseService.courseList(instituteId,page,limit,search,filter,sort);
             res.status(201).json({
-                message: "Course fetched successfully",
-                data: course
+                course,
+                total,
+                page,
+                limit,
+                totalPages: Math.ceil(total / limit)
             });
         } catch (error) {
             next(error)
@@ -117,12 +136,43 @@ export class CourseController {
         next: NextFunction
     ): Promise<void> => {
         try {
+            const token = req.cookies.user.accessToken;
+            if(!token){
+                throw new HttpException(STATUS_CODES.UNAUTHORIZED,MESSAGES.ERROR.UNAUTHORIZED)
+            }
+            const requiredRole = "user";
+            const userId: string | null = decodedToken(token, requiredRole);
+            const data = await this.courseService.PurchasedCourse(userId);
+            const purchased: string | undefined = (data?.purchasedCourses)?.toString();
+            const purchasedCourses = purchased?.split(",");
             const { courseId } = req.params
-            console.log(courseId, "{fdgfgsg}")
             const course = await this.courseService.courseDetail(courseId);
-            console.log(course, "CourseDtatatat")
 
             const response: CourseDetailResponse = {
+                message: "Success",
+                Data: course,
+                purchased: purchasedCourses,
+            };
+
+
+            res.status(201).json(response)
+        } catch (error) {
+            next(error)
+        }
+    }
+
+
+    public courseDetailInstitute = async (
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> => {
+        try {
+
+            const { courseId } = req.params
+            const course = await this.courseService.courseDetail(courseId);
+
+            const response: CourseDetailResponseInstitute = {
                 message: "Success",
                 Data: course,
             };
@@ -138,17 +188,129 @@ export class CourseController {
         req: Request,
         res: Response,
         next: NextFunction
-    ): Promise<void> =>{
-        try{
-            console.log("RequestC");
-            
-            const course = await this.courseService.userCorseList();
+    ): Promise<void> => {
+        try {
+            const page = parseInt(req.query.page as string) || 1;
+            const limit = parseInt(req.query.limit as string) || 4;
+            const search = (req.query.search as string);
+            const filter = (req.query.filter as string);
+            const sort = (req.query.sort as string);
+
+            console.log(filter,search)
+            const {course,total,department,totalCourse} = await this.courseService.userCorseList(page,limit,search,filter,sort);
+            if(!course){
+                throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
+            }
             res.status(201).json({
-                message: "Course fetched successfully",
-                data: course
+                course,
+                total,
+                department,
+                totalCourse,
+                page,
+                limit,
+                totalPages: Math.ceil(total / limit)
             });
-        }catch(error){
+        } catch (error) {
             next(error);
+        }
+    }
+
+    public courseAction = async (
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> => {
+        try {
+            const courseId = req.body.courseId;
+            if(!courseId){
+                throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
+            }
+            const information = await this.courseService.courseAction(courseId);
+
+            if(!information){
+                throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
+            }
+            res.status(201).json({
+                message: information
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+
+    public updateCourse = async (
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> => {
+        try {
+
+            const token = req.cookies.institute.accessToken
+            if(!token){
+                throw new HttpException(STATUS_CODES.UNAUTHORIZED,MESSAGES.ERROR.UNAUTHORIZED)
+            }
+            const requiredRole = "institute";
+            const institutionId: string | null = decodedToken(token, requiredRole);
+
+            const courseData: UpdateCourseDto = req.body;
+            const courseId:string = req.query.courseId as string;
+            console.log(courseData,"Fadavddsssssssssssssssssssssssssssssssssss")
+
+            if (!courseData) {
+                throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
+            }
+
+            await this.courseService.updateCourse(courseData,courseId);
+
+            res.status(201).json({
+                status: STATUS_CODES.SUCCESS,
+                message: "Course Updated",
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+
+    public moduleDelete = async (
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> => {
+        try {
+            const courseId = req.query.courseId as string;
+            const moduleId = req.query.moduleId as string;
+
+            if(!courseId){
+                throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
+            }
+            await this.courseService.moduleDelete(courseId,moduleId);
+            res.status(201).json({
+                message: "Module Deleted"
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    public chartData = async (
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> => {
+        try {
+            const token = req.cookies.institute.accessToken;
+            if(!token){
+                throw new HttpException(STATUS_CODES.UNAUTHORIZED,MESSAGES.ERROR.UNAUTHORIZED)
+            }
+            const requiredRole = "institute";
+            const instituteId: string | null = decodedToken(token, requiredRole);
+            const {published,draft,listed,unlisted,course} = await this.courseService.chartData(instituteId);
+            const quiz = await this.quizService.findQuiz(instituteId);
+            res.status(201).json({published,draft,listed,unlisted,course,quiz});
+        } catch (error) {
+            next(error)
         }
     }
 }

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Search, Menu, X } from 'lucide-react';
+import { useCourseListQuery } from '../../store/slices/userSlice';
 
 interface CourseSidebarProps {
   onSearch?: (query: string) => void;
@@ -9,16 +10,18 @@ interface CourseSidebarProps {
 const userCourseSidebar: React.FC<CourseSidebarProps> = ({ onSearch, onFilterChange }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const { data = {} } = useCourseListQuery(null);
+  const course = data.data || [];
 
-  const courseCategories = [
-    "English", "Mathematics", "Computer Science", "Physics",
-    "Chemistry", "Biology", "Botany", "Economics", "Commerce"
-  ];
 
-  const popularColleges = [
-    "CET", "TKM", "GEC Kannur", "Maharajas", "MCC",
-    "Model", "KMCT", "MDIT", "AWH"
-  ];
+  const Categories = course.map((c: any) => c.department.toUpperCase());
+
+  const courseCategories = Array.from(new Set(Categories));
+  
+  const Colleges = course.map((c: any) => c.institutionId.collegeName.toUpperCase());
+
+
+  const popularColleges = Array.from(new Set(Colleges));
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);

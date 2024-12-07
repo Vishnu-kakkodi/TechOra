@@ -11,6 +11,7 @@ import {
 import { useCreateCourseMutation } from '../../store/slices/institutionSlice';
 import { RootState } from '../../store';
 import InstituteSidebar from '../../components/sidebar/InstituteSidebar';
+import InstituteFooter from '../../components/footer/InstituteFooter';
 
 interface CourseFormValues {
   title: string;
@@ -158,8 +159,10 @@ const AddCourse: React.FC = () => {
   ];
 
   return (
+    <>
     <div className='flex'>
       <InstituteSidebar />
+      <div className='w-full'>
       <div className="p-6 w-[800px] mx-auto">
         <div className="flex items-center mb-6">
           <button
@@ -380,7 +383,10 @@ const AddCourse: React.FC = () => {
           )}
         </Formik>
       </div>
+      <InstituteFooter/>
+      </div>
     </div>
+    </>
   );
 };
 

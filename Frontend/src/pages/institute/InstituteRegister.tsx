@@ -101,7 +101,7 @@ const CollegeRegistration: React.FC = () => {
         console.log("haiiiii")
         if(response){
           toast.success("Application submit successfully")
-          navigate('/');
+          navigate('/institute/login');
         }
       } catch (error) {
         console.error('Error:', error);

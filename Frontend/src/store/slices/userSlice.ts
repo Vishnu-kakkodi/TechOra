@@ -1,22 +1,40 @@
 
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { BaseQueryFn, FetchArgs, FetchBaseQueryError } from '@reduxjs/toolkit/query';
-import { User, UserLogin } from '../../types/userTypes';
+import { ReviewResponse, User, UserLogin } from '../../types/userTypes';
 import { cartResponse } from '../../types/cartType';
+import { OrderResponse } from '../../types/userSide/orderType';
+import { CourseDetailResponse, CourseListResponse } from '../../types/courseType';
+import { RootState } from '..';
 
-const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
+export type UserRole = 'user' | 'admin' | 'institute';
+
 
 interface RegisterResponse {
   userDetails: User;
+  data:any;
   status: number;
   message: string;
 }
 
-const baseQuery = fetchBaseQuery({ baseUrl: `${backendUrl}/api/` });
+const baseQueryWithRole = fetchBaseQuery({
+  baseUrl: `${import.meta.env.VITE_BACKEND_URL}/api/`,
+  prepareHeaders: (headers, { getState }) => {
+    const state = getState() as RootState;
+    
+    let role: UserRole | null = 'user';
+    if (role) {
+      headers.set('role', role);
+    }
 
+    return headers;
+  },
+  credentials: 'include',
+});
 export const userSlice = createApi({
   reducerPath: 'userApi', 
-  baseQuery: baseQuery as BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError>,
+  baseQuery: baseQueryWithRole as BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError>,
   tagTypes: ['User'],
   endpoints: (builder) => ({
     initiateSignup: builder.mutation<RegisterResponse, Partial<User>>({
@@ -180,14 +198,111 @@ export const userSlice = createApi({
       }),
     }),
 
-    courseList: builder.query({
-      query: () => ({
+    courseList: builder.query<CourseListResponse>({
+      query: ({ page = 1, limit = 4, search = '', filter='all', sort='' }) => ({
         url: '/users/course-list',
+        params:{ page, limit, search, filter, sort },
         method: 'GET',
         credentials: 'include'
       }),
       providesTags: ['User'],
      }),
+
+     changePassword: builder.mutation({
+      query: (values) => ({
+        url: '/users/change-password',
+        method: 'PATCH',
+        credentials: 'include',
+        body: values,
+      }),
+      invalidatesTags: ['User'],
+     }),
+
+     getOrders: builder.query<OrderResponse , null>({
+      query: () =>({
+        url: '/users/order-list',
+        method:'GET',
+        credentials: 'include'
+      }),
+      providesTags: ['User'],
+     }),
+
+     coursedetail: builder.query<CourseDetailResponse, string>({
+      query: (courseId) =>({
+        url: `/users/course-detail/${courseId}`,
+        method:'GET',
+        credentials: 'include'
+      }),
+      providesTags: ['User'],
+     }),
+
+     myCourses: builder.query<CourseListResponse>({
+      query: ({ page = 1, limit = 4, search = '' }) =>({
+        url: '/users/my-courses',
+        params:{ page, limit, search},
+        method: 'GET',
+        credentials: 'include',
+      }),
+      providesTags: ['User'],
+     }),
+
+     courseReview: builder.mutation({
+      query: (payload) => ({
+        url: '/users/create-review',
+        method: 'POST',
+        credentials: 'include',
+        body:payload
+      }),
+      invalidatesTags: ['User'],
+    }),
+
+    Review: builder.query<ReviewResponse>({
+      query: (courseId) => ({
+        url: `/users/review?courseId=${courseId}`, 
+        method: 'GET',
+        credentials: 'include',
+      }),
+      providesTags: ['User'],
+    }),
+
+     quizList: builder.query({
+      query: ({ page = 1, limit = 4, search = '', filter='all', sort='' }) =>({
+        url: `/users/quiz-list`,
+        params:{ page, limit, search, filter, sort },
+        method: 'GET',
+        credentials: 'include',
+      }),
+      providesTags:['User']
+     }),
+
+     userLogoutCall: builder.mutation<void, void>({
+      query: () => ({
+        url: '/users/logout',
+        method: 'POST',
+        credentials: 'include',
+      }),
+      invalidatesTags: ['User'],
+    }),
+
+    profilePhoto: builder.mutation<RegisterResponse, { body: FormData }>({
+      query: (payload) => ({
+        url: '/users/profile-photo',
+        method: 'POST',
+        credentials: 'include',
+        body: payload.body
+      }),
+      invalidatesTags: ['User'],
+    }),
+
+    updateProfile: builder.mutation({
+      query: (data) => ({
+          url: '/users/profile-update', 
+          method: 'PUT',
+          body: data,
+          credentials: 'include'
+      }),
+      invalidatesTags: ['User'],
+  }),
   }),
 
 });
@@ -206,6 +321,16 @@ export const
    useRemoveCartMutation,
    usePaymentMutation,
    usePaymentSuccessMutation,
-   useCourseListQuery
+   useCourseListQuery,
+   useChangePasswordMutation,
+   useGetOrdersQuery,
+   useCoursedetailQuery,
+   useMyCoursesQuery,
+   useQuizListQuery,
+   useUserLogoutCallMutation,
+   useProfilePhotoMutation,
+   useUpdateProfileMutation,
+   useCourseReviewMutation,
+   useReviewQuery
   } = userSlice;
 

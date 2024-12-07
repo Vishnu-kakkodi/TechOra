@@ -6,6 +6,8 @@ import { UserCookieData } from '../types/user.types';
 import { setCookie } from "../helperFunction/cookieUtils";
 import STATUS_CODES from "../constants/statusCode";
 import MESSAGES from "../constants/message";
+import { decodedToken } from "../helperFunction/authHelper";
+import { log } from "console";
 
 
 export class UserController {
@@ -23,13 +25,13 @@ export class UserController {
                 password: req.body.password,
                 phoneNumber: req.body.phoneNumber,
             }
-            if(!userDetail){
-                throw new HttpException(STATUS_CODES.BAD_REQUEST,MESSAGES.ERROR.BAD_REQUEST)
+            if (!userDetail) {
+                throw new HttpException(STATUS_CODES.BAD_REQUEST, MESSAGES.ERROR.BAD_REQUEST)
             }
             const user = await this.userService.initiateUser(userDetail);
 
-            if(!user){
-                throw new HttpException(STATUS_CODES.BAD_REQUEST,MESSAGES.ERROR.BAD_REQUEST)
+            if (!user) {
+                throw new HttpException(STATUS_CODES.BAD_REQUEST, MESSAGES.ERROR.BAD_REQUEST)
             }
 
             const userData = {
@@ -47,13 +49,10 @@ export class UserController {
             res.status(STATUS_CODES.SUCCESS).json({
                 success: true,
                 message: MESSAGES.SUCCESS.OTP_SEND,
-              });
+            });
 
         } catch (error) {
-            res.status(STATUS_CODES.SERVER_ERROR).json({
-                success: false,
-                message: MESSAGES.ERROR.SERVER_ERROR,
-              });
+            next(error)
         }
     }
 
@@ -67,26 +66,23 @@ export class UserController {
             const { otp } = req.body;
             const CookieData = req.cookies.userData;
             if (!CookieData) {
-                throw new HttpException(STATUS_CODES.GONE,MESSAGES.ERROR.TIME_EXPIRED);
+                throw new HttpException(STATUS_CODES.GONE, MESSAGES.ERROR.TIME_EXPIRED);
             }
 
-            const user = await this.userService.createUser(CookieData,otp);
-            if(user){
+            const user = await this.userService.createUser(CookieData, otp);
+            if (user) {
                 res.clearCookie('userData');
 
-                const { accessToken, refreshToken, ...userDetails } = user;
-                const Token = {
-                    accessToken: accessToken,
-                    refreshToken: refreshToken
-                }
-                setCookie(res, 'user', Token);
-                res.status(201).json({ userDetails, status: STATUS_CODES.CREATED, message: MESSAGES.SUCCESS.USER_CREATED });
+                // const { accessToken, refreshToken, ...userDetails } = user;
+                // const Token = {
+                //     accessToken: accessToken,
+                //     refreshToken: refreshToken
+                // }
+                // setCookie(res,'user',Token);
+                res.status(201).json({ user, status: STATUS_CODES.CREATED, message: MESSAGES.SUCCESS.USER_CREATED });
             }
         } catch (error) {
-            res.status(STATUS_CODES.SERVER_ERROR).json({
-                success: false,
-                message: MESSAGES.ERROR.SERVER_ERROR,
-              });
+            next(error)
         }
     }
 
@@ -100,7 +96,7 @@ export class UserController {
 
             const email = req.cookies.userData.user.email;
 
-            const user:CreateUserDto = req.cookies.userData.user;
+            const user: CreateUserDto = req.cookies.userData.user;
 
 
             if (!email) {
@@ -128,6 +124,7 @@ export class UserController {
 
         } catch (error) {
             console.error('Error', error);
+            next(error)
         }
     }
 
@@ -149,7 +146,7 @@ export class UserController {
             setCookie(res, 'user', Token);
             res.json({ userDetails });
         } catch (error) {
-            next(error);
+            next(error)
         }
     }
 
@@ -160,7 +157,6 @@ export class UserController {
         next: NextFunction
     ): Promise<void> {
         try {
-            console.log(req.body, "controller");
             const response = await this.userService.verifyEmail(req.body.email);
             const email: string = req.body.email
             const data = {
@@ -180,7 +176,7 @@ export class UserController {
                 res.status(400).json({ message: 'Verification failed' });
             }
         } catch (error) {
-            next(error);
+            next(error)
         }
     }
 
@@ -193,17 +189,19 @@ export class UserController {
         try {
             const { otp } = req.body;
             console.log(otp, "controllerOTP")
-            console.log("Hai")
             const CookieOtp: string = req.cookies.forgotPassword.response;
             const email: string = req.cookies.forgotPassword.email;
             console.log(CookieOtp);
             const response = await this.userService.verifyOtp(otp, CookieOtp);
+            if (!response) {
+                throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
+            }
             if (response) {
                 res.clearCookie('userData');
                 res.status(201).json({ message: 'Successfull', data: email });
             }
         } catch (error) {
-            next(error);
+            next(error)
         }
     }
 
@@ -214,12 +212,145 @@ export class UserController {
     ): Promise<void> {
         try {
             const { email, password } = req.body;
-            const response = await this.userService.forgotPassword(email, password);
-            res.status(201).json({ message: 'Successfull' });
+            await this.userService.forgotPassword(email, password);
+            res.status(201).json({ message: MESSAGES.SUCCESS.PASSWORD_CHANGED });
         } catch (error) {
-            next(error);
+            next(error)
         }
     }
 
+    async changePassword(
+        req: Request<{}, {}>,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
+        try {
+            const credential = req.body;
+            const Token = req.cookies.user
+            const token = Token.accessToken
+            if (!token) {
+                throw new HttpException(STATUS_CODES.UNAUTHORIZED, MESSAGES.ERROR.UNAUTHORIZED)
+            }
+            await this.userService.changePassword(credential, token);
+            res.status(STATUS_CODES.SUCCESS).json({ message: MESSAGES.SUCCESS.PASSWORD_CHANGED });
+        } catch (error) {
+            next(error)
+        }
+    }
+
+
+    async myCourses(
+        req: Request<{}, {}>,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
+        try {
+            const page = parseInt(req.query.page as string) || 1;
+            const limit = parseInt(req.query.limit as string) || 4;
+            const search = (req.query.search as string);
+            const Token = req.cookies.user
+            const token = Token.accessToken;
+            if (!token) {
+                throw new HttpException(STATUS_CODES.UNAUTHORIZED, MESSAGES.ERROR.UNAUTHORIZED)
+            }
+            const { courses, total } = await this.userService.myCourses(token, page, limit, search);
+            if (!courses) {
+                throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
+            }
+            res.status(201).json({
+                courses,
+                total,
+                page,
+                limit,
+                totalPages: Math.ceil(total / limit)
+            });
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async Logout(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
+        try {
+            res.clearCookie('user', {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'strict',
+                path: '/',
+            });
+
+            res.status(200).json({
+                success: true,
+                message: 'Logged out successfully'
+            });
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async profilePhoto(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
+        try {
+
+            let fileLocation = (req.file as any).location;
+            const Token = req.cookies.user
+            const token = Token.accessToken;
+            if (!token) {
+                throw new HttpException(STATUS_CODES.UNAUTHORIZED, MESSAGES.ERROR.UNAUTHORIZED)
+            }
+            const requiredRole = "user";
+            const userId: string | null = decodedToken(token, requiredRole);
+            const user = await this.userService.profilePhoto(userId, fileLocation);
+            if (!user) {
+                throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
+            }
+            res.status(200).json({
+                success: true,
+                message: 'Logged out successfully',
+                data: user
+            });
+        } catch (error) {
+            next(error)
+        }
+    }
+
+
+
+    async profileUpdate(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
+        try {
+            const { userName, phoneNumber } = req.body;
+            const Token = req.cookies.user
+            const token = Token.accessToken;
+            if (!token) {
+                throw new HttpException(STATUS_CODES.UNAUTHORIZED, MESSAGES.ERROR.UNAUTHORIZED)
+            }
+            const requiredRole = "user";
+            const userId: string | null = decodedToken(token, requiredRole);
+            const updatedUser = await this.userService.updateProfile(userId, {
+                userName,
+                phoneNumber,
+            });
+            if (!updatedUser) {
+                throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
+            }
+            res.status(200).json({
+                success: true,
+                message: 'Profile updated successfully',
+                data: updatedUser
+            });
+        } catch (error) {
+            next(error)
+        }
+    }
 
 }

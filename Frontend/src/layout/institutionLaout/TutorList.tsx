@@ -5,6 +5,7 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { useTutorListQuery } from '../../store/slices/institutionSlice';
+import profile from '../../assets/frontEnd/ProfilePic.png'
 
 interface Tutor {
   id: string;
@@ -54,7 +55,7 @@ const TutorList: React.FC<TutorListProps> = ({ itemsPerPage = 10 }) => {
   };
 
   return (
-    <div className="w-full bg-white p-4 rounded-lg shadow">
+    <div className="w-full bg-white p-4 rounded-lg shadow flex flex-col min-h-[600px]">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-semibold text-gray-800">Tutors List</h2>
         <div className="flex gap-4 items-center">
@@ -83,13 +84,13 @@ const TutorList: React.FC<TutorListProps> = ({ itemsPerPage = 10 }) => {
               <th className="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Experience</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200">
+          <tbody className="divide-y divide-gray-200 flex-grow">
             {currentTutors.length > 0 ? (
               currentTutors.map((tutor: Tutor) => (
                 <tr key={tutor.id} className="hover:bg-gray-50">
                   <td className="py-4 px-6">
                     <img
-                      src={tutor.photoUrl || `/api/placeholder/40/40`}
+                      src={profile || `/api/placeholder/40/40`}
                       alt={tutor.tutorname}
                       className="h-10 w-10 rounded-full object-cover"
                     />
@@ -113,10 +114,34 @@ const TutorList: React.FC<TutorListProps> = ({ itemsPerPage = 10 }) => {
               ))
             ) : (
               <tr>
-                <td colSpan={6} className="py-4 px-6 text-center text-gray-500">
-                  {searchTerm ? 'No tutors found matching your search' : 'No tutors available'}
-                </td>
-              </tr>
+              <td colSpan={6} className="py-4 px-6 text-center text-gray-500 flex-grow">
+                <div className="flex flex-col items-center justify-center py-12">
+                  <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    className="h-16 w-16 text-gray-300 mb-4"
+                    fill="none" 
+                    viewBox="0 0 24 24" 
+                    stroke="currentColor"
+                  >
+                    <path 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round" 
+                      strokeWidth={2} 
+                      d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" 
+                    />
+                  </svg>
+                  <h3 className="text-xl font-semibold text-gray-600 mb-2">
+                    {searchTerm ? 'No tutors found' : 'No tutors available'}
+                  </h3>
+                  <p className="text-gray-500 mb-4">
+                    {searchTerm 
+                      ? `No results match "${searchTerm}"` 
+                      : 'Start by adding a new tutor'
+                    }
+                  </p>
+                </div>
+              </td>
+            </tr>
             )}
           </tbody>
         </table>

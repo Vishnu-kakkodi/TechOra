@@ -19,6 +19,33 @@ export class OrderRepository extends BaseRepository<OrderDocument>{
         }
     }
 
+    async findById(orderId: any): Promise<OrderDocument | any> {
+        try {
+  
+            const order = await this.model.findById({_id:orderId});
+
+            return order
+        } catch (error: any) {
+            console.error("Error occurred while fetching order:", error);
+
+        }
+    }
+
+    async find(userId: string): Promise<OrderDocument[] | null> {
+        try {
+            console.log("lalal");
+            const id = new mongoose.Types.ObjectId(userId)
+            console.log(id);
+            
+
+            return await this.model.find({userId:id}).populate({
+                path: 'items.course'
+            });
+        } catch(error) {
+            throw error;
+        }
+    }
+
     async updatePaymentStatus(orderId: mongoose.Types.ObjectId): Promise<OrderDocument | null> {
         try {
             return await this.model.findByIdAndUpdate(

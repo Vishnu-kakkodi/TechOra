@@ -9,51 +9,40 @@ import {
   BarChart,
   CheckCircle2
 } from 'lucide-react';
-import { useInstituteListQuery, useUserListQuery } from '../../store/slices/adminSlice';
+import { useAdminLogoutCallMutation, useInstituteListQuery, useUserListQuery } from '../../store/slices/adminSlice';
 import { adminLogout } from '../../store/slices/authSlice';
 import { useAppDispatch } from '../../store/hook';
+import { toast } from 'react-toastify';
 
 const Sidebar: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { data: users, error } = useUserListQuery(null);
-  const {data: institutes} = useInstituteListQuery(null);
+  // const {data: institutes} = useInstituteListQuery(null);
+  const [adminLogoutCall] = useAdminLogoutCallMutation();
 
   const handleNavigate = (path: string) => {
     navigate(path);
   };
 
   const handleUserList = () => {
-    if (users) {
-      console.log("User list fetched successfully:", users);
       navigate('/admin/user-list');
-    } else if (error) {
-      console.error("Error fetching user list:", error);
-    }
   };
 
   const handleInstitutionList = () => {
-    if (institutes) {
-      console.log("Institute list fetched successfully:", institutes);
       navigate('/admin/institute-list');
-    } 
   };
 
   const handleAllInstitutionList = () => {
-    if (institutes) {
-      console.log("Institute list fetched successfully:", institutes);
       navigate('/admin/all-institute');
-    } 
   };
 
   const handleApprovedInstitution = () => {
-    if (institutes) {
-      console.log("Institute list fetched successfully:", institutes);
       navigate('/admin/approved-institute');
-    } 
   };
 
-  const handleLogout = (): void => {
+  const handleLogout = async () => {
+    const response = await adminLogoutCall().unwrap();
+    toast.success("Logout successfully");
     dispatch(adminLogout());
     navigate('/admin/login');
   };
@@ -102,7 +91,7 @@ const Sidebar: React.FC = () => {
                 <span>All Institutes</span>
               </button>
               
-              <button 
+              {/* <button 
                 onClick={handleInstitutionList}
                 className="flex items-center space-x-2 text-gray-300 hover:text-white w-full"
               >
@@ -116,7 +105,7 @@ const Sidebar: React.FC = () => {
               >
                 <CheckCircle2 className="w-5 h-5" />
                 <span>Active Institutes</span>
-              </button>
+              </button> */}
             </div>
           </div>
         </div>

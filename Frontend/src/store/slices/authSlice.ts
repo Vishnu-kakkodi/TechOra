@@ -1,9 +1,13 @@
+
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface UserInfo {
   id?: string;
   email?: string;
-  name?: string;
+  userName?: string;
+  phoneNumber?: string;
+  status?: string;
+  profilePhoto?:string;
   [key: string]: any;
 }
 
@@ -15,6 +19,7 @@ interface InstituteInfo {
   id?: string;
   collegeName?: string;
   instituteEmail?: string;
+  totalStudents?:number;
   [key: string]: any;
 }
 
@@ -28,23 +33,37 @@ interface AuthState {
   isInstituteAuthenticated: boolean;
 }
 
-const initialState: AuthState = {
-  userInfo: localStorage.getItem("userInfo")
-    ? JSON.parse(localStorage.getItem("userInfo") as string)
-    : null,
-  adminInfo: localStorage.getItem("adminInfo")
-    ? JSON.parse(localStorage.getItem("adminInfo") as string)
-    : null,
-  institutionInfo: localStorage.getItem("institutionInfo")
-    ? JSON.parse(localStorage.getItem("institutionInfo") as string)
-    : null,
-  institutionEmailInfo: localStorage.getItem("institutionEmailInfo")
-    ? JSON.parse(localStorage.getItem("institutionEmailInfo") as string)
-    : null,
-    isUserAuthenticated: !!localStorage.getItem("userInfo"), 
-    isAdminAuthenticated: !!localStorage.getItem("adminInfo"), 
-    isInstituteAuthenticated: !!localStorage.getItem("institutionInfo"), 
+const getFromStorage = (key: string) => {
+  const localItem = localStorage.getItem(key);
+  sessionStorage.setItem(key, localItem || ''); 
+  return localItem ? JSON.parse(localItem) : null;
 };
+
+const setToStorage = (key: string, value: any) => {
+  const stringValue = JSON.stringify(value);
+  localStorage.setItem(key, stringValue);
+  sessionStorage.setItem(key, stringValue);
+};
+
+const removeFromStorage = (key: string) => {
+  localStorage.removeItem(key);
+  sessionStorage.removeItem(key);
+};
+
+const initialState: AuthState = {
+  userInfo: getFromStorage("userInfo"),
+  adminInfo: getFromStorage("adminInfo"),
+  institutionInfo: getFromStorage("institutionInfo"),
+  institutionEmailInfo: getFromStorage("institutionEmailInfo"),
+  isUserAuthenticated: !!localStorage.getItem("userInfo"),
+  isAdminAuthenticated: !!localStorage.getItem("adminInfo"),
+  isInstituteAuthenticated: !!localStorage.getItem("institutionInfo"),
+};
+
+interface UpdateUserFieldPayload {
+  field: keyof UserInfo;
+  value: any;
+}
 
 const authSlice = createSlice({
   name: "auth",
@@ -53,48 +72,62 @@ const authSlice = createSlice({
     setCredentials: (state, action: PayloadAction<UserInfo>) => {
       state.userInfo = action.payload;
       state.isUserAuthenticated = true;
-      localStorage.setItem("userInfo", JSON.stringify(action.payload));
+      setToStorage("userInfo", action.payload);
     },
     setAdminCredentials: (state, action: PayloadAction<UserInfo>) => {
       state.adminInfo = action.payload;
       state.isAdminAuthenticated = true;
-      localStorage.setItem("adminInfo", JSON.stringify(action.payload));
+      setToStorage("adminInfo", action.payload);
     },
     setInstituteCredentials: (state, action: PayloadAction<InstituteInfo>) => {
       state.institutionInfo = action.payload;
       state.isInstituteAuthenticated = true;
-      localStorage.setItem("institutionInfo", JSON.stringify(action.payload));
+      setToStorage("institutionInfo", action.payload);
     },
     setInstituteEmailCredentials: (state, action: PayloadAction<InstituteEmailInfo>) => {
       state.institutionEmailInfo = action.payload;
-      localStorage.setItem("institutionEmailInfo", JSON.stringify(action.payload));
+      setToStorage("institutionEmailInfo", action.payload);
+    },
+    updateUserField: (state, action: PayloadAction<UpdateUserFieldPayload>) => {
+      if (state.userInfo) {
+        const { field, value } = action.payload;
+        state.userInfo = {
+          ...state.userInfo,
+          [field]: value
+        };
+        setToStorage("userInfo", state.userInfo);
+      }
     },
     userLogout: (state) => {
       state.userInfo = null;
-      state.isUserAuthenticated = false; 
-      localStorage.removeItem("userInfo");
+      state.isUserAuthenticated = false;
+      removeFromStorage("userInfo");
     },
     adminLogout: (state) => {
       state.adminInfo = null;
-      state.isAdminAuthenticated = false; 
-      localStorage.removeItem("adminInfo");
+      state.isAdminAuthenticated = false;
+      removeFromStorage("adminInfo");
     },
     instituteLogout: (state) => {
       state.institutionInfo = null;
-      state.isInstituteAuthenticated = false; 
-      localStorage.removeItem("institutionInfo");
+      state.isInstituteAuthenticated = false;
+      removeFromStorage("institutionInfo");
     },
   },
 });
 
-export const { 
-  setCredentials, 
-  setAdminCredentials, 
+export const {
+  setCredentials,
+  setAdminCredentials,
   setInstituteCredentials,
   setInstituteEmailCredentials,
-  userLogout, 
+  updateUserField,
+  userLogout,
   adminLogout,
-  instituteLogout
+  instituteLogout,
 } = authSlice.actions;
 
 export default authSlice.reducer;
+
+
+

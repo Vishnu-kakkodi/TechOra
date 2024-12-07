@@ -19,11 +19,13 @@ import {
 import { useUserListQuery } from '../../store/slices/adminSlice';
 import { useAppDispatch } from '../../store/hook';
 import { instituteLogout } from '../../store/slices/authSlice';
-import { useDraftCourseListQuery } from '../../store/slices/institutionSlice';
+import { useDraftCourseListQuery, useInstituteLogoutCallMutation } from '../../store/slices/institutionSlice';
+import { toast } from 'react-toastify';
 
 const InstituteSidebar: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const [instituteLogoutCall] = useInstituteLogoutCallMutation();
   const {data: course} = useDraftCourseListQuery(null);
 
   const { data: users, error } = useUserListQuery(null);
@@ -50,7 +52,9 @@ const InstituteSidebar: React.FC = () => {
     }
   };
 
-  const handleLogout = (): void => {
+  const handleLogout = async () => {
+    const response = await instituteLogoutCall().unwrap();
+    toast.success("Logout successfully");
     dispatch(instituteLogout());
     navigate('/institute/login');
   };
@@ -107,7 +111,7 @@ const InstituteSidebar: React.FC = () => {
           </div>
           <div className="ml-5 space-y-3">
             <button 
-              onClick={() => handleNavigate('/quizzes')}
+              onClick={() => handleNavigate('/institute/quizzes')}
               className="flex items-center space-x-2 text-gray-300 hover:text-white w-full"
             >
               <Brain className="w-5 h-5" />
@@ -120,13 +124,13 @@ const InstituteSidebar: React.FC = () => {
               <PlusCircle className="w-5 h-5" />
               <span>Add Quiz</span>
             </button>
-            <button 
+            {/* <button 
               onClick={() => handleNavigate('/quizzes/drafts')}
               className="flex items-center space-x-2 text-gray-300 hover:text-white w-full"
             >
               <FileEdit className="w-5 h-5" />
               <span>Draft Quizzes</span>
-            </button>
+            </button> */}
           </div>
         </div>
 
@@ -142,17 +146,17 @@ const InstituteSidebar: React.FC = () => {
               <GraduationCap className="w-5 h-5" />
               <span>Tutor List</span>
             </button>
-            <button 
+            {/* <button 
               onClick={() => handleNavigate('/institute/tutor-add')}
               className="flex items-center space-x-2 text-gray-300 hover:text-white w-full"
             >
               <PlusCircle className="w-5 h-5" />
               <span>Add Tutor</span>
-            </button>
+            </button> */}
           </div>
         </div>
 
-        <div className="mb-6 space-y-4">
+        {/* <div className="mb-6 space-y-4">
           <div className="text-gray-500 text-sm uppercase">
             Students
           </div>
@@ -163,7 +167,7 @@ const InstituteSidebar: React.FC = () => {
             <Users className="w-5 h-5" />
             <span>All Students</span>
           </button>
-        </div>
+        </div> */}
 
         <div className="mt-8">
           <button 

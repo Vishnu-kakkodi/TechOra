@@ -21,8 +21,8 @@ const moduleSchema = new Schema<Module>({
   },
   status: { 
     type: String, 
-    enum: ['draft', 'published'], 
-    default: 'published' 
+    enum: ['list', 'unlist'], 
+    default: 'unlist' 
   }
 }, { timestamps: true });
 
@@ -90,6 +90,10 @@ const courseSchema = new Schema<CourseDocument>({
   totalDuration: { 
     type: Number,
     default: 0 
+  },
+  isListed:{
+    type:Boolean,
+    default:true
   }
 }, { timestamps: true });
 
@@ -108,8 +112,8 @@ courseSchema.pre('save', function(this: CourseDocument, next) {
 });
 
 courseSchema.pre('validate', function(this: CourseDocument, next) {
-  if (this.status === 'published') {
-    const hasUnpublishedModules = this.modules.some(module => module.status === 'draft');
+  if (this.status === 'draft') {
+    const hasUnpublishedModules = this.modules.some(module => module.status === 'unlist');
     if (hasUnpublishedModules) {
       next(new Error('Cannot publish course with draft modules'));
       return;

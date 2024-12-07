@@ -1,4 +1,4 @@
-import { Model,Document } from "mongoose";
+import { Model,Document,Types } from "mongoose";
 import { BaseInterface } from "../interfaces/base.interface";
 import { HttpException } from "../middleware/error.middleware";
 import STATUS_CODES from "../constants/statusCode";

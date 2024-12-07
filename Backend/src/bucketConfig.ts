@@ -59,6 +59,9 @@ const upload: Multer = multer({
         case 'document':
           folderPath = 'institution_documents';
           break;
+        case 'profilePhoto':
+          folderPath = 'institution_documents';
+          break;
         default:
           folderPath = 'other_files';
       }
@@ -69,7 +72,7 @@ const upload: Multer = multer({
     contentType: multerS3.AUTO_CONTENT_TYPE,
   }),
   limits: {
-    fileSize: 10 * 1024 * 1024,
+    fileSize: 100 * 1024 * 1024,
     files: 1 
   },
   fileFilter: (req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {

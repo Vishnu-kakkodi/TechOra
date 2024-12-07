@@ -15,6 +15,13 @@ import ForgotPasswordPage from '../components/modals/ForgotPassword';
 import QuizList from '../pages/user/QuizList';
 import QuizAttempt from '../pages/user/QuizAttempt';
 import PaymentSuccess from '../pages/user/PaymentSuccess';
+import ChangePassword from '../layout/userLayout/ChangePassword';
+import Profile from '../layout/userLayout/Profile';
+import OrderList from '../layout/userLayout/OrderList';
+import OrderDetail from '../layout/userLayout/OrderDetail';
+import MyCourses from '../layout/userLayout/MyCourses';
+import CourseDetail from '../pages/user/CourseDetail';
+import BlcokPage from '../pages/user/BlcokPage';
 
 const UserRoutes: React.FC = () => {
 
@@ -33,6 +40,10 @@ const UserRoutes: React.FC = () => {
       <Route
         path="/forgot-password"
         element={isUserAuthenticated ? <Navigate to="/home" replace /> : <ForgotPasswordPage />}
+      />
+
+      <Route
+        path="/account-blocked" element={<BlcokPage />}
       />
 
       <Route
@@ -72,10 +83,19 @@ const UserRoutes: React.FC = () => {
       />
 
       <Route
-        path="/start-quiz"
+        path="/start-quiz/:quizId"
         element={
           <AuthRoute role={'user'}>
             <QuizAttempt />
+          </AuthRoute>
+        }
+      />
+
+      <Route
+        path="/course-view/:courseId"
+        element={
+          <AuthRoute role={'user'}>
+            <CourseDetail />
           </AuthRoute>
         }
       />
@@ -87,7 +107,16 @@ const UserRoutes: React.FC = () => {
             <Account />
           </AuthRoute>
         }
-      />
+      >
+        <Route index element={<Profile />} />
+        <Route path="change-password" element={<ChangePassword />} />
+        <Route path="orders" element={<OrderList />} />
+        <Route path="order-detail/:orderId" element={<OrderDetail />} />
+        <Route path="my-courses" element={<MyCourses />} />
+
+
+
+      </Route>
 
       <Route
         path="/success"

@@ -11,7 +11,8 @@ const instituteSchema = new Schema<InstituteDocument>(
     district: { type: String, required: true },
     documentUrl:{ type: String, required: true },
     applicationId:{ type: String, required: true},
-    status: { type: String, enum: Object.values(InstituteStatus), default: InstituteStatus.Pending }
+    status: { type: String, enum: Object.values(InstituteStatus), default: InstituteStatus.Pending },
+    totalStudents:{type: Number, required:false, default:0}
 
   },
   { timestamps: true }

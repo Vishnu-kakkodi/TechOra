@@ -1,6 +1,15 @@
 import { BaseRepository } from "./base.repository";
 import { InstituteModel } from "../models/institute.model";
 import { InstituteDocument } from "../interfaces/institute.interface";
+import mongoose, { FilterQuery } from "mongoose";
+
+export type SearchQueryTypeInstitute = FilterQuery<{
+    collegeName: string;
+    instituteEmail: string;
+    collegeCode: string;
+    applicationId: string;
+  }>;
+
 
 
 export class InstituteRepository extends BaseRepository<InstituteDocument> {
@@ -25,9 +34,16 @@ export class InstituteRepository extends BaseRepository<InstituteDocument> {
         }
     }
 
-    async find(): Promise<InstituteDocument[]> { 
+    async find(searchQuery:SearchQueryTypeInstitute,skip:number,limit:number): Promise<{ institutes: InstituteDocument[]; total: number }> { 
         try {
-            return await this.model.find();
+            const institutes = await this.model.find(searchQuery)
+            .skip(skip)
+            .limit(limit)
+
+            const total:number = await this.model.countDocuments(searchQuery);
+            console.log(institutes);
+            return { institutes, total };
+
         } catch (error) {
             throw error;
         }
@@ -36,9 +52,11 @@ export class InstituteRepository extends BaseRepository<InstituteDocument> {
     
     async findById(instituteId : string): Promise<InstituteDocument | null> { 
         try {
+            console.log("instituteId",instituteId);
             console.log("instituteId",typeof(instituteId));
-            
-            const institute =  await this.model.findById(instituteId);
+            const id = new mongoose.Types.ObjectId(instituteId)
+            console.log("instituteId",id);
+            const institute =  await this.model.findById(id);
             console.log(institute,"ufdsakdgks");
             return institute;
             

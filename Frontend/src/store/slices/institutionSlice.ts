@@ -1,14 +1,25 @@
 import { createApi, BaseQueryFn, FetchArgs, fetchBaseQuery, FetchBaseQueryError } from '@reduxjs/toolkit/query/react';
 import { InstituteDocument } from '../../../../Backend/src/interfaces/institute.interface';
-import { CourseDocument } from '../../../../Backend/src/interfaces/course.interface';
 import { CourseDetailResponse } from '../../types/courseType';
 import { TutorFormData } from '../../types/institutionTypes';
-const backendUrl = import.meta.env.VITE_BACKEND_URL;
+import { UserRole } from './userSlice';
 
-const baseQuery = fetchBaseQuery({ baseUrl: `${backendUrl}/api` });
+const baseQueryWithRole = fetchBaseQuery({
+  baseUrl: `${import.meta.env.VITE_BACKEND_URL}/api/`,
+  prepareHeaders: (headers, { getState }) => {
+    
+    let role: UserRole | null = 'institute';
 
+    if (role) {
+      headers.set('role', role);
+    }
+
+    return headers;
+  },
+  credentials: 'include',
+});
 export const institutionSlice = createApi({
-  baseQuery: baseQuery as BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError>,
+  baseQuery: baseQueryWithRole as BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError>,
   tagTypes: ['Admin', 'User', 'Institution'],
   endpoints: (builder) => ({
 
@@ -100,8 +111,9 @@ export const institutionSlice = createApi({
    }),
 
    courseList: builder.query({
-    query: () => ({
+    query: ({ page = 1, limit = 4, search = '', filter='all', sort='' }) => ({
       url: '/institution/course-list',
+      params:{ page, limit, search, filter, sort },
       method: 'GET',
       credentials: 'include'
     }),
@@ -125,15 +137,91 @@ export const institutionSlice = createApi({
     providesTags: ['Institution'],
   }),
 
-  addQuiz: builder.mutation<any, { body: FormData }>({
-    query: (payload) => ({
+  addQuiz: builder.mutation({
+    query: (quizPayload) => ({
       url: '/institution/create-quiz',
       method: 'POST',
-      body: payload.body,
+      body: quizPayload,
       credentials: 'include'
     }),
     invalidatesTags: ['Institution'],
   }),
+
+  instituteLogoutCall: builder.mutation<void, void>({
+    query: () => ({
+      url: '/institution/logout',
+      method: 'POST',
+      credentials: 'include',
+    }),
+    invalidatesTags: ['Institution'],
+  }),
+
+  quizList: builder.query({
+    query: ({ page = 1, limit = 4, search = '', filter='all', sort='', selectedStatus='' }) =>({
+      url: `/institution/quiz-list`,
+      params:{ page, limit, search, filter, sort, selectedStatus },
+      method: 'GET',
+      credentials: 'include',
+    }),
+    providesTags:['Institution']
+   }),
+
+   quizDetail: builder.query({
+    query: (quizId) =>({
+      url: `/institution/quiz-detail/?quizId=${quizId}`,
+      method: 'GET',
+      credentials: 'include',
+    }),
+    providesTags:['Institution']
+   }),
+
+   updateQuiz: builder.mutation<any, {quizPayload:any, quizId:string|undefined}>({
+    query: ({quizPayload,quizId}) => ({
+        url: `/institution/quiz-update/?quizId=${quizId}`, 
+        method: 'POST',
+        body: quizPayload,
+        credentials: 'include'  
+    }),
+    invalidatesTags: ['Institution'],
+}),
+
+   listCourse: builder.mutation<string, { courseId: string }>({
+    query: ({courseId}) => ({
+      url: '/institution/list-course',
+      method: 'PATCH',
+      body:{courseId},
+      credentials: 'include'
+    }),
+    invalidatesTags: ['Institution'],
+  }),
+
+  updateCourse: builder.mutation<any, {values:any, id:string|undefined}>({
+    query: ({values,id}) => ({
+        url: `/institution/course-update/?courseId=${id}`, 
+        method: 'POST',
+        body: values,
+        credentials: 'include'  
+    }),
+    invalidatesTags: ['Institution'],
+}),
+
+moduleDelete: builder.mutation<any, {moduleId:any, courseId:string}>({
+  query: ({moduleId,courseId}) => ({
+      url: `/institution/module-delete/?courseId=${courseId}&moduleId=${moduleId}`,
+      method: 'DELETE',
+      credentials: 'include'  
+  }),
+  invalidatesTags: ['Institution'],
+}),
+
+chartData: builder.query({
+  query: () => ({
+    url: '/institution/chart-data',
+    method: 'GET',
+    credentials: 'include'
+  }),
+  providesTags: ['Institution'],
+ }),
 
   }),
 });
@@ -151,5 +239,13 @@ export const {
   useCourseListQuery,
   useCoursedetailQuery,
   useTutorListQuery,
-  useAddQuizMutation
+  useAddQuizMutation,
+  useInstituteLogoutCallMutation,
+  useQuizListQuery,
+  useQuizDetailQuery,
+  useUpdateQuizMutation,
+  useListCourseMutation,
+  useUpdateCourseMutation,
+  useModuleDeleteMutation,
+  useChartDataQuery
 } = institutionSlice;

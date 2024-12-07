@@ -36,6 +36,10 @@ import DraftCourses from '../pages/institute/DraftCourses';
 import AuthRoute from './AuthRoute';
 import TutorListPage from '../pages/institute/TutorListPage';
 import CreateQuiz from '../pages/institute/CreateQuiz';
+import ListQuiz from '../pages/institute/ListQuiz';
+import QuizDetail from '../pages/institute/QuizDetail';
+import EditQuiz from '../pages/institute/EditQuiz';
+import EditCourse from '../pages/institute/EditCourse';
 
 const InstituteRoutes: React.FC = () => {
 
@@ -114,6 +118,15 @@ const InstituteRoutes: React.FC = () => {
       />
 
       <Route
+        path="/courses/edit/:courseId"
+        element={
+          <AuthRoute role='institute'>
+            <EditCourse />
+          </AuthRoute>
+        }
+      />
+
+      <Route
         path="/tutors"
         element={
           <AuthRoute role='institute'>
@@ -127,6 +140,33 @@ const InstituteRoutes: React.FC = () => {
         element={
           <AuthRoute role='institute'>
             <CreateQuiz />
+          </AuthRoute>
+        }
+      />
+
+      <Route
+        path="/quizzes"
+        element={
+          <AuthRoute role='institute'>
+            <ListQuiz />
+          </AuthRoute>
+        }
+      />
+
+      <Route
+        path="/quiz/:quizId"
+        element={
+          <AuthRoute role='institute'>
+            <QuizDetail />
+          </AuthRoute>
+        }
+      />
+
+      <Route
+        path="/edit-quiz/:quizId"
+        element={
+          <AuthRoute role='institute'>
+            <EditQuiz />
           </AuthRoute>
         }
       />

@@ -1,26 +1,75 @@
-import React, { useState, useEffect } from 'react';
-import { ChevronRight, ChevronLeft } from 'lucide-react';
-import { Quiz } from '../../types/userSide/quizType';
-import { useLocation } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useMemo } from 'react';
+import { 
+  ChevronRight, 
+  ChevronLeft, 
+  CheckCircle, 
+  XCircle, 
+  HelpCircle, 
+  Trophy, 
+  RefreshCcw, 
+  List, 
+  Check, 
+  X, 
+  Clock, 
+  AlertTriangle 
+} from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { toast } from 'react-toastify';
+import Navbar from '../../components/header/Navbar';
 
-interface Question {
-  id: number;
+interface QuizOption {
   text: string;
-  options: string[];
-  correctAnswer: number;
+  isCorrect: boolean;
+  _id: string;
 }
 
+interface QuizQuestion {
+  _id: string;
+  question: string;
+  options: QuizOption[];
+  points: number;
+  type: string;
+}
 
+interface QuizDocument {
+  _id: string;
+  title: string;
+  duration: number;
+  questions: QuizQuestion[];
+  totalQuestions: number;
+  passingScore: string;
+  positiveScore: number;
+  negativeScore: number;
+
+}
 
 const QuizAttempt: React.FC = () => {
   const [currentQuestion, setCurrentQuestion] = useState<number>(0);
-  const [selectedAnswers, setSelectedAnswers] = useState<Record<number, number>>({});
+  const [selectedAnswers, setSelectedAnswers] = useState<Record<string, number>>({});
   const [submitted, setSubmitted] = useState<boolean>(false);
+  const [seconds, setSeconds] = useState<number>(0);
+  const [answeredQuestions, setAnsweredQuestions] = useState<Record<string, boolean>>({});
+  const [skippedQuestions, setSkippedQuestions] = useState<Record<string, boolean>>({});
+  const [answered, setAnswered] = useState<number>(0)
+  const [correct, setCorrect] = useState<number>(0)
+
+
+
+  const formatTime = (totalSeconds: number) => {
+    const minutes = Math.floor(totalSeconds / 60);
+    const remainingSeconds = totalSeconds % 60;
+
+    const formattedMinutes = minutes < 10 ? `0${minutes}` : `${minutes}`;
+    const formattedSeconds = remainingSeconds < 10 ? `0${remainingSeconds}` : `${remainingSeconds}`;
+
+    return `${formattedMinutes}:${formattedSeconds}`;
+  };
+
 
   const location = useLocation();
   const navigate = useNavigate();
-  const [quiz, setQuiz] = useState<Quiz | null>(null);
+  const [quiz, setQuiz] = useState<QuizDocument>(null);
 
   useEffect(() => {
     const quizFromState = location.state?.quiz;
@@ -28,54 +77,51 @@ const QuizAttempt: React.FC = () => {
       navigate('/quiz-list');
       return;
     }
+    setSeconds(quizFromState.duration * 60);
     setQuiz(quizFromState);
   }, [location, navigate]);
-  
-  const questions: Question[] = [
-    {
-      id: 1,
-      text: 'What is the primary purpose of React hooks?',
-      options: [
-        'To manage state in functional components',
-        'To create class components',
-        'To handle HTTP requests',
-        'To define CSS styles'
-      ],
-      correctAnswer: 0
-    },
-    {
-      id: 2,
-      text: 'Which hook is used for side effects in functional components?',
-      options: [
-        'useState',
-        'useContext',
-        'useEffect',
-        'useReducer'
-      ],
-      correctAnswer: 2
-    },
-    {
-      id: 3,
-      text: 'What does useState return?',
-      options: [
-        'A single value',
-        'An array with the state value and a setter function',
-        'A promise',
-        'An object with state methods'
-      ],
-      correctAnswer: 1
-    }
-  ];
 
-  const handleAnswerSelect = (questionId: number, selectedOption: number): void => {
+  useEffect(() => {
+    if (seconds > 0) {
+      const interval = setInterval(() => {
+        setSeconds((prevSeconds) => prevSeconds - 1);
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [seconds]);
+
+  const handleAnswerSelect = (questionId: string, selectedOptionIndex: number): void => {
+
     setSelectedAnswers(prev => ({
       ...prev,
-      [questionId]: selectedOption
+      [questionId]: selectedOptionIndex
+    }));
+
+    setAnsweredQuestions(prev => ({
+      ...prev,
+      [questionId]: true
+    }));
+
+    setSkippedQuestions(prev => {
+      const updated = { ...prev };
+      delete updated[questionId];
+      return updated;
+    });
+    if (!selectedAnswers.hasOwnProperty(questionId)) {
+      setAnswered(prev => prev + 1);
+    }
+
+  };
+
+  const handleSkipQuestion = (questionId: string): void => {
+    setSkippedQuestions(prev => ({
+      ...prev,
+      [questionId]: true
     }));
   };
 
   const handleNextQuestion = (): void => {
-    if (currentQuestion < questions.length - 1) {
+    if (quiz && currentQuestion < quiz.questions.length - 1) {
       setCurrentQuestion(prev => prev + 1);
     }
   };
@@ -86,130 +132,364 @@ const QuizAttempt: React.FC = () => {
     }
   };
 
-  const handleSubmit = (): void => {
-    setSubmitted(true);
-  };
-
-  const calculateScore = (): number => {
-    return questions.reduce((score, question) => {
-      return selectedAnswers[question.id] === question.correctAnswer 
-        ? score + 1 
+  const calculateScore = useMemo(() => {
+    if (!quiz) return 0;
+  
+    let correctCount = 0;
+    const score = quiz.questions.reduce((score, question) => {
+      const selectedOptionIndex = selectedAnswers[question._id];
+      const isCorrect =
+        selectedOptionIndex !== undefined &&
+        question.options[selectedOptionIndex].isCorrect;
+      
+      if (isCorrect) {
+        correctCount++;
+      }
+      
+      return isCorrect
+        ? score + quiz.positiveScore
+        : score > 0
+        ? score - quiz.negativeScore
         : score;
     }, 0);
+  
+    // Update correct count only when dependencies change
+    setCorrect(correctCount);
+  
+    return score;
+  }, [quiz, selectedAnswers]); // Dependencies array
+  if (!quiz) {
+    return <div>Loading...</div>;
+  }
+
+  const totalQuestions = quiz.totalQuestions;
+  const unansweredQuestions = totalQuestions - answered;
+  const progressPercentage = Math.round((answered / totalQuestions) * 100);
+
+  const handleSubmit = (): void => {
+    if(unansweredQuestions===0){
+      for(let i in selectedAnswers){
+        console.log(selectedAnswers[i])
+      }
+      setSubmitted(true);
+    }else{
+      toast.warning("Complete the quiz")
+    }
   };
 
   if (submitted) {
-    const score = calculateScore();
-    const percentage = ((score / questions.length) * 100).toFixed(2);
+       const score = calculateScore;
+    const passMark: number = (quiz.totalQuestions*quiz.positiveScore)*(parseInt(quiz.passingScore))/100
+    const percentage = ((score / (quiz.totalQuestions*quiz.positiveScore)) * 100).toFixed(2);
 
     return (
-      <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md">
-        <h1 className="text-3xl font-bold text-center mb-6">{quiz?.title} - Results</h1>
-        <div className="text-center">
-          <div className="text-6xl font-bold mb-4 text-blue-600">{percentage}%</div>
-          <div className="text-xl mb-4">
-            You scored {score} out of {questions.length} questions
-          </div>
-          <div className="flex justify-center space-x-4 mt-6">
-            <button 
-              className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition"
-              onClick={() => window.location.reload()}
-            >
-              Retake Quiz
-            </button>
-            <button 
-              className="border border-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-100 transition"
-            >
-              Back to Quiz List
-            </button>
-          </div>
-        </div>
-      </div>
+      <QuizResults 
+        quiz={quiz} 
+        score={score} 
+        percentage={percentage} 
+        answered={answered} 
+        correct={correct} 
+        passMark={passMark} 
+        navigate={navigate}
+      />
     );
   }
 
-  return (
-    <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md">
-      <div className="mb-6 flex justify-between items-center">
-        <h1 className="text-2xl font-bold">{quiz?.title}</h1>
-        <div className="text-gray-600">
-          Question {currentQuestion + 1} of {questions.length}
-        </div>
-      </div>
+  const currentQuestionData = quiz.questions[currentQuestion];
 
-      <div className="bg-gray-100 p-6 rounded-lg mb-6">
-        <h2 className="text-xl font-semibold mb-4">{questions[currentQuestion].text}</h2>
-        
-        <div className="space-y-3">
-          {questions[currentQuestion].options.map((option, index) => (
-            <div 
-              key={index}
-              className={`
-                p-3 rounded-lg cursor-pointer transition 
-                ${selectedAnswers[questions[currentQuestion].id] === index 
-                  ? 'bg-blue-100 border-2 border-blue-500' 
-                  : 'bg-white hover:bg-gray-50 border border-gray-200'}
-              `}
-              onClick={() => handleAnswerSelect(questions[currentQuestion].id, index)}
-            >
-              <div className="flex items-center">
-                <div className={`
-                  w-5 h-5 mr-3 rounded-full border-2 
-                  ${selectedAnswers[questions[currentQuestion].id] === index 
-                    ? 'bg-blue-500 border-blue-500' 
-                    : 'border-gray-300'}
-                `}></div>
-                <span>{option}</span>
+  return (
+    <>
+    <Navbar/>
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-indigo-50">
+      <div className="container mx-auto px-4 py-8">
+        {/* Quiz Header */}
+        <div className="flex justify-between items-center mb-8">
+          <motion.div 
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="flex items-center space-x-4"
+          >
+            <h1 className="text-3xl font-bold text-indigo-800">{quiz.title}</h1>
+            <div className="flex items-center space-x-2 bg-indigo-100 px-3 py-1 rounded-full">
+              <Clock className="text-indigo-600" size={16} />
+              <span className="text-indigo-700 font-semibold">
+                {formatTime(seconds)}
+              </span>
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="text-gray-600"
+          >
+            Question {currentQuestion + 1} of {quiz.questions.length}
+          </motion.div>
+        </div>
+
+        {/* Main Quiz Content */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Question Navigation Sidebar */}
+          <motion.div 
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="lg:col-span-1 bg-white rounded-xl shadow-lg p-6"
+          >
+            <h3 className="text-xl font-semibold mb-4 text-indigo-800">
+              Quiz Progress
+            </h3>
+
+            {/* Progress Visualization */}
+            <div className="mb-6">
+              <div className="w-full bg-indigo-100 rounded-full h-3 mb-2">
+                <div 
+                  className="bg-indigo-500 h-3 rounded-full transition-all duration-300"
+                  style={{ width: `${progressPercentage}%` }}
+                />
+              </div>
+              <div className="flex justify-between text-sm text-gray-600">
+                <span>{answered} / {totalQuestions} Answered</span>
+                <span>{progressPercentage}%</span>
               </div>
             </div>
-          ))}
+
+            {/* Question Status Grid */}
+            <div className="grid grid-cols-6 gap-2">
+              {quiz.questions.map((question, index) => {
+                const isAnswered = answeredQuestions[question._id];
+                const isSkipped = skippedQuestions[question._id];
+
+                let statusClass = "bg-indigo-500 text-white";
+                let StatusIcon = HelpCircle;
+
+                if (isAnswered) {
+                  statusClass = "bg-green-500 text-white";
+                  StatusIcon = CheckCircle;
+                } else if (isSkipped) {
+                  statusClass = "bg-yellow-500 text-white";
+                  StatusIcon = XCircle;
+                }
+
+                return (
+                  <motion.div
+                    key={question._id}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                    className={`
+                      ${statusClass} 
+                      rounded-lg p-2 flex items-center 
+                      justify-center cursor-pointer 
+                      hover:opacity-80 transition-all
+                    `}
+                    onClick={() => setCurrentQuestion(index)}
+                    title={`Question ${index + 1}`}
+                  >
+                    <StatusIcon size={20} />
+                  </motion.div>
+                );
+              })}
+            </div>
+          </motion.div>
+
+          {/* Current Question */}
+          <motion.div 
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="lg:col-span-2 bg-white rounded-xl shadow-lg p-8"
+          >
+            <h2 className="text-2xl font-bold mb-6 text-gray-800">
+              {currentQuestionData.question}
+            </h2>
+
+            <div className="space-y-4">
+              {currentQuestionData.options.map((option, index) => (
+                <motion.div
+                  key={option._id}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className={`
+                    p-4 rounded-lg border-2 cursor-pointer 
+                    transition-all duration-200 ease-in-out
+                    ${selectedAnswers[currentQuestionData._id] === index
+                      ? 'bg-indigo-100 border-indigo-500'
+                      : 'border-gray-200 hover:border-indigo-300'}
+                  `}
+                  onClick={() => handleAnswerSelect(currentQuestionData._id, index)}
+                >
+                  <div className="flex items-center">
+                    <div className={`
+                      w-6 h-6 mr-4 rounded-full border-2 
+                      ${selectedAnswers[currentQuestionData._id] === index
+                        ? 'bg-indigo-500 border-indigo-500'
+                        : 'border-gray-300'}
+                    `}></div>
+                    <span className="text-gray-800">{option.text}</span>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Navigation Buttons */}
+            <div className="flex justify-between mt-8">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={handlePreviousQuestion}
+                disabled={currentQuestion === 0}
+                className={`
+                  flex items-center px-6 py-3 rounded-lg 
+                  transition-all duration-200
+                  ${currentQuestion === 0
+                    ? 'text-gray-300 cursor-not-allowed'
+                    : 'text-indigo-600 bg-indigo-50 hover:bg-indigo-100'}
+                `}
+              >
+                <ChevronLeft className="mr-2" /> Previous
+              </motion.button>
+
+              {currentQuestion === quiz.questions.length - 1 ? (
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={handleSubmit}
+                  disabled={selectedAnswers[currentQuestionData._id] === undefined}
+                  className={`
+                    flex items-center px-6 py-3 rounded-lg 
+                    transition-all duration-200
+                    ${selectedAnswers[currentQuestionData._id] === undefined
+                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      : 'bg-indigo-600 text-white hover:bg-indigo-700'}
+                  `}
+                >
+                  Submit Quiz
+                </motion.button>
+              ) : (
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={handleNextQuestion}
+                  className="flex items-center px-6 py-3 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700"
+                >
+                  Next <ChevronRight className="ml-2" />
+                </motion.button>
+              )}
+            </div>
+          </motion.div>
         </div>
-      </div>
 
-      <div className="flex justify-between">
-        <button 
-          onClick={handlePreviousQuestion}
-          disabled={currentQuestion === 0}
-          className={`
-            flex items-center px-4 py-2 rounded-lg transition
-            ${currentQuestion === 0 
-              ? 'text-gray-300 cursor-not-allowed' 
-              : 'text-blue-600 hover:bg-blue-50'}
-          `}
-        >
-          <ChevronLeft className="mr-2" /> Previous
-        </button>
-
-        {currentQuestion === questions.length - 1 ? (
-          <button 
-            onClick={handleSubmit}
-            disabled={selectedAnswers[questions[currentQuestion].id] === undefined}
-            className={`
-              flex items-center px-6 py-2 rounded-lg transition
-              ${selectedAnswers[questions[currentQuestion].id] === undefined
-                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                : 'bg-blue-500 text-white hover:bg-blue-600'}
-            `}
+        {/* Time Warning */}
+        {seconds <= 60 && seconds > 0 && (
+          <motion.div 
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="fixed bottom-4 left-1/2 transform -translate-x-1/2 
+              bg-yellow-100 border-2 border-yellow-300 
+              px-6 py-3 rounded-lg flex items-center space-x-3"
           >
-            Submit Quiz
-          </button>
-        ) : (
-          <button 
-            onClick={handleNextQuestion}
-            disabled={selectedAnswers[questions[currentQuestion].id] === undefined}
-            className={`
-              flex items-center px-4 py-2 rounded-lg transition
-              ${selectedAnswers[questions[currentQuestion].id] === undefined
-                ? 'text-gray-300 cursor-not-allowed'
-                : 'text-blue-600 hover:bg-blue-50'}
-            `}
-          >
-            Next <ChevronRight className="ml-2" />
-          </button>
+            <AlertTriangle className="text-yellow-600" />
+            <span className="text-yellow-800">Hurry! Less than a minute remaining.</span>
+          </motion.div>
         )}
       </div>
     </div>
+    </>
   );
 };
 
 export default QuizAttempt;
+
+
+export const QuizResults = ({ quiz, score, percentage, answered, correct, passMark, navigate }) => {
+  return (
+    <div className='flex justify-center items-center h-screen'>
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="w-full max-w-3xl  p-8 bg-white rounded-xl shadow-lg border-2"
+    >
+      <h1 className="text-3xl font-bold text-center mb-8 text-gray-800">
+        {quiz.title} - Results
+      </h1>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+        <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-xl">
+          <div className="text-center">
+            <motion.div 
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              className="text-7xl font-bold text-blue-600 mb-2"
+            >
+              {percentage}%
+            </motion.div>
+            <p className="text-gray-600">Overall Score</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div className="bg-gray-50 p-4 rounded-xl text-center">
+            <div className="flex items-center justify-center mb-2">
+              <Check className="w-6 h-6 text-green-500" />
+            </div>
+            <div className="text-2xl font-bold text-gray-800">{correct}</div>
+            <p className="text-sm text-gray-600">Correct Answers</p>
+          </div>
+
+          <div className="bg-gray-50 p-4 rounded-xl text-center">
+            <div className="flex items-center justify-center mb-2">
+              <X className="w-6 h-6 text-red-500" />
+            </div>
+            <div className="text-2xl font-bold text-gray-800">{answered - correct}</div>
+            <p className="text-sm text-gray-600">Incorrect Answers</p>
+          </div>
+
+          <div className="bg-gray-50 p-4 rounded-xl text-center col-span-2">
+            <div className="text-2xl font-bold text-gray-800">{score} / {quiz.totalQuestions * quiz.positiveScore}</div>
+            <p className="text-sm text-gray-600">Total Points</p>
+          </div>
+        </div>
+      </div>
+
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.5 }}
+        className="text-center mb-8"
+      >
+        {score >= passMark ? (
+          <div className="bg-green-50 p-6 rounded-xl">
+            <Trophy className="w-12 h-12 text-green-500 mx-auto mb-4" />
+            <p className="text-xl font-semibold text-green-700">
+              Congratulations! You've passed the quiz!
+            </p>
+          </div>
+        ) : (
+          <div className="bg-red-50 p-6 rounded-xl">
+            <div className="w-12 h-12 text-red-500 mx-auto mb-4">😔</div>
+            <p className="text-xl font-semibold text-red-700">
+              Unfortunately, you did not pass. Keep practicing!
+            </p>
+          </div>
+        )}
+      </motion.div>
+
+      <div className="flex flex-col sm:flex-row justify-center gap-4">
+        <button
+          onClick={() => window.location.reload()}
+          className="flex items-center justify-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors duration-200"
+        >
+          <RefreshCcw className="w-5 h-5" />
+          Retake Quiz
+        </button>
+        {/* <button
+          onClick={() => navigate('/quiz-list')}
+          className="flex items-center justify-center gap-2 border-2 border-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-50 transition-colors duration-200"
+        >
+          <List className="w-5 h-5" />
+          Back to Quiz List
+        </button> */}
+      </div>
+    </motion.div>
+    </div>
+  );
+};
+

@@ -47,6 +47,7 @@ const SignUpModal: React.FC<SignUpModalProps> = ({ setSignUpModalOpen, setOtpMod
       password: '',
       confirmPassword: '',
       phoneNumber: '',
+      profilePhoto: ''
     },
     validationSchema,
     onSubmit: async (values, { setSubmitting }) => {

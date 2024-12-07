@@ -3,23 +3,46 @@ import React, { useEffect, useState } from 'react';
 import {
   Search,
   Download,
-  Eye
+  Eye,
+  ChevronDown
 } from 'lucide-react';
 import { useInstituteListQuery, useDocumentDownloadMutation } from '../../store/slices/adminSlice';
 import { InstituteDocument } from '../../../../Backend/src/interfaces/institute.interface';
 import { useNavigate } from 'react-router-dom';
+import useDebouncedValue from '../../hooks/debounceHook';
 
 const InstitutionList = () => {
   const navigate = useNavigate();
-  const { data: { institutes } = {}, refetch } = useInstituteListQuery(null);
   const [downloading, setDownloading] = useState<string | null>(null);
   const [downloadDocument] = useDocumentDownloadMutation();
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(4); 
+  const [search, setSearch] = useState("");
+  const debouncedSearchTerm = useDebouncedValue(search, 500);
 
+  const {
+    data: { institutes, total } = {},
+    isLoading,
+    error,
+    refetch
+  } = useInstituteListQuery({
+    page,
+    limit,
+    search: debouncedSearchTerm,
+  });
 
+  console.log(institutes)
 
   useEffect(() => {
-    refetch();
-  }, [institutes]);
+    setPage(1);
+  }, [debouncedSearchTerm]);
+
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    setPage(1);
+    setSearch(value);
+  };
 
   const handleViewApplication = (instituteId: string) => {
     navigate(`/admin/institute-detail/${instituteId}`);
@@ -54,16 +77,30 @@ const InstitutionList = () => {
     }
   };
 
+  const handleNextPage = () => {
+    if (page * limit < total) {
+      setPage(page + 1);
+    }
+  };
+
+  const handlePreviousPage = () => {
+    if (page > 1) {
+      setPage(page - 1);
+    }
+  };
+
   return (
     <div className="w-full bg-white p-4 rounded-lg shadow">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-semibold text-gray-800">Institutions List</h2>
         <div className="flex gap-4 items-center">
           <div className="relative">
-            <input
+          <input
               type="text"
-              placeholder="Search institutions..."
+              placeholder="Search users..."
               className="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={search}
+              onChange={handleSearchChange}
             />
             <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
           </div>
@@ -85,7 +122,7 @@ const InstitutionList = () => {
           </thead>
           <tbody className="divide-y divide-gray-200">
             {institutes ? (
-              institutes.filter((institute: InstituteDocument) => institute.status !== 'Active' && institute.status !== 'Rejected').map((institute: InstituteDocument) => (
+              institutes.map((institute: InstituteDocument) => (
                 <tr key={institute.id} className="hover:bg-gray-50 transition-colors">
                   <td className="py-4 px-6">
                     <div className="text-sm font-medium text-gray-900">{institute.applicationId}</div>
@@ -138,23 +175,46 @@ const InstitutionList = () => {
 
       <div className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6 mt-4">
         <div className="flex flex-1 justify-between sm:hidden">
-          <button className="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+          <button
+            onClick={handlePreviousPage}
+            disabled={page === 1}
+            className="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
+          >
             Previous
           </button>
-          <button className="relative ml-3 inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+          <button
+            onClick={handleNextPage}
+            disabled={page * limit >= total}
+            className="relative ml-3 inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
+          >
             Next
           </button>
         </div>
         <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
           <div>
+            <p className="text-sm text-gray-700">
+              Showing <span className="font-medium">{(page - 1) * limit + 1}</span> to{' '}
+              <span className="font-medium">{Math.min(page * limit, total)}</span> of{' '}
+              <span className="font-medium">{total}</span> results
+            </p>
+          </div>
+          <div>
             <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
-              <button className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0">
+              <button
+                onClick={handlePreviousPage}
+                disabled={page === 1}
+                className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50"
+              >
                 Previous
               </button>
               <button className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0">
-                1
+                {page}
               </button>
-              <button className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0">
+              <button
+                onClick={handleNextPage}
+                disabled={page * limit >= total}
+                className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50"
+              >
                 Next
               </button>
             </nav>

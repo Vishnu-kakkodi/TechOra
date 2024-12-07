@@ -4,7 +4,7 @@ import { Navigate, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../store';
 import axios, { AxiosError } from 'axios';
-import axiosInstance from '../utils/axiosInstance';
+import { axiosInstance } from '../utils/axiosInstance';
 
 interface ProtectedRouteProps {
   role: 'user' | 'institute' | 'admin';
@@ -33,8 +33,10 @@ const AuthRoute: React.FC<ProtectedRouteProps> = ({ children, role }) => {
         setIsLoading(true);
         console.log("AuthRoute");
         
-        const response = await axiosInstance.get('/api/auth/verify-accessToken');
-        console.log(response,"Response");
+        const response = await axiosInstance.get('/api/auth/verify-accessToken', {
+          headers: { Role: role }
+      });  
+           console.log(response,"Response");
       } catch (err) {
         const error = err as AxiosError<AuthError>;
       } finally {

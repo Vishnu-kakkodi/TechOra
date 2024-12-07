@@ -4,8 +4,8 @@ export interface Institute{
     collegeCode: string;
     country:string;
     state: string;
-    district: string;
-    
+    department: string;
+    district: string;   
 }
 
 export interface InstituteType{

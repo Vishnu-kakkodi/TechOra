@@ -1,7 +1,7 @@
 import nodemailer from 'nodemailer';
 
 
-export const emailSend = async (email: string, OTP: string) =>{
+export const emailSend = async (email: string, subject: string, data: string) =>{
     const transporter = nodemailer.createTransport({
         host: 'smtp.gmail.com',
         port: 587,
@@ -18,9 +18,9 @@ export const emailSend = async (email: string, OTP: string) =>{
     const info = await transporter.sendMail({
         from: 'techoraworld@gmail.com',
         to: email,
-        subject: "Otp For Authentication",
-        text: `This is your otp ${OTP} for authentication`,
-        html: `<p>Your OTP for authentication is: <strong>${OTP}</strong></p>`,
+        subject: subject,
+        text: data,
+        html: `<p><strong>${data}</strong></p>`,
         headers: { 'x-myheader': 'test header' }
     });
 

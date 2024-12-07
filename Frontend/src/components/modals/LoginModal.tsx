@@ -77,7 +77,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ setLoginModalOpen, setOtpModalO
         const response = await login(values).unwrap();
         toast.success(response.message);
         setLoginModalOpen(false);
-        dispatch(setCredentials({ ...response.user }));
+        dispatch(setCredentials({ ...response.userDetails }));
         navigate('/home');
       } catch (error: unknown) {
         console.log(error,"Error")

@@ -4,6 +4,8 @@ import { CreateUserDto, CreateTutorDto } from "../dtos/institute.dtos";
 import { HttpException } from "../middleware/error.middleware";
 import { setCookie } from "../helperFunction/cookieUtils";
 import { decodedToken } from "../helperFunction/authHelper";
+import STATUS_CODES from "../constants/statusCode";
+import MESSAGES from "../constants/message";
 
 export class InstitutionController{
     constructor(private readonly instituteService: InstituteService){}
@@ -14,12 +16,12 @@ export class InstitutionController{
         res: Response,
         next: NextFunction
     ): Promise<void>{
-
         try{
             const trackID:string = req.body.trackID;
-            console.log(trackID)
+            if (!trackID) {
+                throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
+              }
             const response = await this.instituteService.trackStatus(trackID);
-            console.log(response,"yy")
             if(!response){
                 res.status(401).json({
                     message: "Application is active"
@@ -41,9 +43,7 @@ export class InstitutionController{
         next: NextFunction
     ): Promise<void>{
         try {
-            console.log(req.body, "controller");
             const response = await this.instituteService.verifyEmail(req.body.email);
-            
             if (response) {
                 res.cookie('institutionOTP', response, {
                     httpOnly: true,
@@ -56,7 +56,7 @@ export class InstitutionController{
                 res.status(400).json({ message: 'Verification failed' });
             }
         } catch (error) {
-            next(error);
+            next(error)
         }
     }
 
@@ -67,18 +67,24 @@ export class InstitutionController{
     ): Promise<void>{
         try{
             const { otp } = req.body;
-            console.log(otp,"controller")
-            console.log("Hai")
+            if(!otp){
+                throw new HttpException(STATUS_CODES.BAD_REQUEST, MESSAGES.ERROR.BAD_REQUEST)
+            }
             const CookieData: string = req.cookies.institutionOTP;
-            console.log(CookieData);
+            if (!CookieData) {
+                throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
+              }
             const response = await this.instituteService.verifyOtp(otp,CookieData[0]);
+            if (!response) {
+                throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
+              }
             const email = CookieData[1]
             if(response){
                 res.clearCookie('institutionOTP');
                 res.status(201).json({email,message:'Successfull'});
             }
         }catch(error){
-            next(error);
+            next(error)
         }
     }
 
@@ -94,28 +100,26 @@ export class InstitutionController{
               if (!fileLocation) {
                  res.status(400).json({ message: "File upload failed." });
               }
-            console.log(req.file,"File name");
-            console.log(req.body,"controller")
-            console.log("Hai")
 
             const instituteData = {
                 ...req.body,
                 documentUrl: fileLocation,
               };
             const institute = await this.instituteService.createInstitute(instituteData);
-            console.log(institute,"ggggggggggggggggggggg")
+            if (!institute) {
+                throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
+              }
             const { accessToken, refreshToken, ...instituteDetails } = institute;
-            console.log(instituteDetails,"Institute")
             const Token ={
                 accessToken: accessToken,
                 refreshToken: refreshToken
             }
 
-            setCookie(res, 'institute', Token);
+            setCookie(res,'institute',Token);
 
             res.status(201).json({instituteDetails, message:'Successfull'});
         }catch(error){
-            next(error);
+            next(error)
         }
     }
 
@@ -126,22 +130,20 @@ export class InstitutionController{
     ): Promise<void> {
         try {
             const institute = await this.instituteService.getUgetInstitution(req.body.instituteEmail,req.body.collegeCode);
-            console.log(institute,"yyyyyyyyyyyyyyyyyyyyyy")
             if (!institute) {
-                throw new HttpException(404, 'Institution not found');
-            }
+                throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
+              }
             const { accessToken, refreshToken, ...instituteDetails } = institute;
-            console.log(instituteDetails,"Institute")
             const Token ={
                 accessToken: accessToken,
                 refreshToken: refreshToken
             }
 
-            setCookie(res, 'institute', Token);
+            setCookie(res,'institute',Token);
 
             res.json({ institute,message:"Login successfully" });
         } catch (error) {
-            next(error);
+            next(error)
         }
     }
 
@@ -151,25 +153,24 @@ export class InstitutionController{
         next: NextFunction
     ): Promise<void>{
         try{
-            console.log("data");
             const token = req.cookies.institute.accessToken;
+            if(!token){
+                throw new HttpException(STATUS_CODES.UNAUTHORIZED,MESSAGES.ERROR.UNAUTHORIZED)
+            }
             const requiredRole = "institute";
-            console.log(token,"Token")
             const institutionId: string | null = decodedToken(token, requiredRole);
             const tutorDetail = req.body;
-            console.log(institutionId,tutorDetail,"Data")
             const tutorData = {
                 ...tutorDetail,
                 institutionId
             }
-            console.log(tutorDetail)
             await this.instituteService.createTutor(tutorData)
             res.status(201).json({
                 status: 'success',
                 message: 'Tutor created successfully'
             });
         }catch(error){
-            next(error);
+            next(error)
         }
     }
 
@@ -181,16 +182,21 @@ export class InstitutionController{
     ): Promise<void>{
         try{
             const token = req.cookies.institute.accessToken;
+            if(!token){
+                throw new HttpException(STATUS_CODES.UNAUTHORIZED,MESSAGES.ERROR.UNAUTHORIZED)
+            }
             const requiredRole = "institute";
-            console.log(token,"TokenGet")
             const institutionId: string | null = decodedToken(token, requiredRole);
             const institutes = await this.instituteService.tutorList(institutionId);
+            if (!institutes) {
+                throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
+              }
             console.log(institutes,"Ins")
             res.status(201).json({
                 institutes
             });
         }catch(error){
-            next(error);
+            next(error)
         }
     }
 
@@ -201,20 +207,43 @@ export class InstitutionController{
     ): Promise<void> {
         try {
             const courseData = req.body;
-            
+            if (!courseData) {
+                throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
+              }
             if (req.file) {
                 courseData.thumbnailUrl = (req.file as any).location;
-            }
-    
-            console.log('Course Data:', courseData);
-            
+            } else {
+                throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
+            }            
             res.status(201).json({
                 status: 'success',
                 message: 'Course created successfully', 
                 data: courseData
             });
         } catch (error) {
-            next(error);
+            next(error)
+        }
+    }
+
+    async Logout(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
+        try {
+            res.clearCookie('institute', {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'strict',
+                path: '/',
+            });
+
+            res.status(200).json({
+                success: true,
+                message: 'Logged out successfully'
+            });
+        } catch (error) {
+            next(error)
         }
     }
 
