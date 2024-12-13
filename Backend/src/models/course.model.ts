@@ -35,8 +35,9 @@ const courseSchema = new Schema<CourseDocument>({
     type: String, 
     required: true 
   },
-  instructor: { 
-    type: String, 
+  tutorId: { 
+    type: Schema.Types.ObjectId, 
+    ref: 'Tutor', 
     required: true 
   },
   duration: { 

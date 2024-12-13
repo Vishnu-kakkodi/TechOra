@@ -28,7 +28,7 @@ export interface Course extends BaseInterface {
     id: string;
     title: string;
     department: string;
-    instructor: string;
+    tutorId: Types.ObjectId | string;
     duration: string;
     description: string;
     startDate: string;

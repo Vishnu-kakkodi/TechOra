@@ -15,6 +15,7 @@ interface Tutor {
   gender: string;
   experiance: string;
   photoUrl?: string;
+  profilePic?: string;
 }
 
 interface TutorListProps {
@@ -90,7 +91,7 @@ const TutorList: React.FC<TutorListProps> = ({ itemsPerPage = 10 }) => {
                 <tr key={tutor.id} className="hover:bg-gray-50">
                   <td className="py-4 px-6">
                     <img
-                      src={profile || `/api/placeholder/40/40`}
+                      src={tutor.profilePic || `/api/placeholder/40/40`}
                       alt={tutor.tutorname}
                       className="h-10 w-10 rounded-full object-cover"
                     />

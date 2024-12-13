@@ -9,6 +9,8 @@ import { TutorRepository } from "../repositories/tutor.repository";
 import { TutorDocument } from "../interfaces/tutor.interface";
 import STATUS_CODES from "../constants/statusCode";
 import MESSAGES from "../constants/message";
+import mongoose from "mongoose";
+import { Department } from "../types/repository.types";
 
 export class InstituteService {
     private instituteRepository: InstituteRepository;
@@ -176,4 +178,58 @@ export class InstituteService {
             throw new HttpException(STATUS_CODES.SERVER_ERROR, MESSAGES.ERROR.SERVER_ERROR)
         }
     }
+
+    async addDepartment(institutionId: string | null, department: string):Promise<void>{
+        try{
+            if(!institutionId){
+                throw new HttpException(STATUS_CODES.BAD_REQUEST, MESSAGES.ERROR.BAD_REQUEST)
+            }
+            const institute = await this.instituteRepository.findById(institutionId);
+            
+            if(institute){
+                institute.department.push(department);
+                institute.save();
+            }
+            return
+        }catch(error){
+            throw error;
+        }
+    }
+
+    async getDepartment(
+        institutionId: string, 
+        page: number, 
+        limit: number, 
+        search: string
+      ): Promise<{ departments: any; total: number; }> {
+        try {
+          if (!institutionId) {
+            throw new HttpException(STATUS_CODES.UNAUTHORIZED, MESSAGES.ERROR.UNAUTHORIZED);
+          }
+      
+          const skip = (page - 1) * limit;
+          
+          let searchQuery: any = {};
+          if (search && search.trim() !== '') {
+            searchQuery.department = { $regex: search, $options: 'i' };
+          }
+          
+      
+          const {departments,total} = await this.tutorRepository.countTutorsByDepartment(
+            'institutionId', 
+            institutionId,
+            searchQuery,    
+            skip,         
+            limit,           
+            { department: 1 }
+          );   
+      
+          return {
+            departments,
+            total
+          };
+        } catch (error) {
+          throw error;
+        }
+      }
 }

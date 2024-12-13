@@ -182,10 +182,9 @@ const ListQuiz = () => {
                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stack</th>
                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Difficulty</th>
                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Duration</th>
-                                            {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Questions</th> */}
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Questions</th>
                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Start Date</th>
-                                            <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody className="bg-white divide-y divide-gray-200">
@@ -219,12 +218,12 @@ const ListQuiz = () => {
                                                         {quiz.duration} min
                                                     </div>
                                                 </td>
-                                                {/* <td className="px-6 py-4 whitespace-nowrap">
+                                                <td className="px-6 py-4 whitespace-nowrap">
                                                     <div className="text-sm text-gray-500 flex items-center">
                                                         <Book className="w-4 h-4 mr-1" />
                                                         {quiz.totalQuestions}
                                                     </div>
-                                                </td> */}
+                                                </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(quiz.status)}`}>
                                                         {quiz.status}
@@ -232,15 +231,6 @@ const ListQuiz = () => {
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <div className="text-sm text-gray-500">{quiz.startDate}</div>
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-center">
-                                                    <button
-                                                        className="text-blue-600 hover:text-blue-900 flex items-center justify-center"
-                                                    >
-                                                        <Link to={`/institute/quiz/${quiz._id}`} className="flex items-center">
-                                                            <Eye className="w-5 h-5" />
-                                                        </Link>
-                                                    </button>
                                                 </td>
                                             </tr>
                                         ))}

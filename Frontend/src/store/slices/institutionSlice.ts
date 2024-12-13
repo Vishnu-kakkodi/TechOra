@@ -19,6 +19,7 @@ const baseQueryWithRole = fetchBaseQuery({
   credentials: 'include',
 });
 export const institutionSlice = createApi({
+  reducerPath: 'instituteApi',
   baseQuery: baseQueryWithRole as BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError>,
   tagTypes: ['Admin', 'User', 'Institution'],
   endpoints: (builder) => ({
@@ -223,6 +224,27 @@ chartData: builder.query({
   providesTags: ['Institution'],
  }),
 
+
+ addDepartment: builder.mutation({
+  query: ({department}) => ({
+      url: `/institution/add-department`,
+      method: 'POST',
+      body:{department},
+      credentials: 'include'  
+  }),
+  invalidatesTags: ['Institution'],
+}),
+
+getDepartment: builder.query({
+  query: ({ page = 1, limit = 4, search = '' }) => ({
+      url: `/institution/department-list`,
+      params:{ page, limit, search},
+      method: 'GET',
+      credentials: 'include'  
+  }),
+  providesTags: ['Institution'],
+}),
+
   }),
 });
 
@@ -247,5 +269,7 @@ export const {
   useListCourseMutation,
   useUpdateCourseMutation,
   useModuleDeleteMutation,
-  useChartDataQuery
+  useChartDataQuery,
+  useAddDepartmentMutation,
+  useGetDepartmentQuery
 } = institutionSlice;

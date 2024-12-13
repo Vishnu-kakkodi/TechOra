@@ -65,18 +65,18 @@ export interface Course {
   _id: string;
   title: string;
   department: string;
-  instructor: string;
+  tutorId?: Types.ObjectId | string;
   duration: string;
   description: string;
   startDate?: string;
-  price?: number; // Changed to number for consistency
+  price?: number; 
   status: 'draft' | 'published';
   thumbnail?: string;
   institutionId?: Types.ObjectId | string;
   modules: Module[];
   totalModules?: number;
   totalDuration?: number;
-  isListed?: boolean; // Added based on the sample data
+  isListed?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
   __v?: number;

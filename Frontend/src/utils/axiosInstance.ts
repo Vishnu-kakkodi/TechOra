@@ -38,7 +38,9 @@ export const useAxiosInterceptor = () => {
         if (!isRefreshing) {
           isRefreshing = true;
           try {
-            const { data } = await axios.post(`${backendUrl}/api/auth/refresh-token`, {}, { withCredentials: true });
+            const { data } = await axios.post(`${backendUrl}/api/auth/refresh-token`, {
+              
+          }, { withCredentials: true });
             const newAccessToken = data.accessToken;
 
             axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${newAccessToken}`;

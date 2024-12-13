@@ -29,14 +29,12 @@ export interface CartItem {
         _id: string;
         title: string;
         department: string;
-        instructor: string;
         duration: string;
         description: string;
         startDate: string;
         price: number;
         status: string;
         thumbnail: string;
-        institutionId: string;
         totalModules: number;
         totalDuration: number;
         modules: {

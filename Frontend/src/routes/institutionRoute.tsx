@@ -40,6 +40,7 @@ import ListQuiz from '../pages/institute/ListQuiz';
 import QuizDetail from '../pages/institute/QuizDetail';
 import EditQuiz from '../pages/institute/EditQuiz';
 import EditCourse from '../pages/institute/EditCourse';
+import DepartmentList from '../pages/institute/DepartmentList';
 
 const InstituteRoutes: React.FC = () => {
 
@@ -170,6 +171,16 @@ const InstituteRoutes: React.FC = () => {
           </AuthRoute>
         }
       />
+
+      <Route
+        path="/departments"
+        element={
+          <AuthRoute role='institute'>
+            <DepartmentList />
+          </AuthRoute>
+        }
+      />
+
       <Route path="*" element={<ErrorPage />} />
     </Routes>
   );

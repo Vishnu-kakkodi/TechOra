@@ -6,6 +6,7 @@ import AdminRoutes from './routes/adminRoute';
 import InstituteRoutes from './routes/institutionRoute';
 import { ToastContainer } from 'react-toastify';
 import { useAxiosInterceptor } from './utils/axiosInstance';
+import TutorRoutes from './routes/tutorRoute';
 
 function App() {
   useAxiosInterceptor();
@@ -15,6 +16,8 @@ function App() {
         <Route path="/*" element={<UserRoutes />} />
         <Route path="/admin/*" element={<AdminRoutes />} />
         <Route path="/institute/*" element={<InstituteRoutes />} />
+        <Route path="/tutor/*" element={<TutorRoutes />} />
+
     </Routes>
     </>
 

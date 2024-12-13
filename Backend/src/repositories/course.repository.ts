@@ -19,11 +19,11 @@ export class CourseRepository extends BaseRepository<CourseDocument> {
         super(CourseModel);
     }
 
-    async findDraft(instituteId: any): Promise<CourseDocument[]> {
+    async findDraft(tutorId: any): Promise<CourseDocument[]> {
         try {
             console.log("Repoosos");
 
-            return await this.model.find({ institutionId: instituteId });
+            return await this.model.find({ tutorId: tutorId });
         } catch (error) {
             throw error;
         }
@@ -87,9 +87,9 @@ export class CourseRepository extends BaseRepository<CourseDocument> {
             if (courseData.description) {
                 existingCourse.description = courseData.description
             }
-            if (courseData.instructor) {
-                existingCourse.instructor = courseData.instructor
-            }
+            // if (courseData.instructor) {
+            //     existingCourse.instructor = courseData.instructor
+            // }
             if (courseData.price) {
                 existingCourse.price = courseData.price
                 console.log("Updateddddddddddddddddddddddddddddddddddddddddd");
@@ -120,15 +120,30 @@ export class CourseRepository extends BaseRepository<CourseDocument> {
         }
     }
 
-    async findCourses(instituteId: string, searchQuery: SearchCourse, skip: number, limit: number, sortOptions: any = { createdAt: -1 }): Promise<{ course: CourseDocument[]; total: number; }> {
+    async findCourses(
+        filterKey: string,
+        filterValue: string,
+        searchQuery: SearchCourse,
+        skip: number,
+        limit: number,
+        sortOptions: any = { createdAt: -1 }
+    ): Promise<{ course: CourseDocument[]; total: number }> {
         try {
-            const course = await this.model.find({ institutionId:instituteId,status: 'published', ...searchQuery })
+            const filter: Record<string, any> = {
+                [filterKey]: filterValue,
+                status: 'published',
+                ...searchQuery,
+            };
+
+            const course = await this.model
+                .find(filter)
                 .sort(sortOptions)
                 .skip(skip)
-                .limit(limit)
-                const total: number = await this.model.countDocuments({ institutionId:instituteId, status: 'published' }, searchQuery);
-                return { course, total};
+                .limit(limit);
 
+            const total: number = await this.model.countDocuments(filter);
+
+            return { course, total };
         } catch (error) {
             throw error;
         }
@@ -150,9 +165,18 @@ export class CourseRepository extends BaseRepository<CourseDocument> {
             console.log("empty", searchQuery);
 
             const course = await this.model.find({ isListed: true, status: 'published', ...searchQuery })
+                .select({ 'modules.video': 0 })
                 .sort(sortOptions)
                 .skip(skip)
                 .limit(limit)
+                .populate([{
+                    path: 'tutorId',
+                    select:'tutorname department education experiance profilePic'
+                }, {
+                    path: 'institutionId',
+                    select:'collegeName'
+                }
+                ]);
 
             console.log(course)
 
@@ -192,12 +216,12 @@ export class CourseRepository extends BaseRepository<CourseDocument> {
         }
     }
 
-    async chartData(instituteId: string): Promise<{published:number, draft:number,listed:number,unlisted:number,course:CourseDocument[]}> {
+    async chartData(instituteId: string): Promise<{ published: number, draft: number, listed: number, unlisted: number, course: CourseDocument[] }> {
         try {
             const published: number = await this.model.countDocuments({ status: 'published' });
-            const course = await this.model.find({ institutionId:instituteId,status: 'published' })
-            .sort({createdAt:-1})
-            .limit(4);
+            const course = await this.model.find({ institutionId: instituteId, status: 'published' })
+                .sort({ createdAt: -1 })
+                .limit(4);
             const draft: number = await this.model.countDocuments({ status: 'draft' });
             const listed: number = await this.model.countDocuments({ isListed: true });
             const unlisted: number = await this.model.countDocuments({ status: false });
@@ -206,6 +230,21 @@ export class CourseRepository extends BaseRepository<CourseDocument> {
                 draft,
                 listed,
                 unlisted,
+                course
+            };
+        } catch (error) {
+            throw error;
+        }
+    }
+
+
+    async homeData(): Promise<{ course: CourseDocument[] }> {
+        try {
+            const published: number = await this.model.countDocuments({ status: 'published' });
+            const course = await this.model.find({ status: 'published' })
+                .sort({ createdAt: -1 })
+                .limit(4);
+            return {
                 course
             };
         } catch (error) {

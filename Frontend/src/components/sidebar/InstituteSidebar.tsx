@@ -1,4 +1,4 @@
-import React from 'react';
+import React,{useState} from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppSelector } from '../../store/hook';
 import {
@@ -16,11 +16,13 @@ import {
   Brain,
   FileEdit,
 } from 'lucide-react';
+import { FaSitemap } from 'react-icons/fa';
 import { useUserListQuery } from '../../store/slices/adminSlice';
 import { useAppDispatch } from '../../store/hook';
 import { instituteLogout } from '../../store/slices/authSlice';
 import { useDraftCourseListQuery, useInstituteLogoutCallMutation } from '../../store/slices/institutionSlice';
 import { toast } from 'react-toastify';
+import DepartmentAdd from '../modals/Institute/DepartmentAdd';
 
 const InstituteSidebar: React.FC = () => {
   const navigate = useNavigate();
@@ -29,6 +31,9 @@ const InstituteSidebar: React.FC = () => {
   const {data: course} = useDraftCourseListQuery(null);
 
   const { data: users, error } = useUserListQuery(null);
+
+  const [isDepartmentModalOpen, setIsDepartmentModalOpen] = useState(false);
+
 
   const handleDraft = async() =>{
     if (course) {
@@ -59,7 +64,9 @@ const InstituteSidebar: React.FC = () => {
     navigate('/institute/login');
   };
 
+
   return (
+    <>
     <div className="min-h-screen w-64 bg-gray-900 text-white">
       <div className="px-6 py-4 border-b border-gray-800">
         <h1 className="text-xl font-bold">Institute Portal</h1>
@@ -88,20 +95,6 @@ const InstituteSidebar: React.FC = () => {
               <BookOpen className="w-5 h-5" />
               <span>Course List</span>
             </button>
-            <button 
-              onClick={() => handleNavigate('/institute/course-add')}
-              className="flex items-center space-x-2 text-gray-300 hover:text-white w-full"
-            >
-              <PlusCircle className="w-5 h-5" />
-              <span>Add Course</span>
-            </button>
-            <button 
-              onClick={() => handleDraft()}
-              className="flex items-center space-x-2 text-gray-300 hover:text-white w-full"
-            >
-              <FileEdit className="w-5 h-5" />
-              <span>Draft Courses</span>
-            </button>
           </div>
         </div>
 
@@ -117,13 +110,6 @@ const InstituteSidebar: React.FC = () => {
               <Brain className="w-5 h-5" />
               <span>Quiz List</span>
             </button>
-            <button 
-              onClick={() => handleNavigate('/institute/add-quiz')}
-              className="flex items-center space-x-2 text-gray-300 hover:text-white w-full"
-            >
-              <PlusCircle className="w-5 h-5" />
-              <span>Add Quiz</span>
-            </button>
             {/* <button 
               onClick={() => handleNavigate('/quizzes/drafts')}
               className="flex items-center space-x-2 text-gray-300 hover:text-white w-full"
@@ -131,6 +117,28 @@ const InstituteSidebar: React.FC = () => {
               <FileEdit className="w-5 h-5" />
               <span>Draft Quizzes</span>
             </button> */}
+          </div>
+        </div>
+
+        <div className="mb-6 space-y-4">
+          <div className="text-gray-500 text-sm uppercase">
+            Department Management
+          </div>
+          <div className="ml-5 space-y-3">
+            <button 
+              onClick={() => handleNavigate('/institute/departments')}
+              className="flex items-center space-x-2 text-gray-300 hover:text-white w-full"
+            >
+              <GraduationCap className="w-5 h-5" />
+              <span>Department List</span>
+            </button>
+            <button 
+              onClick={() => setIsDepartmentModalOpen(true)}
+              className="flex items-center space-x-2 text-gray-300 hover:text-white w-full"
+            >
+              <PlusCircle className="w-5 h-5" />
+              <span>Add Department</span>
+            </button>
           </div>
         </div>
 
@@ -180,6 +188,13 @@ const InstituteSidebar: React.FC = () => {
         </div>
       </div>
     </div>
+    <DepartmentAdd
+    isOpen={isDepartmentModalOpen}
+        onClose={() => setIsDepartmentModalOpen(false)}
+        />
+
+        </>
+
   );
 };
 

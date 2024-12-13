@@ -7,6 +7,9 @@ import { QuizDocument } from '../../types/quizType';
 import { useNavigate } from 'react-router-dom';
 import { motion } from "framer-motion";
 import useDebouncedValue from '../../hooks/debounceHook';
+import { useAppSelector } from '../../store/hook';
+import { toast } from 'react-toastify';
+import Footer from '../../components/footer/Footer';
 
 
 const QuizList = () => {
@@ -20,6 +23,8 @@ const QuizList = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const userdata = useAppSelector((state) => state.auth.userInfo);
+
 
 
   const navigate = useNavigate();
@@ -65,6 +70,11 @@ const QuizList = () => {
       console.error('Quiz ID is required to start the quiz.');
       return;
     }
+    if(quiz.isComplete?.includes(userdata?._id)){
+      toast.warning("This quiz is already attempted");
+      return;
+    }
+
     navigate(`/start-quiz/quizId=${quiz._id}`, {
       state: { quiz: quiz }
     }); console.log('Starting quiz:', quiz._id);
@@ -371,6 +381,8 @@ const QuizList = () => {
           </div>
         </motion.div>
       </div>
+
+      <Footer/>
 
     </>
   );

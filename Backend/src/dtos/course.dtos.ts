@@ -3,7 +3,7 @@ import { Types } from 'mongoose';
 export class CreateCourseDto {
     title!: string;
     department!: string;
-    instructor!: string;
+    tutorId!: Types.ObjectId | string;
     duration!: string;
     description!: string;
     startDate!: string;
@@ -16,7 +16,7 @@ export class CreateCourseDto {
 export class UpdateCourseDto {
     title!: string;
     department!: string;
-    instructor!: string;
+    tutorId!: Types.ObjectId | string;
     duration!: string;
     description!: string;
     startDate!: string;

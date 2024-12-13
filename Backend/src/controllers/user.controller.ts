@@ -353,4 +353,55 @@ export class UserController {
         }
     }
 
+    async homeData(
+        req: Request<{}, {}>,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
+        try {
+            const courses = await this.userService.homeData();
+            if (!courses) {
+                throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
+            }
+            res.status(201).json(
+                courses
+            );
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async leaderBoard
+    (
+        req: Request<{}, {}>,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
+        try {
+            const Token = req.cookies.user
+            const token = Token.accessToken;
+            if (!token) {
+                throw new HttpException(STATUS_CODES.UNAUTHORIZED, MESSAGES.ERROR.UNAUTHORIZED)
+            }
+            const requiredRole = "user";
+            console.log("lllll",token,"toooooooooooooooooooooo")
+            const userId: string | null = decodedToken(token, requiredRole);
+            const page = parseInt(req.query.page as string) || 1;
+            const limit = parseInt(req.query.limit as string) || 4;
+            const search = (req.query.search as string);
+            console.log(search)
+            const {users,total, currentUser }= await this.userService.leaderBoard(page, limit, search,userId);
+            if (!users) {
+                throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
+            }
+            res.status(201).json({
+                users,
+                total,
+                currentUser
+            });
+        } catch (error) {
+            next(error)
+        }
+    }
+
 }

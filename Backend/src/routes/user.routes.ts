@@ -18,6 +18,7 @@ import upload from "../bucketConfig";
 import { ReviewRepository } from "../repositories/review.repository";
 import { ReviewService } from "../services/review.service";
 import { ReviewController } from "../controllers/review.controller";
+import { TutorRepository } from "../repositories/tutor.repository";
 
 
 
@@ -25,12 +26,13 @@ const router =  Router();
 const userRepository = new UserRepository();
 const courseRepository = new CourseRepository();
 const cartRepository = new CartRepository();
+const tutorRepository = new TutorRepository();
 const userService = new UserService(userRepository,courseRepository);
 const userController = new UserController(userService);
 const quizRepository = new QuizRepository()
-const quizService = new QuizService(quizRepository)
+const quizService = new QuizService(quizRepository,userRepository,tutorRepository)
 const quizController = new QuizController(quizService)
-const courseService = new CourseService(courseRepository, cartRepository, userRepository)
+const courseService = new CourseService(courseRepository, cartRepository, userRepository,tutorRepository)
 const cartController = new CartController(courseService)
 const courseController = new CourseController(courseService,quizService)
 const orderRepository = new OrderRepository()
@@ -48,6 +50,8 @@ router.get('/course-detail/:courseId',authMiddleware,courseController.courseDeta
 router.get('/my-courses',authMiddleware,userController.myCourses.bind(userController));
 router.get('/quiz-list',authMiddleware,quizController.quizList.bind(quizController));
 router.get('/review',authMiddleware,reviewController.Review.bind(reviewController));
+router.get('/home-data',authMiddleware,userController.homeData.bind(userController));
+router.get('/leaderBoard-list',authMiddleware,userController.leaderBoard.bind(userController));
 
 
 
@@ -69,6 +73,7 @@ router.post('/profile-photo',upload.single('profilePhoto'),authMiddleware,userCo
 router.put('/profile-update',authMiddleware,userController.profileUpdate.bind(userController));
 router.post('/create-review',authMiddleware,reviewController.createReview.bind(reviewController));
 router.patch('/change-password',authMiddleware,userController.changePassword.bind(userController));
+router.post('/quiz-result',authMiddleware,quizController.quizResult.bind(quizController));
 
 
 

@@ -11,6 +11,7 @@ export interface Institute extends BaseInterface{
     district: string;
     applicationId: string;
     status: InstituteStatus;
+    department: string[];
     documentUrl: string;
     accessToken?: string;
     refreshToken?: string;

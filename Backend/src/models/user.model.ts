@@ -14,6 +14,11 @@ const userSchema = new Schema<IUserDocument>(
       default: [] 
     }],
     profilePhoto: { type: String, required: false },
+    quizProgress:{
+      score:{type:Number,required: false, default:0},
+      progress:{type:String,required: false, default:""},
+      rank:{type:String,required: false, default: ""}
+    }
   },
   { timestamps: true }
 );

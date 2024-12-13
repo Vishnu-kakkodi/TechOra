@@ -23,6 +23,12 @@ export class CourseController {
         next: NextFunction
     ): Promise<void> => {
         try {
+            const token = req.cookies.tutor.accessToken
+            if(!token){
+                throw new HttpException(STATUS_CODES.UNAUTHORIZED,MESSAGES.ERROR.UNAUTHORIZED)
+            }
+            const requiredRole = "tutor";
+            const tutorId: string | null = decodedToken(token, requiredRole);
             const courseData: CreateCourseDto = req.body;
 
             if (!courseData) {
@@ -39,7 +45,7 @@ export class CourseController {
                 throw new HttpException(400, 'Institute ID is required');
             }
 
-            const course = await this.courseService.createCourse(courseData);
+            const course = await this.courseService.createCourse(courseData,tutorId);
 
             res.status(201).json({
                 status: STATUS_CODES.SUCCESS,
@@ -64,6 +70,29 @@ export class CourseController {
             const requiredRole = "institute";
             const instituteId: string | null = decodedToken(token, requiredRole);
             const course = await this.courseService.draftCourse(instituteId)
+            res.status(201).json({
+                message: "Approved",
+                data: course
+            })
+        } catch (error) {
+            next(error);
+        }
+
+    }
+
+    public draftCourses = async (
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> => {
+        try {
+            const token = req.cookies.tutor.accessToken
+            if(!token){
+                throw new HttpException(STATUS_CODES.UNAUTHORIZED,MESSAGES.ERROR.UNAUTHORIZED)
+            }
+            const requiredRole = "tutor";
+            const tutorId: string | null = decodedToken(token, requiredRole);
+            const course = await this.courseService.draftCourse(tutorId)
             res.status(201).json({
                 message: "Approved",
                 data: course
@@ -118,6 +147,36 @@ export class CourseController {
             const filter = (req.query.filter as string);
             const sort = (req.query.sort as string);
             const {course,total} = await this.courseService.courseList(instituteId,page,limit,search,filter,sort);
+            res.status(201).json({
+                course,
+                total,
+                page,
+                limit,
+                totalPages: Math.ceil(total / limit)
+            });
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    public TutorCourseList = async (
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> => {
+        try {
+            const token = req.cookies.tutor.accessToken;
+            if(!token){
+                throw new HttpException(STATUS_CODES.UNAUTHORIZED,MESSAGES.ERROR.UNAUTHORIZED)
+            }
+            const requiredRole = "tutor";
+            const tutorId: string | null = decodedToken(token, requiredRole);
+            const page = parseInt(req.query.page as string) || 1;
+            const limit = parseInt(req.query.limit as string) || 4;
+            const search = (req.query.search as string);
+            const filter = (req.query.filter as string);
+            const sort = (req.query.sort as string);
+            const {course,total} = await this.courseService.TutorCourseList(tutorId,page,limit,search,filter,sort);
             res.status(201).json({
                 course,
                 total,
@@ -245,14 +304,6 @@ export class CourseController {
         next: NextFunction
     ): Promise<void> => {
         try {
-
-            const token = req.cookies.institute.accessToken
-            if(!token){
-                throw new HttpException(STATUS_CODES.UNAUTHORIZED,MESSAGES.ERROR.UNAUTHORIZED)
-            }
-            const requiredRole = "institute";
-            const institutionId: string | null = decodedToken(token, requiredRole);
-
             const courseData: UpdateCourseDto = req.body;
             const courseId:string = req.query.courseId as string;
             console.log(courseData,"Fadavddsssssssssssssssssssssssssssssssssss")

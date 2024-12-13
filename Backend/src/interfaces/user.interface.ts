@@ -17,6 +17,11 @@ export interface IUser extends BaseInterface{
     refreshToken: string;
     purchasedCourses: Types.ObjectId[];
     profilePhoto: string;
+    quizProgress:{
+        score:number;
+        progress:string;
+        rank:string;
+    };
 }
 
 export type IUserDocument = IUser & Document;   

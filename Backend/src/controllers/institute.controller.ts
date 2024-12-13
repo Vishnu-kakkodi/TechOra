@@ -225,6 +225,60 @@ export class InstitutionController{
         }
     }
 
+    async addDepartment(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
+        try{
+            const token = req.cookies.institute.accessToken;
+            if(!token){
+                throw new HttpException(STATUS_CODES.UNAUTHORIZED,MESSAGES.ERROR.UNAUTHORIZED)
+            }
+            const requiredRole = "institute";
+            const institutionId: string | null = decodedToken(token, requiredRole);
+            const institutes = await this.instituteService.tutorList(institutionId);
+            if (!institutes) {
+                throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
+            }
+            const {department} = req.body;
+            console.log(department,"lllllllllllllllllllll")
+            await this.instituteService.addDepartment(institutionId,department)
+            res.status(201).json({status:'success',message:"Department added"});
+
+        }catch(error){
+            next(error)
+        }
+    }
+
+    async getDepartment(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void>
+{
+    try{
+        const token = req.cookies.institute.accessToken;
+        if(!token){
+            throw new HttpException(STATUS_CODES.UNAUTHORIZED,MESSAGES.ERROR.UNAUTHORIZED)
+        }
+        const requiredRole = "institute";
+        const institutionId: string | null = decodedToken(token, requiredRole);
+        const institutes = await this.instituteService.tutorList(institutionId);
+        if (!institutes) {
+            throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
+        }
+        const page = parseInt(req.query.page as string) || 1;
+        const limit = parseInt(req.query.limit as string) || 4;
+        const search = (req.query.search as string) || '';
+        const {departments,total} = await this.instituteService.getDepartment(institutionId,page,limit,search);
+        res.status(201).json({status:'success',message:"Department added", data: {departments,total}});
+
+    }catch(error){
+        next(error)
+    }
+}    
+
     async Logout(
         req: Request,
         res: Response,

@@ -109,12 +109,6 @@ const CourseList = () => {
               <div>
                 <h1 className="text-2xl font-bold">Course List</h1>
               </div>
-              <button
-                onClick={() => navigate('/institute/course-add')}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                Add New Course
-              </button>
             </div>
 
             <div className="flex gap-4 mb-6">
@@ -214,13 +208,6 @@ const CourseList = () => {
                                   View
                                 </button>
                               </Link>
-                              <button
-                                onClick={() => handleEdit(course._id)}
-                                className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                              >
-                                <Edit2 className="mr-2 h-4 w-4" />
-                                Edit
-                              </button>
                               <div className="border-t border-gray-200" />
                               <button
                                 onClick={() => handleDelete(course._id)}

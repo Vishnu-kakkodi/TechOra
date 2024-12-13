@@ -19,6 +19,9 @@ import ProfilePic from '../../assets/frontEnd/ProfilePic.png'
 import ReactStars from 'react-stars';
 import Footer from '../../components/footer/Footer';
 import useDebouncedValue from '../../hooks/debounceHook';
+import { motion } from 'framer-motion';
+import { MessageCircle } from 'lucide-react';
+import ChatModal from '../../components/modals/User/ChatModal';
 
 
 const CourseDetail = () => {
@@ -34,34 +37,23 @@ const CourseDetail = () => {
   const [purchased, setPurchased] = useState<boolean>(false);
   const [isAddingReview, setIsAddingReview] = useState<boolean>(false);
   const [courseReview] = useCourseReviewMutation();
+  const [isChatOpen, setIsChatOpen] = useState(false);
+
 
 
   const [currentValue, setCurrentValue] = React.useState<number | undefined>(0);
   const [reviewText, setReviewText] = React.useState<string>("");
-  // const [reviews, setReviews] = React.useState([
-  //   { name: "John Doe", rating: 4, comment: "Great course, very informative!" },
-  //   { name: "Jane Smith", rating: 5, comment: "Loved it! Highly recommend." },
-  // ]);
-
-
-  // const {
-  //   data: courseDatas
-  // } = useMyCoursesQuery({
-  //   page,
-  //   limit,
-  //   search: debouncedSearchTerm,
-  // });
 
   const { data: courseData, isLoading, isError } = useCoursedetailQuery(courseId as string);
 
 
-  const courseIDs:string[] = courseData?.purchased || [];
+  const courseIDs: string[] = courseData?.purchased || [];
 
   let course = courseData?.Data;
 
   const { data: Review } = useReviewQuery(courseId as string);
 
-  console.log(courseData?.purchased,"purchasedsed")
+  console.log(courseData?.purchased, "purchasedsed")
 
 
 
@@ -70,11 +62,6 @@ const CourseDetail = () => {
       alert("Please provide a rating and a review!");
       return;
     }
-
-    // setReviews((prevReviews) => [
-    //   ...prevReviews,
-    //   { name: "Anonymous", rating: currentValue, comment: reviewText },
-    // ]);
 
     let courseId: string | undefined = course?._id
 
@@ -123,31 +110,51 @@ const CourseDetail = () => {
       <Navbar />
       <div className='flex'>
         <div className="container mx-auto p-6 max-w-7xl">
-          <button
-            onClick={() => window.history.back()}
-            className="flex items-center text-gray-600 hover:text-gray-800 mb-6"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Course List
-          </button>
+          {courseIDs.includes(courseId) && (
+            <div className='flex justify-between mb-4'>
+              <button
+                onClick={() => window.history.back()}
+                className="flex items-center text-gray-600 hover:text-gray-800 mb-6"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Course List
+              </button>
+
+              <div className="relative">
+                <motion.button
+                  className="group relative flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-full font-semibold shadow-lg overflow-hidden"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setIsChatOpen(!isChatOpen)}
+                >
+                  <motion.div
+                    initial={{ rotate: 0 }}
+                    animate={{ rotate: 360 }}
+                    transition={{
+                      duration: 0.5,
+                      repeat: Infinity,
+                      repeatDelay: 5,
+                      ease: "easeInOut"
+                    }}
+                  >
+                    <MessageCircle className="w-5 h-5" />
+                  </motion.div>
+                  <span className="relative z-10">Chat Us</span>
+                </motion.button>
+
+                <ChatModal
+                  isOpen={isChatOpen}
+                  onClose={() => setIsChatOpen(false)}
+                />
+              </div>
+            </div>
+          )}
 
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-10">
             <div className="lg:col-span-2">
-            <div className="mb-6">
+              <div className="mb-6">
                 <h1 className="text-3xl font-bold mb-4">{course?.title}</h1>
                 <div className="flex flex-wrap gap-4 text-sm text-gray-600 mb-4">
-                  {/* <div className="flex items-center">
-                    <Users className="w-4 h-4 mr-2" />
-                    data students enrolled
-                  </div> */}
-                  {/* <div className="flex items-center">
-                    <Clock className="w-4 h-4 mr-2" />
-                    {course?.duration}
-                  </div>
-                  <div className="flex items-center">
-                    <BookOpen className="w-4 h-4 mr-2" />
-                    {course?.department}
-                  </div> */}
                 </div>
               </div>
               <div className="bg-white overflow-hidden mb-6 border-2 border-black-100">
@@ -156,40 +163,40 @@ const CourseDetail = () => {
                     src={currentVideo}
                     controls
                     onEnded={handleVideoEnd}
-                    className="w-[600px] h-[300px] object-cover"
+                    className="w-[700px] h-[400px] object-cover"
                   />
                 ) : (
                   <img
                     src={course?.thumbnail}
                     alt={course?.title}
-                    className="w-[600px] h-[300px] object-cover"
+                    className="w-[700px] h-[400px] object-cover"
                   />
                 )}
               </div>
 
-                                            {/* Instructor Details - Right Side */}
-                                            <div className="lg:col-span-1">
-                    <div className="bg-white rounded-lg border-2 p-6">
-                      <h3 className="text-lg font-bold mb-4">Instructor Details</h3>
-                      <div className="flex items-center space-x-4">
-                        <img
-                          src={ProfilePic}
-                          alt={course?.instructor}
-                          className="w-16 h-16"
-                        />
-                        <div>
-                          <p className="font-medium">{course?.instructor}</p>
-                          <p className="text-sm text-gray-500">{course?.department}</p>
-                        </div>
-                      </div>
+              {/* Instructor Details - Right Side */}
+              <div className="lg:col-span-1">
+                <div className="bg-white rounded-lg border-2 p-6">
+                  <h3 className="text-lg font-bold mb-4">Instructor Details</h3>
+                  <div className="flex items-center space-x-4">
+                    <img
+                      src={ProfilePic}
+                      alt={course?.instructor}
+                      className="w-16 h-16"
+                    />
+                    <div>
+                      <p className="font-medium">{course?.instructor}</p>
+                      <p className="text-sm text-gray-500">{course?.department}</p>
                     </div>
                   </div>
+                </div>
+              </div>
             </div>
 
 
 
             <div className="lg:col-span-2">
-              <div className="bg-white rounded-lg shadow-md p-6">
+              <div className="bg-white border-2 rounded-lg shadow-md p-6">
                 <h2 className="text-xl font-bold mb-4">Course Modules</h2>
                 <div className="space-y-4 max-h-[300px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
                   {course?.modules.map((module: any) => (

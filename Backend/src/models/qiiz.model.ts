@@ -79,6 +79,11 @@ const quizSchema = new Schema({
     ref: 'Institute',
     required: true
   },
+  tutorId: {
+    type: Schema.Types.ObjectId,
+    ref: 'Tutor',
+    required: true
+  },
   duration: {
     type: Number,
     required: true
@@ -111,6 +116,11 @@ const quizSchema = new Schema({
     type: Number,
     default: 0
   },
+  isComplete:[
+{    type: Schema.Types.ObjectId,
+     ref: 'User',
+     required: true}
+  ]
 }, { timestamps: true });
 
 

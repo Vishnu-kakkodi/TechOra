@@ -6,7 +6,7 @@ interface HelperFunction {
     refreshtoken: (userId: string, role: string) => string;
 }
 
-interface DecodedToken {
+export interface DecodedToken {
     _id: string;
     role: string;
     iat?: number;
@@ -18,7 +18,7 @@ const helperFunction: HelperFunction = {
         return jwt.sign(
             { _id: userId, role: role }, 
             process.env.ACCESS_SECRET_KEY as string,
-            { expiresIn: "40m" }
+            { expiresIn: "50m" }
         );
     },
 

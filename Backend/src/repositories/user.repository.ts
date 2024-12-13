@@ -3,9 +3,8 @@ import { UserModel } from "../models/user.model";
 import { IUserDocument } from "../interfaces/user.interface";
 import { customError } from "../customError";
 import { HttpException } from "../middleware/error.middleware";
-import mongoose from 'mongoose';
+import mongoose, { FilterQuery } from 'mongoose';
 import { MyCourses } from "../types/user.types";
-import { SearchQueryType } from "../services/admin.service";
 
 interface UpdateProfileData {
     userName?: string;
@@ -13,6 +12,15 @@ interface UpdateProfileData {
     address?: string;
     [key: string]: any;  
 }
+
+export type SearchQueryType = FilterQuery<{
+    userName: string;
+    email: string;
+    phoneNumber: string;
+    quizProgress:{
+        rank:number;
+    }
+  }>;
 
 
 export class UserRepository extends BaseRepository<IUserDocument> {
@@ -109,6 +117,61 @@ export class UserRepository extends BaseRepository<IUserDocument> {
             if (error instanceof mongoose.Error.ValidationError) {
                 throw new Error('Invalid data provided for update');
             }
+            throw error;
+        }
+    }
+
+    async findUsers(searchQuery:SearchQueryType,skip:number,limit:number): Promise<{ users: IUserDocument[]; total: number }> { 
+        try {
+            console.log("empty",searchQuery);
+            
+            const users = await this.model.find(searchQuery)
+            .sort({ 'quizProgress.rank': 1 })
+            .skip(skip)
+            .limit(limit)
+            // .select('- password');
+
+            const total:number = await this.model.countDocuments(searchQuery);
+            console.log(users);
+            return { users, total };
+
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async updateRank():Promise<void>{
+        try{
+            const users = await this.model.find()
+            .sort({'quizProgress.score':-1})
+            .select('_id userName quizProgress');
+
+            const rankedUsers = users.map((user,index)=>{
+                let rank = (index + 1).toString();
+            return {
+                userId: user._id,
+                rank: rank
+              };
+            })
+
+            const bulkWrite = rankedUsers.map(userRank=>({
+                updateOne:{
+                    filter:{_id:userRank.userId},
+                    update:{
+                        $set:{
+                            "quizProgress.rank":userRank.rank
+                        }
+                    }
+                }
+            }));
+
+            if (bulkWrite.length > 0) {
+                await this.model.bulkWrite(bulkWrite);
+              }
+          
+              return
+
+        }catch(error){
             throw error;
         }
     }

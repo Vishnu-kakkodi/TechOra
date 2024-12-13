@@ -1,7 +1,7 @@
 import { Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { AuthenticatedRequest } from "../types/auth.types";
-import { helperFunction } from "../helperFunction/authHelper";
+import { DecodedToken, helperFunction } from "../helperFunction/authHelper";
 import { UserModel } from "../models/user.model";
 
 export const authMiddleware = async (
@@ -11,9 +11,6 @@ export const authMiddleware = async (
 ): Promise<any> => {
   try {
     let role = req.headers.role
-    console.log("Role:", req.headers);
-    console.log("Role1:", role);
-
     const getCookieByRole = (role: string) => {
       switch (role) {
         case "user":
@@ -22,13 +19,15 @@ export const authMiddleware = async (
           return req.cookies.admin;
         case "institute":
           return req.cookies.institute;
+        case "tutor":
+          return req.cookies.tutor;  
         default:
           return null;
       }
     };
 
     const tokenToValidate = getCookieByRole(role as string);
-    console.log("Token to validate:", tokenToValidate);
+    console.log("Token to validate lllll:", req.cookies.user);
 
     if (!tokenToValidate) {
       return res.status(401).json({
@@ -39,6 +38,7 @@ export const authMiddleware = async (
     }
 
     const { accessToken, refreshToken } = tokenToValidate;
+    console.log(accessToken,"Token")
 
     if (!accessToken) {
       return res.status(401).json({
@@ -51,7 +51,8 @@ export const authMiddleware = async (
     const secretKey = process.env.ACCESS_SECRET_KEY as string;
 
     try {
-      const decoded = jwt.verify(accessToken, secretKey) as jwt.JwtPayload;
+      const decoded = jwt.verify(accessToken, secretKey) as DecodedToken;
+      console.log(decoded._id,"Pppppppppppppppppp")
       
       if (role === "user") {
         const user = await UserModel.findById(decoded._id);
@@ -61,6 +62,14 @@ export const authMiddleware = async (
             message: "User account is not active"
           });
         }
+      }
+
+      if(!decoded._id){
+        return res.status(401).json({
+          success: false,
+          message: "Access token expired",
+          code: "ACCESS_TOKEN_EXPIRED"
+        });
       }
       
       req.user = decoded as AuthenticatedRequest["user"];

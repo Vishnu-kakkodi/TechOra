@@ -11,12 +11,15 @@ const config: Config = {
         skyblue: '#052941',
         deepPurple: '#250A14',
         gold: '#FFD700',
+       'custom-blue': 'rgb(0, 2, 91)'
       },
       backgroundImage: {
         'custom-gradient': 'linear-gradient(180deg, #2D4059 0%, #4E6E58 100%)'
       },
       fontFamily: {
         jakarta: ['"Plus Jakarta Sans"', 'sans-serif'],
+        bebasNeue: ['"Bebas Neue"', 'sans-serif'], 
+
       },
     },
   },

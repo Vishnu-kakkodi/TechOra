@@ -60,7 +60,10 @@ const upload: Multer = multer({
           folderPath = 'institution_documents';
           break;
         case 'profilePhoto':
-          folderPath = 'institution_documents';
+          folderPath = 'user_photo';
+          break;
+        case 'profilePic':
+          folderPath = 'tutor_photo';
           break;
         default:
           folderPath = 'other_files';

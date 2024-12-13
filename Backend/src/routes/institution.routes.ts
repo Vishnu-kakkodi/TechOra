@@ -10,16 +10,18 @@ import { QuizController } from "../controllers/quiz.controller";
 import { QuizRepository } from "../repositories/quiz.repository";
 import { QuizService } from "../services/quiz.service";
 import { UserRepository } from "../repositories/user.repository";
+import { TutorRepository } from "../repositories/tutor.repository";
 
 const router = Router();
 const instituteService = new InstituteService();
 const courseRepository = new CourseRepository();
 const cartRepository = new CartRepository();
 const userRepository = new UserRepository();
-const courseService = new CourseService(courseRepository,cartRepository,userRepository);
+const tutorRepository = new TutorRepository();
+const courseService = new CourseService(courseRepository,cartRepository,userRepository,tutorRepository);
 const instituteController = new InstitutionController(instituteService);
 const quizRepository = new QuizRepository();
-const quizService = new QuizService(quizRepository);
+const quizService = new QuizService(quizRepository,userRepository,tutorRepository);
 const quizController = new QuizController(quizService)
 const courseController = new CourseController(courseService,quizService);
 
@@ -33,6 +35,7 @@ router.get('/tutor-list',instituteController.tutorList.bind(instituteController)
 router.get('/quiz-list',quizController.listQuiz.bind(quizController));
 router.get('/quiz-detail',quizController.quizDetail.bind(quizController));
 router.get('/chart-data',courseController.chartData.bind(courseController));
+router.get('/department-list',instituteController.getDepartment.bind(instituteController));
 
 
 router.post('/verify-email', instituteController.verifyEmail.bind(instituteController));
@@ -47,6 +50,7 @@ router.post('/create-quiz',quizController.createQuiz.bind(quizController));
 router.post('/quiz-update',quizController.updateQuiz.bind(quizController));
 router.post('/logout', instituteController.Logout.bind(instituteController));
 router.post('/course-update',courseController.updateCourse.bind(courseController));
+router.post('/add-department',instituteController.addDepartment.bind(instituteController));
 router.patch('/list-course',courseController.courseAction.bind(courseController));
 router.delete('/module-delete',courseController.moduleDelete.bind(courseController));
 

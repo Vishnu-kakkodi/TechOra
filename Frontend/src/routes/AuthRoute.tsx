@@ -7,7 +7,7 @@ import axios, { AxiosError } from 'axios';
 import { axiosInstance } from '../utils/axiosInstance';
 
 interface ProtectedRouteProps {
-  role: 'user' | 'institute' | 'admin';
+  role: 'user' | 'institute' | 'admin' | 'tutor';
   children: JSX.Element;
 }
 
@@ -25,6 +25,7 @@ const AuthRoute: React.FC<ProtectedRouteProps> = ({ children, role }) => {
   const isUserAuthenticated = useSelector((state: RootState) => state.auth.isUserAuthenticated);
   const isInstituteAuthenticated = useSelector((state: RootState) => state.auth.isInstituteAuthenticated);
   const isAdminAuthenticated = useSelector((state: RootState) => state.auth.isAdminAuthenticated);
+  const isTutorAuthenticated = useSelector((state: RootState) => state.auth.isTutorAuthenticated);
 
 
   useEffect(() => {
@@ -55,6 +56,8 @@ const AuthRoute: React.FC<ProtectedRouteProps> = ({ children, role }) => {
         return '/institute/login';
       case 'admin':
         return '/admin/login';
+      case 'tutor':
+        return '/tutor/login';
       default:
         return '/';
     }
@@ -73,6 +76,8 @@ const AuthRoute: React.FC<ProtectedRouteProps> = ({ children, role }) => {
         return isInstituteAuthenticated;
       case 'admin':
         return isAdminAuthenticated;
+      case 'tutor':
+        return isTutorAuthenticated;
       default:
         return false;
     }

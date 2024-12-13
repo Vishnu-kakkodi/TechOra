@@ -14,6 +14,9 @@ export class CreateUserDto{
 export class CreateTutorDto{
     department!: string;
     tutorname!: string;
+    tutorEmail!: string;
+    password!: string;
+    isAdmin!: boolean;
     education!: string;
     experiance!: string;
     gender!: string;

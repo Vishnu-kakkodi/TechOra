@@ -306,10 +306,36 @@ export class UserService {
     }): Promise<IUserDocument | null> {
         try {
             const updatedUser = await this.userRepository.UpdateProfile(userId,updateData );
-            return updatedUser;
-
-            
+            return updatedUser;        
         } catch (error) {
+            throw error        }
+    }
+
+        async homeData(): Promise<{course:CourseDocument[] | null}> {
+        try {
+            const course = await this.courseRepository.homeData();
+            return course;         
+        } catch (error) {
+            throw error 
+               }
+    }
+
+
+    async leaderBoard(page:number,limit:number,search:string,userId:string): Promise<{ users: IUserDocument[] | null; total: number; currentUser: IUserDocument|null}> {
+        try{
+            const skip = (page - 1) * limit;
+            let query:any = {};
+            if (search && search.trim() !== '') {
+                query.$or = [
+                    { userName: { $regex: search, $options: 'i' } },
+                    { 'quizProgress.rank': { $regex: search, $options: 'i' } }
+                ];
+            }
+            const {users,total} =  await this.userRepository.findUsers(query,skip,limit);
+            const currentUser =  await this.userRepository.findById(userId);
+
+            return {users,total,currentUser}
+        }catch(error){
             throw error        }
     }
 }

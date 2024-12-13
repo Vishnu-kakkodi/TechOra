@@ -254,7 +254,6 @@ const Profile = () => {
         fileInputRef.current?.click();
     };
 
-    // Toggle edit mode for a field
     const toggleEdit = (field: keyof typeof editMode) => {
         setEditMode(prev => ({
             ...prev,
@@ -262,7 +261,6 @@ const Profile = () => {
         }));
     };
 
-    // Handle input change
     const handleInputChange = (field: keyof typeof fieldValues, value: string) => {
         setFieldValues(prev => ({
             ...prev,
@@ -270,7 +268,6 @@ const Profile = () => {
         }));
     };
 
-    // Handle save
     const handleSave = async (field: keyof typeof fieldValues) => {
         const fieldToApiKeyMap = {
             name: 'userName',

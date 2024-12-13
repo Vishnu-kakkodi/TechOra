@@ -11,6 +11,23 @@ interface UserInfo {
   [key: string]: any;
 }
 
+
+interface TutorInfo {
+  id?: string;
+  tutorEmail?: string;
+  tutorname?: string;
+  education?: string;
+  experiance?: string;
+  institutionId?: {
+    _id:string;
+    collegeName:string;
+  }
+  gender?:string;
+  isAdmin?:string;
+  profilePic?:string;
+  [key: string]: any;
+}
+
 export interface InstituteEmailInfo {
   instituteEmail?: string;
 }
@@ -27,41 +44,47 @@ interface AuthState {
   userInfo: UserInfo | null;
   adminInfo: UserInfo | null;
   institutionInfo: InstituteInfo | null;
+  tutorInfo: TutorInfo | null;
   institutionEmailInfo: InstituteEmailInfo;
   isUserAuthenticated: boolean;
   isAdminAuthenticated: boolean;
   isInstituteAuthenticated: boolean;
+  isTutorAuthenticated: boolean;
 }
 
 const getFromStorage = (key: string) => {
   const localItem = localStorage.getItem(key);
-  sessionStorage.setItem(key, localItem || ''); 
   return localItem ? JSON.parse(localItem) : null;
 };
 
 const setToStorage = (key: string, value: any) => {
   const stringValue = JSON.stringify(value);
   localStorage.setItem(key, stringValue);
-  sessionStorage.setItem(key, stringValue);
 };
 
 const removeFromStorage = (key: string) => {
   localStorage.removeItem(key);
-  sessionStorage.removeItem(key);
 };
 
 const initialState: AuthState = {
   userInfo: getFromStorage("userInfo"),
   adminInfo: getFromStorage("adminInfo"),
   institutionInfo: getFromStorage("institutionInfo"),
+  tutorInfo: getFromStorage("tutorInfo"),
   institutionEmailInfo: getFromStorage("institutionEmailInfo"),
   isUserAuthenticated: !!localStorage.getItem("userInfo"),
   isAdminAuthenticated: !!localStorage.getItem("adminInfo"),
   isInstituteAuthenticated: !!localStorage.getItem("institutionInfo"),
+  isTutorAuthenticated: !!localStorage.getItem("tutorInfo")
 };
 
 interface UpdateUserFieldPayload {
   field: keyof UserInfo;
+  value: any;
+}
+
+interface UpdateTutorFieldPayload {
+  field: keyof TutorInfo;
   value: any;
 }
 
@@ -88,6 +111,11 @@ const authSlice = createSlice({
       state.institutionEmailInfo = action.payload;
       setToStorage("institutionEmailInfo", action.payload);
     },
+    setTutorCredential: (state, action: PayloadAction<TutorInfo>) => {
+      state.tutorInfo = action.payload;
+      state.isTutorAuthenticated = true;
+      setToStorage("tutorInfo", action.payload);
+    },
     updateUserField: (state, action: PayloadAction<UpdateUserFieldPayload>) => {
       if (state.userInfo) {
         const { field, value } = action.payload;
@@ -96,6 +124,17 @@ const authSlice = createSlice({
           [field]: value
         };
         setToStorage("userInfo", state.userInfo);
+      }
+    },
+
+    updateTutorField: (state, action: PayloadAction<UpdateTutorFieldPayload>) => {
+      if (state.tutorInfo) {
+        const { field, value } = action.payload;
+        state.tutorInfo = {
+          ...state.tutorInfo,
+          [field]: value
+        };
+        setToStorage("tutorInfo", state.tutorInfo);
       }
     },
     userLogout: (state) => {
@@ -113,6 +152,11 @@ const authSlice = createSlice({
       state.isInstituteAuthenticated = false;
       removeFromStorage("institutionInfo");
     },
+    tutorLogout: (state) => {
+      state.tutorInfo = null;
+      state.isTutorAuthenticated = false;
+      removeFromStorage("tutorInfo");
+    },
   },
 });
 
@@ -120,11 +164,14 @@ export const {
   setCredentials,
   setAdminCredentials,
   setInstituteCredentials,
+  setTutorCredential,
   setInstituteEmailCredentials,
   updateUserField,
   userLogout,
   adminLogout,
   instituteLogout,
+  tutorLogout,
+  updateTutorField
 } = authSlice.actions;
 
 export default authSlice.reducer;

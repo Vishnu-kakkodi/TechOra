@@ -22,6 +22,7 @@ import OrderDetail from '../layout/userLayout/OrderDetail';
 import MyCourses from '../layout/userLayout/MyCourses';
 import CourseDetail from '../pages/user/CourseDetail';
 import BlcokPage from '../pages/user/BlcokPage';
+import LeaderBoard from '../pages/user/LeaderBoard';
 
 const UserRoutes: React.FC = () => {
 
@@ -60,6 +61,16 @@ const UserRoutes: React.FC = () => {
         element={
           <AuthRoute role={'user'}>
             <UserCart />
+          </AuthRoute>
+        }
+      />
+
+
+      <Route
+        path="/leaderboard"
+        element={
+          <AuthRoute role={'user'}>
+            <LeaderBoard />
           </AuthRoute>
         }
       />

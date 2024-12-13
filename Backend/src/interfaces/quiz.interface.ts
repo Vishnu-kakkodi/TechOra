@@ -17,8 +17,10 @@ export interface Question {
     type: QuestionType;
 }
 
+
 export interface QuizData extends BaseInterface {
     institutionId?: Types.ObjectId,
+    tutorId?: Types.ObjectId,
     title: string;
     description: string;
     duration: string;
@@ -33,6 +35,7 @@ export interface QuizData extends BaseInterface {
     negativeScore?: number;
     passingScore?: number;
     startDate?: string;
+    isComplete:string[]
 }
 
 

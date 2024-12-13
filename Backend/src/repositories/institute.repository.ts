@@ -50,16 +50,11 @@ export class InstituteRepository extends BaseRepository<InstituteDocument> {
     }
 
     
-    async findById(instituteId : string): Promise<InstituteDocument | null> { 
+    async findById(institutionId : string ): Promise<InstituteDocument | null> { 
         try {
-            console.log("instituteId",instituteId);
-            console.log("instituteId",typeof(instituteId));
-            const id = new mongoose.Types.ObjectId(instituteId)
-            console.log("instituteId",id);
+            const id = new mongoose.Types.ObjectId(institutionId)
             const institute =  await this.model.findById(id);
-            console.log(institute,"ufdsakdgks");
-            return institute;
-            
+            return institute;            
         } catch (error) {
             throw error;
         }

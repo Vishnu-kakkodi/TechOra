@@ -53,7 +53,7 @@ const UserCart: React.FC<UserCartProps> = ({ onRemoveItem, onCheckout }) => {
     }
   };
 
-  const selectedItemsDetails: CartItem[] = cartItems?.items.filter(item => selectedItems.has(item.course._id)) ?? [];
+  const selectedItemsDetails: CartItem[] = cartItems?.items.filter(item => selectedItems.has(item.course?._id)) ?? [];
   console.log(selectedItemsDetails)
   const total = selectedItemsDetails.length > 0 
     ? selectedItemsDetails.reduce((sum, item) => sum + item.price, 0) 
@@ -195,7 +195,6 @@ const UserCart: React.FC<UserCartProps> = ({ onRemoveItem, onCheckout }) => {
                           <div className="flex flex-col sm:flex-row sm:justify-between">
                             <div className="mb-2 sm:mb-0">
                               <h3 className="text-lg font-semibold truncate">{item.course.title}</h3>
-                              <p className="text-sm text-gray-600">by {item.course.instructor}</p>
                             </div>
                             <div className="flex items-center justify-between sm:flex-col sm:items-end">
                               <div className="text-lg font-bold">{item.price.toFixed(2)}</div>

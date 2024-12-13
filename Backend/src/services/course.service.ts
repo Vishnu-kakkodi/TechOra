@@ -10,25 +10,32 @@ import MESSAGES from "../constants/message";
 import { IUserDocument } from "../interfaces/user.interface";
 import { UserRepository } from "../repositories/user.repository";
 import { QuizDocument } from "../interfaces/quiz.interface";
+import { TutorRepository } from "../repositories/tutor.repository";
 
 
 export class CourseService {
   private courseRepository: CourseRepository;
   private cartRepository: CartRepository;
   private userRepository: UserRepository;
+  private tutorRepository: TutorRepository;
 
 
-  constructor(courseRepository: CourseRepository, cartRepository: CartRepository, userRepository: UserRepository) {
+  constructor(courseRepository: CourseRepository, cartRepository: CartRepository, userRepository: UserRepository, tutorRepository: TutorRepository) {
     this.courseRepository = courseRepository;
     this.cartRepository = cartRepository;
     this.userRepository = userRepository;
+    this.tutorRepository = tutorRepository;
   }
 
-  async createCourse(courseData: CreateCourseDto): Promise<Course> {
+  async createCourse(courseData: CreateCourseDto, tutorId: string): Promise<Course> {
     try {
       if (!courseData.title || !courseData.institutionId) {
         throw new HttpException(400, 'Missing required fields');
       }
+      if(tutorId){
+        courseData.tutorId = tutorId;
+      }
+      console.log(courseData)
       const response = await this.courseRepository.create(courseData);
       if (!response) {
         throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
@@ -39,12 +46,12 @@ export class CourseService {
     }
   }
 
-  async draftCourse(instituteId: any): Promise<any> {
+  async draftCourse(tutorId: any): Promise<any> {
     try{
-      if(!instituteId){
+      if(!tutorId){
         throw new HttpException(STATUS_CODES.UNAUTHORIZED, MESSAGES.ERROR.UNAUTHORIZED)
       }
-      const data = await this.courseRepository.findDraft(instituteId)
+      const data = await this.courseRepository.findDraft(tutorId)
       if(!data){
         throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
       }
@@ -113,7 +120,52 @@ export class CourseService {
           sortOptions = { createdAt: -1 };
       }
 
-      return await this.courseRepository.findCourses(instituteId,query,skip,limit,sortOptions);
+      return await this.courseRepository.findCourses("institutionId",instituteId,query,skip,limit,sortOptions);
+
+    } catch (error) {
+      throw error;
+    }
+  }
+
+
+  async TutorCourseList(tutorId: any, page:number,limit:number,search:string,department:string,sort:string): Promise<{ course: CourseDocument[]; total: number;}> {
+    try {
+      if(!tutorId){
+        throw new HttpException(STATUS_CODES.UNAUTHORIZED, MESSAGES.ERROR.UNAUTHORIZED)
+      }
+      const skip = (page - 1) * limit;
+      let query:any = {};
+      let sortOptions: any = {};
+
+      if (search && search.trim() !== '') {
+          query.$or = [
+              { title: { $regex: search, $options: 'i' } },
+              { department: { $regex: search, $options: 'i' } },
+              { instructor: { $regex: search, $options: 'i' } }
+          ];
+      }
+
+      if (department && department.trim() !== '') {
+          console.log('Status received:', department);
+          const departmentArray = department.split(',').map((dep)=>dep.trim());
+          
+          query.department = { $in:departmentArray };
+      }
+
+      console.log("Query:", query);
+
+      switch(sort) {
+        case 'newest':
+          sortOptions = { createdAt: -1 };
+          break;
+        case 'oldest':
+          sortOptions = { createdAt: 1 };
+          break;
+        default:
+          sortOptions = { createdAt: -1 };
+      }
+
+      return await this.courseRepository.findCourses("tutorId",tutorId,query,skip,limit,sortOptions);
 
     } catch (error) {
       throw error;
@@ -161,6 +213,8 @@ export class CourseService {
       let cart = await this.cartRepository.findCart(userId);
 
       let course = await this.courseRepository.findById(courseId);
+
+
 
       if(!course){
         throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)

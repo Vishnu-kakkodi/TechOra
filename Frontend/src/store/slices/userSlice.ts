@@ -8,7 +8,7 @@ import { CourseDetailResponse, CourseListResponse } from '../../types/courseType
 import { RootState } from '..';
 
 
-export type UserRole = 'user' | 'admin' | 'institute';
+export type UserRole = 'user' | 'admin' | 'institute' | 'tutor';
 
 
 interface RegisterResponse {
@@ -303,6 +303,36 @@ export const userSlice = createApi({
       }),
       invalidatesTags: ['User'],
   }),
+
+  homeData: builder.query({
+    query: () => ({
+      url: '/users/home-data',
+      method: 'GET',
+      credentials: 'include'
+    }),
+    providesTags: ['User'],
+   }),
+
+   leaderBoardList: builder.query({
+    query: ({ page = 1, limit = 4, search = ''}) =>({
+      url: `/users/leaderBoard-list`,
+      params:{ page, limit, search},
+      method: 'GET',
+      credentials: 'include',
+    }),
+    providesTags:['User']
+   }),
+
+   quizResult: builder.mutation<{message:string},{mark:string,quizId:string}>({
+    query: ({mark,quizId}) =>({
+      url: `/users/quiz-result`,
+      method: 'POST',
+      body: {mark,quizId},
+      credentials: 'include',
+    }),
+    invalidatesTags:['User']
+   }),
+
   }),
 
 });
@@ -331,6 +361,9 @@ export const
    useProfilePhotoMutation,
    useUpdateProfileMutation,
    useCourseReviewMutation,
-   useReviewQuery
+   useReviewQuery,
+   useHomeDataQuery,
+   useLeaderBoardListQuery,
+   useQuizResultMutation
   } = userSlice;
 

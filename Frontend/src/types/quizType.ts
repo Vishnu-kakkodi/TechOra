@@ -52,6 +52,7 @@ export interface QuizData {
   passingScore?: number;
   institutionId?: Institute
   startDate?: string;
+  isComplete?: string[];
 }
 
 export interface QuizListResponse {
