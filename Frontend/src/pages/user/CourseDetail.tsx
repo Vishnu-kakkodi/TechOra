@@ -22,6 +22,7 @@ import useDebouncedValue from '../../hooks/debounceHook';
 import { motion } from 'framer-motion';
 import { MessageCircle } from 'lucide-react';
 import ChatModal from '../../components/modals/User/ChatModal';
+import { useAppSelector } from '../../store/hook';
 
 
 const CourseDetail = () => {
@@ -43,6 +44,8 @@ const CourseDetail = () => {
 
   const [currentValue, setCurrentValue] = React.useState<number | undefined>(0);
   const [reviewText, setReviewText] = React.useState<string>("");
+  const userdata = useAppSelector((state) => state.auth.userInfo);
+
 
   const { data: courseData, isLoading, isError } = useCoursedetailQuery(courseId as string);
 
@@ -145,6 +148,10 @@ const CourseDetail = () => {
                 <ChatModal
                   isOpen={isChatOpen}
                   onClose={() => setIsChatOpen(false)}
+                  token={userdata?.accessToken}
+                  senderId={userdata?._id}
+                  receiverId={(course?.tutorId)?.toString()}
+                  currentUserType='user'
                 />
               </div>
             </div>
@@ -181,11 +188,11 @@ const CourseDetail = () => {
                   <div className="flex items-center space-x-4">
                     <img
                       src={ProfilePic}
-                      alt={course?.instructor}
+                      alt={course?.tutorId?.tutorname}
                       className="w-16 h-16"
                     />
                     <div>
-                      <p className="font-medium">{course?.instructor}</p>
+                      <p className="font-medium">{course?.tutorId?.tutorname}</p>
                       <p className="text-sm text-gray-500">{course?.department}</p>
                     </div>
                   </div>

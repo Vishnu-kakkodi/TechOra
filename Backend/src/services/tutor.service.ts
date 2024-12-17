@@ -9,11 +9,18 @@ import { TutorRepository } from "../repositories/tutor.repository";
 import { TutorDocument } from "../interfaces/tutor.interface";
 import STATUS_CODES from "../constants/statusCode";
 import MESSAGES from "../constants/message";
+import { IUserDocument } from "../interfaces/user.interface";
+import { UserRepository } from "../repositories/user.repository";
+import mongoose from "mongoose";
 
 export class TutorService {
     private tutorRepository: TutorRepository;
-    constructor(tutorRepository: TutorRepository) {
+    private userRepository: UserRepository;
+
+    constructor(tutorRepository: TutorRepository, userRepository:UserRepository) {
         this.tutorRepository = tutorRepository;
+        this.userRepository = userRepository;
+
     }
 
     async tutorLogin(tutorEmail: string, password: string): Promise<TutorDocument | null> {
@@ -68,4 +75,73 @@ export class TutorService {
             throw error        
         }
     }
+
+    async enrolledStudents(
+        tutorId: string,
+        page: number,
+        limit: number,
+        search: string
+      ): Promise<{ users: IUserDocument[]; total: number }> {
+        try {
+          const skip = (page - 1) * limit;
+          
+          const pipeline: any[] = [
+            {
+              $lookup: {
+                from: "courses", 
+                localField: "purchasedCourses",
+                foreignField: "_id",
+                as: "purchasedCoursesDetails",
+              },
+            },
+            {
+              $match: {
+                "purchasedCoursesDetails.tutorId": new mongoose.Types.ObjectId(tutorId),
+              },
+            }
+          ];
+      
+          if (search && search.trim() !== "") {
+            pipeline.push({
+              $match: {
+                $or: [
+                  { userName: { $regex: search, $options: "i" } },
+                  { email: { $regex: search, $options: "i" } },
+                  { phoneNumber: { $regex: search, $options: "i" } },
+                ]
+              }
+            });
+          }
+      
+          pipeline.push({
+            $facet: {
+              data: [
+                { $skip: skip },
+                { $limit: limit },
+                {
+                  $project: {
+                    userName: 1,
+                    email: 1,
+                    phoneNumber: 1,
+                    profilePhoto: 1,
+                  }
+                }
+              ],
+              totalCount: [{ $count: "count" }],
+            },
+          });
+      
+          const result = await this.userRepository.aggregate(pipeline);
+      
+          const total = result[0]?.totalCount[0]?.count || 0;
+          return { 
+            users: result[0]?.data || [], 
+            total 
+          };
+        } catch (error) {
+          console.error('Error in enrolledStudents:', error);
+          throw error;
+        }
+      }
+      
 }

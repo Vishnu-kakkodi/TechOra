@@ -18,7 +18,7 @@ export class ChatController{
     ): Promise<void> {
         try {
             const {receiverId} = req.params;
-            const senderId = req.user._id
+            const senderId =  req.body;
             const chat = await this.chatService.getMessages(receiverId,senderId);
             res.json({ chat,message:"Login successfully" });
         } catch (error) {
@@ -26,25 +26,25 @@ export class ChatController{
         }
     }
 
-    async sendMessages(
-        req: Request,
-        res: Response,
-        next: NextFunction
-    ): Promise<void> {
-        try {
-            const text = req.body;
-            const {receiverId} = req.params;
-            const senderId = req.user._id
-            const chatData = {
-                senderId:senderId,
-                receiverId:receiverId,
-                text:text
-            }
-            const chat = await this.chatService.sendMessages(chatData);
-            res.json({ chat,message:"Login successfully" });
-        } catch (error) {
-            next(error)
-        }
-    }
+    // async sendMessages(
+    //     req: Request,
+    //     res: Response,
+    //     next: NextFunction
+    // ): Promise<void> {
+    //     try {
+    //         const text = req.body;
+    //         const {receiverId} = req.params;
+    //         const senderId = req.body
+    //         const chatData = {
+    //             senderId:senderId,
+    //             receiverId:receiverId,
+    //             text:text
+    //         }
+    //         // const chat = await this.chatService.sendMessages(chatData);
+    //         res.json({ chat,message:"Login successfully" });
+    //     } catch (error) {
+    //         next(error)
+    //     }
+    // }
 
 }

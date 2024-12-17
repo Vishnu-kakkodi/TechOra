@@ -8,6 +8,7 @@ interface UserInfo {
   phoneNumber?: string;
   status?: string;
   profilePhoto?:string;
+  accessToken?: string;
   [key: string]: any;
 }
 
@@ -25,6 +26,7 @@ interface TutorInfo {
   gender?:string;
   isAdmin?:string;
   profilePic?:string;
+  accessToken?: string;
   [key: string]: any;
 }
 

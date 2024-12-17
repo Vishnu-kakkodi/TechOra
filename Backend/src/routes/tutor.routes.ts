@@ -26,7 +26,7 @@ const quizRepository = new QuizRepository();
 const quizService = new QuizService(quizRepository,userRepository,tutorRepository);
 const quizController = new QuizController(quizService)
 const courseController = new CourseController(courseService,quizService);
-const tutorService = new TutorService(tutorRepository);
+const tutorService = new TutorService(tutorRepository,userRepository);
 const tutorController = new TutorController(tutorService);
 
 
@@ -38,6 +38,8 @@ router.get('/course-detail/:courseId',courseController.courseDetailInstitute.bin
 router.get('/quiz-list',quizController.TutorListQuiz.bind(quizController));
 router.get('/quiz-detail',quizController.quizDetail.bind(quizController));
 router.get('/chart-data',courseController.chartData.bind(courseController));
+router.get('/enrolled-students',tutorController.enrolledStudents.bind(tutorController));
+
 
 
 router.post('/login', tutorController.tutorLogin.bind(tutorController));

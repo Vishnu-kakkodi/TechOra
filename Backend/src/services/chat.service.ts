@@ -28,13 +28,13 @@ export class ChatService {
         }
     }
 
-    async sendMessages(chatData:CreateChatDto): Promise<ChatDocument[] | null> {
-        try {
+    // async sendMessages(chatData:CreateChatDto): Promise<ChatDocument[] | null> {
+    //     try {
 
-            const chat = await this.chatRepository.create(chatData)
-            return chat
-        } catch (error) {
-            throw new HttpException(STATUS_CODES.SERVER_ERROR, MESSAGES.ERROR.SERVER_ERROR)
-        }
-    }
+    //         const chat = await this.chatRepository.create(chatData)
+    //         return chat
+    //     } catch (error) {
+    //         throw new HttpException(STATUS_CODES.SERVER_ERROR, MESSAGES.ERROR.SERVER_ERROR)
+    //     }
+    // }
 }

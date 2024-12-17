@@ -18,6 +18,7 @@ export type ReviewDocument = Review & Document;
 import { InstituteDocument } from "../../../Backend/src/interfaces/institute.interface";
 
 export interface User{
+    _id:string | null;
     userName:string;
     email:string;
     password:string;

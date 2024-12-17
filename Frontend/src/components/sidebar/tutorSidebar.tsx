@@ -158,13 +158,6 @@ const TutorSidebar: React.FC = () => {
               <MessageCircle className="w-5 h-5" />
               <span>Chat Sessions</span>
             </button>
-            <button
-              onClick={() => handleNavigate('/tutor/chat-history')}
-              className="flex items-center space-x-2 text-gray-300 hover:text-white w-full"
-            >
-              <ClipboardList className="w-5 h-5" />
-              <span>Chat History</span>
-            </button>
           </div>
         </div>
 

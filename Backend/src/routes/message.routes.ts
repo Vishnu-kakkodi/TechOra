@@ -29,7 +29,7 @@ const quizRepository = new QuizRepository();
 const quizService = new QuizService(quizRepository,userRepository,tutorRepository);
 const quizController = new QuizController(quizService)
 const courseController = new CourseController(courseService,quizService);
-const tutorService = new TutorService(tutorRepository);
+const tutorService = new TutorService(tutorRepository,userRepository);
 const tutorController = new TutorController(tutorService);
 const chatRepository = new ChatRepository();
 const chatService = new ChatService(chatRepository);
@@ -39,7 +39,7 @@ const chatController = new ChatController(chatService);
 
 
 router.get('/get-messages',chatController.getMessages.bind(chatController));
-router.post('/send-messages',chatController.sendMessages.bind(chatController));
+// router.post('/send-messages',chatController.sendMessages.bind(chatController));
 
 
 export default router;

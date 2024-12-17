@@ -206,6 +206,17 @@ chartData: builder.query({
   invalidatesTags: ['User'],
 }),
 
+enrolledUsers: builder.query({
+  query: ({ page = 1, limit = 4, search = ''}) =>({
+    url: `/tutor/enrolled-students`,
+    params:{ page, limit, search},
+    method: 'GET',
+    credentials: 'include',
+  }),
+  providesTags:['Tutor']
+ }),
+
+
 
 
   }),
@@ -230,5 +241,6 @@ export const {
   useModuleDeleteMutation,
   useChartDataQuery,
   useUploadPhotoMutation,
-  useUpdateProfileMutation
+  useUpdateProfileMutation,
+  useEnrolledUsersQuery
 } = tutorSlice;

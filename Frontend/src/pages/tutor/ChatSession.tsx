@@ -1,81 +1,73 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Send, Paperclip, User, Lock } from 'lucide-react';
-import { toast } from 'react-toastify';
-
-interface User {
-  id: string;
-  name: string;
-  avatar?: string;
-  lastMessage?: string;
-  unreadCount?: number;
-}
+import React, { useEffect, useState } from 'react';
+import { Send, MessageCircle, User as UserIcon, Search } from 'lucide-react';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import TutorSidebar from '../../components/sidebar/tutorSidebar';
+import ChatModal from '../../components/modals/User/ChatModal';
+import { useAppSelector } from '../../store/hook';
+import useDebouncedValue from '../../hooks/debounceHook';
+import { useEnrolledUsersQuery } from '../../store/slices/tutorSlice';
+import { User } from '../../types/userTypes';
 
 interface Message {
   id: string;
-  senderId: string;
+  senderId: string | null;
   senderName: string;
   content: string;
   timestamp: number;
   type: 'text' | 'file';
 }
 
-const ChatSession: React.FC = () => {
-  const [users, setUsers] = useState<User[]>([
-    { 
-      id: '1', 
-      name: 'John Doe', 
-      avatar: 'https://via.placeholder.com/50', 
-      lastMessage: 'Hello, I need help with my course',
-      unreadCount: 2 
-    },
-    { 
-      id: '2', 
-      name: 'Jane Smith', 
-      avatar: 'https://via.placeholder.com/50', 
-      lastMessage: 'Can we discuss the quiz?',
-      unreadCount: 1 
-    }
-  ]);
 
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+const UserChatList: React.FC = () => {
+  const tutordata = useAppSelector((state) => state.auth.tutorInfo);
+    const [page, setPage] = useState(1);
+    const [limit, setLimit] = useState(4);
+    const [search, setSearch] = useState("");
+    const debouncedSearchTerm = useDebouncedValue(search, 500);
+
+      const {
+        data: Data,
+        isLoading,
+        isError
+      } = useEnrolledUsersQuery({
+        page,
+        limit,
+        search: debouncedSearchTerm
+      });
+
+    const users = Data?.users || [];
+    const total = Data?.total || users.length;;
+
+
+  const [selectedUser, setSelectedUser] = useState<string | null>(null);
+  const [isChatOpen, setIsChatOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
-  const messagesEndRef = useRef<null | HTMLDivElement>(null);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  const fetchMessages = (userId: string) => {
-    const mockMessages: Message[] = [
+  const handleOpenChatModal = (user: User) => {
+    setSelectedUser(user._id); 
+    setIsChatOpen(true);
+  
+    const initialMessages: Message[] = [
       {
         id: '1',
-        senderId: userId,
-        senderName: selectedUser?.name || 'User',
+        senderId: user._id,
+        senderName: user.userName,
         content: 'Hello, I need help with my course assignment',
         timestamp: Date.now() - 300000,
-        type: 'text'
+        type: 'text',
       },
-      {
-        id: '2',
-        senderId: 'tutor',
-        senderName: 'Tutor',
-        content: 'Sure, what specific help do you need?',
-        timestamp: Date.now() - 250000,
-        type: 'text'
-      }
     ];
-    setMessages(mockMessages);
+    setMessages(initialMessages);
   };
 
-  const handleUserSelect = (user: User) => {
-    setSelectedUser(user);
-    fetchMessages(user.id);
-  };
+    const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+      const value = event.target.value;
+      setPage(1);
+      setSearch(value);
+    };
+  
 
   const handleSendMessage = () => {
     if (!newMessage.trim() || !selectedUser) return;
@@ -95,139 +87,152 @@ const ChatSession: React.FC = () => {
     toast.success('Message sent successfully');
   };
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      toast.info(`File ${file.name} selected for upload`);
+  const handleNextPage = () => {
+    if (page * limit < total) {
+      setPage(page + 1);
     }
   };
 
+  const handlePreviousPage = () => {
+    if (page > 1) {
+      setPage(page - 1);
+    }
+  };
+
+
   return (
-    <div className="flex h-screen bg-gray-100">
-      <div className="w-80 bg-white border-r border-gray-200 overflow-y-auto">
-        <div className="p-4 border-b">
-          <h2 className="text-xl font-bold">Chat Sessions</h2>
-        </div>
-        {users.map(user => (
+    <div className='flex'>
+      <TutorSidebar/>
+      <div className="container mx-auto p-6 bg-gray-100 min-h-screen">
+      <h1 className="text-2xl font-bold mb-6">Student Chat List</h1>
+      <div className="mb-8">
+                  <h2 className="text-lg font-bold mb-4">Search</h2>
+                  <div className="w-[300px] relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+                    <input
+                      type="text"
+                      placeholder="Search courses..."
+                      value={search}
+                      onChange={handleSearchChange}
+                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                </div>
+      
+      <div className="grid gap-4">
+        {users.map((user:any) => (
           <div 
-            key={user.id}
-            onClick={() => handleUserSelect(user)}
-            className={`
-              flex items-center p-4 cursor-pointer hover:bg-gray-100 
-              ${selectedUser?.id === user.id ? 'bg-blue-50' : ''}
-            `}
+            key={user.id} 
+            className="bg-white rounded-lg shadow-md p-4 flex items-center justify-between hover:shadow-lg transition-shadow"
           >
-            <div className="relative">
+            <div className="flex items-center">
               <img 
-                src={user.avatar || 'https://via.placeholder.com/50'}
+                src={user.profilePhoto}
                 alt={user.name}
-                className="w-12 h-12 rounded-full mr-4"
+                className="w-16 h-16 rounded-full mr-4"
               />
+              <div>
+                <h2 className="font-semibold text-lg">{user.userName}</h2>
+                <p className="text-gray-500">{user.email}</p>
+                {user.lastMessage && (
+                  <p className="text-sm text-gray-400 mt-1">
+                    {user.lastMessage}
+                  </p>
+                )}
+              </div>
+            </div>
+            <div className="flex items-center">
               {user.unreadCount && user.unreadCount > 0 ? (
-                <span className="absolute top-0 right-3 bg-red-500 text-white rounded-full px-2 py-0.5 text-xs">
-                  {user.unreadCount}
+                <span className="bg-red-500 text-white rounded-full px-2 py-1 text-xs mr-4">
+                  {user.unreadCount} new
                 </span>
               ) : null}
-            </div>
-            <div>
-              <h3 className="font-semibold">{user.name}</h3>
-              <p className="text-gray-500 text-sm truncate">
-                {user.lastMessage}
-              </p>
+              <button 
+                onClick={() => handleOpenChatModal(user)}
+                className="flex items-center bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600 transition-colors"
+              >
+                <MessageCircle className="w-5 h-5 mr-2" />
+                Chat
+              </button>
             </div>
           </div>
         ))}
-      </div>
-
-      <div className="flex-1 flex flex-col">
-        {selectedUser ? (
-          <>
-            <div className="bg-white p-4 flex items-center justify-between border-b">
-              <div className="flex items-center">
-                <img 
-                  src={selectedUser.avatar || 'https://via.placeholder.com/50'}
-                  alt={selectedUser.name}
-                  className="w-10 h-10 rounded-full mr-4"
-                />
-                <div>
-                  <h2 className="font-semibold">{selectedUser.name}</h2>
-                  <p className="text-gray-500 text-sm">Active now</p>
-                </div>
-              </div>
-              <div>
-                <button className="text-gray-500 hover:text-blue-600">
-                  <Lock className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
-
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
-              {messages.map(message => (
-                <div 
-                  key={message.id}
-                  className={`flex ${
-                    message.senderId === 'tutor' 
-                      ? 'justify-end' 
-                      : 'justify-start'
-                  }`}
-                >
-                  <div 
-                    className={`
-                      max-w-md p-3 rounded-lg 
-                      ${
-                        message.senderId === 'tutor' 
-                          ? 'bg-blue-500 text-white' 
-                          : 'bg-gray-200 text-black'
-                      }
-                    `}
-                  >
-                    <p>{message.content}</p>
-                    <span className="text-xs opacity-70 block text-right mt-1">
-                      {new Date(message.timestamp).toLocaleTimeString()}
-                    </span>
-                  </div>
-                </div>
-              ))}
-              <div ref={messagesEndRef} />
-            </div>
-
-            <div className="bg-white p-4 border-t flex items-center">
-              <input 
-                type="file" 
-                className="hidden" 
-                id="file-upload"
-                onChange={handleFileUpload}
-              />
-              <label 
-                htmlFor="file-upload" 
-                className="mr-4 cursor-pointer text-gray-500 hover:text-blue-600"
+                  <div className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6 mt-4">
+            <div className="flex flex-1 justify-between sm:hidden">
+              <button
+                onClick={handlePreviousPage}
+                disabled={page === 1}
+                className="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
               >
-                <Paperclip className="w-6 h-6" />
-              </label>
-              <input 
-                type="text"
-                placeholder="Type a message..."
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                className="flex-1 p-2 border rounded-lg mr-4"
-              />
-              <button 
-                onClick={handleSendMessage}
-                className="bg-blue-500 text-white p-2 rounded-full hover:bg-blue-600"
+                Previous
+              </button>
+              <button
+                onClick={handleNextPage}
+                disabled={page * limit >= total}
+                className="relative ml-3 inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
               >
-                <Send className="w-6 h-6" />
+                Next
               </button>
             </div>
-          </>
-        ) : (
-          <div className="flex-1 flex items-center justify-center bg-gray-50">
-            <p className="text-gray-500">Select a user to start chatting</p>
+            <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+              <div>
+                <p className="text-sm text-gray-700">
+                  Showing{' '}
+                  <span className="font-medium">{(page - 1) * limit + 1}</span>{' '}
+                  to{' '}
+                  <span className="font-medium">{Math.min(page * limit, total)}</span>{' '}
+                  of{' '}
+                  <span className="font-medium">{total}</span>{' '}
+                  results
+                </p>
+              </div>
+              <div>
+                <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+                  <button
+                    onClick={handlePreviousPage}
+                    disabled={page === 1}
+                    className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50"
+                  >
+                    Previous
+                  </button>
+                  <button className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0">
+                    {page}
+                  </button>
+                  <button
+                    onClick={handleNextPage}
+                    disabled={page * limit >= total}
+                    className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50"
+                  >
+                    Next
+                  </button>
+                </nav>
+              </div>
+            </div>
           </div>
-        )}
       </div>
+
+      <ChatModal
+                  isOpen={isChatOpen}
+                  onClose={() => setIsChatOpen(false)}
+                  token={tutordata?.accessToken}
+                  senderId={tutordata?._id}
+                  receiverId={(selectedUser)}
+                  currentUserType='tutor'
+                />    
+      <ToastContainer 
+        position="bottom-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
+    </div>
     </div>
   );
 };
 
-export default ChatSession;
+export default UserChatList;

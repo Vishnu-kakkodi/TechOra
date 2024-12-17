@@ -134,11 +134,11 @@ export class UserController {
         next: NextFunction
     ): Promise<void> {
         try {
-            const user = await this.userService.getUser(req.body.email, req.body.password);
-            if (!user) {
+            const userDetails = await this.userService.getUser(req.body.email, req.body.password);
+            if (!userDetails) {
                 throw new HttpException(404, 'User not found');
             }
-            const { accessToken, refreshToken, ...userDetails } = user;
+            const { accessToken, refreshToken, ...userData } = userDetails;
             const Token = {
                 accessToken: accessToken,
                 refreshToken: refreshToken

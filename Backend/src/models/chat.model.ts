@@ -1,33 +1,37 @@
-import {Schema, model} from 'mongoose'
-import { ReviewDocument } from '../interfaces/review.interface';
-import { ChatDocument } from '../interfaces/chat.interface';
+import mongoose from 'mongoose';
 
-const chatSchema = new Schema<ChatDocument>(
-    {
-            senderId: {
-                type: Schema.Types.ObjectId,
-                ref: 'User',
-                required: true
-            },
-            receiverId: {
-                type: Schema.Types.ObjectId,
-                ref: 'Tutor',
-                required: true
-            },
-            text: {
-                type: String,
-                required:true
-            },
-            createdAt: {
-                type: Date,
-                default: Date.now
-            }
-    },
+const MessageSchema = new mongoose.Schema({
+  senderId: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'User', 
+    required: true 
+  },
+  receiverId: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'User', 
+    required: true 
+  },
+  currentUserType: {
+    type: String,
+    required: true
+  },
+  content: { 
+    type: String, 
+    required: true 
+  },
+  roomId: {
+    type: String,
+    required: true
+  },
+  timestamp: { 
+    type: Date, 
+    default: Date.now 
+  },
+  status: {
+    type: String,
+    enum: ['pending', 'sent', 'delivered', 'read'],
+    default: 'pending'
+  }
+});
 
-    {
-        timestamps: true
-    }
-    
-)
-
-export const ChatModel =  model<ChatDocument>('Review',chatSchema);
+export default mongoose.model('Message', MessageSchema);

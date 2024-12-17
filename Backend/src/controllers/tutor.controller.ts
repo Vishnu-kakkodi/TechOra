@@ -87,6 +87,37 @@ export class TutorController{
         }
     }
 
+    async enrolledStudents(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void>{
+        try{
+            const token = req.cookies.tutor.accessToken;
+            if(!token){
+                throw new HttpException(STATUS_CODES.UNAUTHORIZED,MESSAGES.ERROR.UNAUTHORIZED)
+            }
+            const requiredRole = "tutor";
+            const tutorId: string | null = decodedToken(token, requiredRole);
+            const page = parseInt(req.query.page as string) || 1;
+            const limit = parseInt(req.query.limit as string) || 4;
+            const search = (req.query.search as string);
+            const {users,total} = await this.tutorService.enrolledStudents(tutorId,page,limit,search);
+            if (!users) {
+                throw new HttpException(STATUS_CODES.BAD_REQUEST, MESSAGES.ERROR.BAD_REQUEST)
+              }
+              res.status(201).json({
+                users,
+                total,
+                page,
+                limit,
+                totalPages: Math.ceil(total / limit)
+            });
+        } catch (error) {
+            next(error)
+        }
+    }
+
     async Logout(
         req: Request,
         res: Response,

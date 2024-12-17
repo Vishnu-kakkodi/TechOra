@@ -175,5 +175,10 @@ export class UserRepository extends BaseRepository<IUserDocument> {
             throw error;
         }
     }
+
+    async aggregate(pipeline: any[]): Promise<any> {
+        return this.model.aggregate(pipeline).exec();
+      }
+      
     
 }
