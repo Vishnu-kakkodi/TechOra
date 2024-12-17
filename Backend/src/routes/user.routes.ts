@@ -61,6 +61,7 @@ router.post('/verify-user',userController.verifyUser.bind(userController));
 router.post('/resend-otp',userController.resendOtp.bind(userController));
 // router.post('/register',userController.createUser.bind(userController));
 router.post('/login',userController.getUser.bind(userController));
+router.post('/googleSign',userController.googleSign.bind(userController));
 router.post('/verify-email',userController.verifyEmail.bind(userController));
 router.post('/verify-Otp',userController.verifyOtp.bind(userController));
 router.post('/forgot-password',userController.forgotPassword.bind(userController));

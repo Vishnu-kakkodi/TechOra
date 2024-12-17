@@ -150,6 +150,29 @@ export class UserController {
         }
     }
 
+    async googleSign(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
+        try {
+            const {email,userName,phoneNumber} = req.body
+            const userDetails = await this.userService.googleSign(email,userName,phoneNumber);
+            if (!userDetails) {
+                throw new HttpException(404, 'User not found');
+            }
+            const { accessToken, refreshToken, ...user } = userDetails;
+            const Token = {
+                accessToken: accessToken,
+                refreshToken: refreshToken
+            }
+            setCookie(res, 'user', Token);
+            res.status(201).json({ userDetails, status: STATUS_CODES.CREATED, message: MESSAGES.SUCCESS.USER_CREATED });
+        } catch (error) {
+            next(error)
+        }
+    }
+
 
     async verifyEmail(
         req: Request<{}, {}>,

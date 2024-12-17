@@ -91,6 +91,42 @@ export class UserService {
             throw error        }
     }
 
+    async googleSign(email: string, userName: string, phoneNumber: string): Promise<any | null> {
+        try {
+            const user = await this.userRepository.findByEmail(email)
+
+            if (!user) {
+                let userDetail = {
+                    email,
+                    userName,
+                    password: userName+"@123",
+                    phoneNumber,
+                }
+                const user = await this.userRepository.create(userDetail);
+                console.log(user,"Userrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr")
+                let id : any = user._id
+                const accessToken = helperFunction.accesstoken(id, "user");
+                const refreshToken = helperFunction.refreshtoken(id, "user");
+    
+                return { ...user, accessToken, refreshToken };  
+
+             }
+
+            if (user) {
+                if (user.status === 'inactive') {
+                    throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.ACCOUNT_LOCKED);
+                }
+            }
+
+            const accessToken = helperFunction.accesstoken(user.id, "user");
+            const refreshToken = helperFunction.refreshtoken(user.id, "user");
+
+            return { ...user.toObject(), accessToken, refreshToken };
+
+        } catch (error) {
+            throw error        }
+    }
+
     async verifyEmail(email: string): Promise<string> {
         try {
             const user = await this.userRepository.findByEmail(email)

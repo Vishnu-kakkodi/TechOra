@@ -24,13 +24,16 @@ export interface User{
     password:string;
     confirmPassword?:string;
     phoneNumber:string;
-    profilePhoto:string;
-    
+    profilePhoto?:string;  
 }
 
 export interface UserLogin{
     email:string;
     password:string;
+}
+
+export interface googleSign{
+  email:string;
 }
 
 export interface ResponseData{

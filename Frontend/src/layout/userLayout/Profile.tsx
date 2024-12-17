@@ -219,6 +219,8 @@ const Profile = () => {
     const [updateProfile] = useUpdateProfileMutation();
     const dispatch = useDispatch();
 
+    console.log(userdata,"User")
+
     // Separate state for editing mode and field values
     const [editMode, setEditMode] = useState({
         name: false,

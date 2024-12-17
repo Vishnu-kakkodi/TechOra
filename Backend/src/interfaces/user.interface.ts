@@ -11,12 +11,12 @@ export interface IUser extends BaseInterface{
     userName: string;
     email: string;
     password: string;
-    phoneNumber:string;
+    phoneNumber?:string;
     status: UserStatus;
     accessToken: string;
     refreshToken: string;
     purchasedCourses: Types.ObjectId[];
-    profilePhoto: string;
+    profilePhoto?: string;
     quizProgress:{
         score:number;
         progress:string;

@@ -1,7 +1,7 @@
 
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { BaseQueryFn, FetchArgs, FetchBaseQueryError } from '@reduxjs/toolkit/query';
-import { ReviewResponse, User, UserLogin } from '../../types/userTypes';
+import { googleSign, ReviewResponse, User, UserLogin } from '../../types/userTypes';
 import { cartResponse } from '../../types/cartType';
 import { OrderResponse } from '../../types/userSide/orderType';
 import { CourseDetailResponse, CourseListResponse } from '../../types/courseType';
@@ -103,6 +103,24 @@ export const userSlice = createApi({
     login: builder.mutation<RegisterResponse, Partial<UserLogin>>({
       query: (data) => ({
         url: 'users/login',
+        method: 'POST',
+        body: data,
+        credentials: 'include'
+      }),
+      transformResponse: (response: RegisterResponse) => {
+        console.log("Transform response:", response);
+        return response;
+      },
+      transformErrorResponse: (error: FetchBaseQueryError) => {
+        console.log('Transform Error:', error);
+        return error;
+      },
+      invalidatesTags: [{ type: 'User' }],
+    }),
+
+    googleSign: builder.mutation({
+      query: (data) => ({
+        url: 'users/googleSign',
         method: 'POST',
         body: data,
         credentials: 'include'
@@ -343,6 +361,7 @@ export const
    useResendOtpMutation, 
    useRegisterMutation, 
    useLoginMutation, 
+   useGoogleSignMutation,
    useUserEmailVerifyMutation,
    useUserOtpVerifyMutation,
    useForgotPasswordMutation,

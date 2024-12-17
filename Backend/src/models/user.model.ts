@@ -6,7 +6,7 @@ const userSchema = new Schema<IUserDocument>(
     userName: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    phoneNumber: { type: String, required: true },
+    phoneNumber: { type: String, required: false },
     status: { type: String, enum: Object.values(UserStatus), default: UserStatus.Active },
     purchasedCourses: [{ 
       type: Schema.Types.ObjectId,

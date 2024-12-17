@@ -5,7 +5,7 @@ import Modal from './Modal';
 import { toast } from 'react-toastify';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { useLoginMutation } from '../../store/slices/userSlice';
+import { useGoogleSignMutation, useLoginMutation } from '../../store/slices/userSlice';
 import { setCredentials } from '../../store/slices/authSlice';
 import { FcGoogle } from 'react-icons/fc';
 import { auth, googleProvider } from '../../firebase/firebaseConfig';
@@ -27,6 +27,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ setLoginModalOpen, setOtpModalO
   const navigate = useNavigate();
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [emailVerify, setEmailVerify] = useState(false);
+  const [googleSign] = useGoogleSignMutation();
 
   useEffect(() => {
     const savedEmail = localStorage.getItem('email');
@@ -39,12 +40,20 @@ const LoginModal: React.FC<LoginModalProps> = ({ setLoginModalOpen, setOtpModalO
     try {
       const result: UserCredential = await signInWithPopup(auth, googleProvider as GoogleAuthProvider);
       const email = result.user.email;
+      const userName = result.user.displayName;
+      const phoneNumber = result.user.phoneNumber;
+
+
+      console.log(email,userName,phoneNumber)
 
       if (email) {
+        const response = await googleSign({email,userName,phoneNumber});
+        console.log(response)
         setUserEmail(email);
         localStorage.setItem('email', email);
         toast.success('Google sign-in successful!');
         setLoginModalOpen(false);
+        dispatch(setCredentials({ ...response.data?.userDetails }));
         navigate('/home');
       }
     } catch (error) {
