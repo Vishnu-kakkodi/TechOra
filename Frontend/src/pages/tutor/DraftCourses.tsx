@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
-import { Trash2, ChevronDown, Search } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Trash2, ChevronDown, Search, Edit, Eye } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import { Course } from '../../types/courseType';
 import { useDraftCourseListQuery } from '../../store/slices/tutorSlice';
 import TutorSidebar from '../../components/sidebar/tutorSidebar';
 import InstituteFooter from '../../components/footer/InstituteFooter';
+import useDebouncedValue from '../../hooks/debounceHook';
 
 const DraftCourses = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -13,22 +14,51 @@ const DraftCourses = () => {
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [activeDropdown, setActiveDropdown] = useState<number | null>(null);
   const [draftId, setDraftId] = useState("");
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(8);
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState('');
+  const [sort, setSort] = useState('');
+  const debouncedSearchTerm = useDebouncedValue(search, 500);
 
-  const { data = {} } = useDraftCourseListQuery(null);
-  const course = data.data || [];
-  
+  const {
+    data: courseData,
+    isLoading,
+    error
+  } = useDraftCourseListQuery({
+    page,
+    limit,
+    search: debouncedSearchTerm,
+    filter,
+    sort
+  });
+
+  const courses = courseData?.data.course || [];
+  const total = courseData?.data.total || 0;
+
   const navigate = useNavigate();
 
-  const handleEdit = (courseId: string) => {
-    navigate('/tutor/upload-videos', { state: { draftId: courseId } });
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearchTerm, filter]);
+
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    setPage(1);
+    setSearch(value);
+  };
+
+  const handleEdit = (courseId: number) => {
+    navigate(`/tutor/courses/edit/${courseId}`);
   };
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
   };
 
-  const handleView = () => {
-    navigate('/tutor/courses-view');
+  const handleView = (courseId: string) => {
+      navigate(`/tutor/course-view/${courseId}`, { state: { courseId: courseId } });
   };
 
   const handleDelete = (courseId: number) => {
@@ -39,7 +69,17 @@ const DraftCourses = () => {
     setActiveDropdown(activeDropdown === courseId ? null : courseId);
   };
 
-  const filteredCourses = course.filter((course: Course) => course.status !== 'published');
+  const handleNextPage = () => {
+    if (page * limit < total) {
+      setPage(page + 1);
+    }
+  };
+
+  const handlePreviousPage = () => {
+    if (page > 1) {
+      setPage(page - 1);
+    }
+  };
 
   return (
     <div className='flex min-h-screen'>
@@ -48,83 +88,160 @@ const DraftCourses = () => {
         <div className="flex-grow p-6">
           <div className="flex justify-between items-center mb-6">
             <div>
-              <h1 className="text-2xl font-bold">Course List</h1>
+              <h1 className="text-2xl font-bold">Draft Course List</h1>
             </div>
           </div>
 
           <div className="flex gap-4 mb-6">
-            {/* Search and filter controls here if needed */}
-          </div>
-
-          {filteredCourses.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {filteredCourses.map((course: any) => (
-                <div key={course.id} className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
-                  <img
-                    src={course.thumbnail}
-                    alt={course.title}
-                    className="w-full h-48 object-cover"
-                  />
-                  <div className="p-6">
-                    <div className="mb-4">
-                      <h2 className="text-xl font-semibold mb-2">{course.title}</h2>
-                      <div className="text-sm text-gray-500">
-                        <p>Instructor: {course.instructor}</p>
-                        <p>Department: {course.department}</p>
-                        <p>Last modified: {course.lastModified}</p>
-                      </div>
-                    </div>
-
-                    <div className="flex justify-between mt-6 pt-4 border-t border-gray-200">
-                      <button
-                        className="flex items-center px-3 py-2 text-red-600 hover:bg-red-50 rounded transition-colors duration-200"
-                      >
-                        <Trash2 className="h-4 w-4 mr-1" />
-                        Delete
-                      </button>
-                      <button
-                        onClick={() => handleEdit(course._id)}
-                        className="flex items-center px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors duration-200"
-                      >
-                        Continue Editing
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center py-12 px-4">
-              <div className="text-center">
-                <svg
-                  className="mx-auto h-12 w-12 text-gray-400"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  aria-hidden="true"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"
-                  />
-                </svg>
-                <h3 className="mt-2 text-sm font-semibold text-gray-900">No courses available</h3>
-                <p className="mt-1 text-sm text-gray-500">Get started by creating a new course.</p>
-                <div className="mt-6">
-                  <button
-                    onClick={() => navigate('/tutor/course-add')}
-                    className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                  >
-                    Add New Course
-                  </button>
-                </div>
+            <div className="flex">
+              <div className="relative">
+                <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
+                <input
+                  type="text"
+                  placeholder="Search courses..."
+                  value={search}
+                  onChange={handleSearchChange}
+                  className="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
               </div>
             </div>
+          </div>
+
+          {courses.length > 0 ? (
+            <div className="bg-white shadow overflow-hidden sm:rounded-lg">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Course</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Instructor</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Modified</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">View</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Edit</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {courses.map((course: any) => (
+                    <tr key={course._id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <div className="flex-shrink-0 h-10 w-10">
+                            <img
+                              className="h-10 w-10 rounded-md object-cover"
+                              src={course.thumbnail}
+                              alt={course.title}
+                            />
+                          </div>
+                          <div className="ml-4">
+                            <div className="text-sm font-medium text-gray-900">{course.title}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {course.tutorId.tutorname}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {course.department}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {new Date(course.updatedAt).toLocaleDateString('en-GB', {
+                          day: '2-digit',
+                          month: '2-digit',
+                          year: 'numeric',
+                        })}{' '}
+                        {new Date(course.updatedAt).toLocaleTimeString('en-GB', {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          hour12: true,
+                        })}
+                      </td>
+
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                          <button 
+                            onClick={() => handleView(course._id)}
+                            className="text-blue-600 hover:text-blue-900 flex items-center"
+                          >
+                            <Eye className="h-4 w-4 mr-1" /> View
+                          </button>
+                      </td>
+
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                          <button
+                            onClick={() => handleEdit(course._id)}
+                            className="text-blue-600 hover:text-blue-900 flex items-center"
+                          >
+                            <Edit className="h-4 w-4 mr-1" /> Edit
+                          </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="text-center py-10">
+              <p className="text-gray-500">No draft courses available</p>
+              <button
+                onClick={() => navigate('/tutor/course-add')}
+                className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              >
+                Create New Course
+              </button>
+            </div>
           )}
+          <div className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6 mt-4">
+            <div className="flex flex-1 justify-between sm:hidden">
+              <button
+                onClick={handlePreviousPage}
+                disabled={page === 1}
+                className="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
+              >
+                Previous
+              </button>
+              <button
+                onClick={handleNextPage}
+                disabled={page * limit >= total}
+                className="relative ml-3 inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
+              >
+                Next
+              </button>
+            </div>
+            <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+              <div>
+                <p className="text-sm text-gray-700">
+                  Showing{' '}
+                  <span className="font-medium">{(page - 1) * limit + 1}</span>{' '}
+                  to{' '}
+                  <span className="font-medium">{Math.min(page * limit, total)}</span>{' '}
+                  of{' '}
+                  <span className="font-medium">{total}</span>{' '}
+                  results
+                </p>
+              </div>
+              <div>
+                <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+                  <button
+                    onClick={handlePreviousPage}
+                    disabled={page === 1}
+                    className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50"
+                  >
+                    Previous
+                  </button>
+                  <button className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0">
+                    {page}
+                  </button>
+                  <button
+                    onClick={handleNextPage}
+                    disabled={page * limit >= total}
+                    className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50"
+                  >
+                    Next
+                  </button>
+                </nav>
+              </div>
+            </div>
+          </div>
         </div>
-        <InstituteFooter />
       </div>
     </div>
   );

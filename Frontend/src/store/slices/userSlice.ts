@@ -216,7 +216,7 @@ export const userSlice = createApi({
       }),
     }),
 
-    courseList: builder.query<CourseListResponse>({
+    courseList: builder.query<CourseListResponse,any>({
       query: ({ page = 1, limit = 4, search = '', filter='all', sort='' }) => ({
         url: '/users/course-list',
         params:{ page, limit, search, filter, sort },
@@ -254,7 +254,7 @@ export const userSlice = createApi({
       providesTags: ['User'],
      }),
 
-     myCourses: builder.query<CourseListResponse>({
+     myCourses: builder.query<CourseListResponse,any>({
       query: ({ page = 1, limit = 4, search = '' }) =>({
         url: '/users/my-courses',
         params:{ page, limit, search},
@@ -274,7 +274,7 @@ export const userSlice = createApi({
       invalidatesTags: ['User'],
     }),
 
-    Review: builder.query<ReviewResponse>({
+    Review: builder.query<ReviewResponse,any>({
       query: (courseId) => ({
         url: `/users/review?courseId=${courseId}`, 
         method: 'GET',

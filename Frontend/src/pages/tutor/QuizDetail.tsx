@@ -185,9 +185,6 @@ const QuizDetail: React.FC = () => {
                                 <button className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600" onClick={handleEdit}>
                                     Edit Quiz
                                 </button>
-                                <button className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">
-                                    Preview
-                                </button>
                             </div>
                         </div>
 

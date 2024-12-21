@@ -4,9 +4,10 @@ import { Routes, Route } from 'react-router-dom';
 import UserRoutes from './routes/userRoutes';
 import AdminRoutes from './routes/adminRoute';
 import InstituteRoutes from './routes/institutionRoute';
-import { ToastContainer } from 'react-toastify';
 import { useAxiosInterceptor } from './utils/axiosInstance';
 import TutorRoutes from './routes/tutorRoute';
+
+
 
 function App() {
   useAxiosInterceptor();
@@ -20,7 +21,6 @@ function App() {
 
     </Routes>
     </>
-
   );
 }
 

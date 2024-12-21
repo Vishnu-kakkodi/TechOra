@@ -35,7 +35,7 @@ export class CourseService {
       if(tutorId){
         courseData.tutorId = tutorId;
       }
-      console.log(courseData)
+      console.log(courseData.institutionId,"InstitutionId")
       const response = await this.courseRepository.create(courseData);
       if (!response) {
         throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
@@ -46,21 +46,38 @@ export class CourseService {
     }
   }
 
-  async draftCourse(tutorId: any): Promise<any> {
-    try{
-      if(!tutorId){
-        throw new HttpException(STATUS_CODES.UNAUTHORIZED, MESSAGES.ERROR.UNAUTHORIZED)
+  async draftCourse(
+    Query: { tutorId?: string; institutionId?: string },
+    page: number,
+    limit: number,
+    search: string,
+  ): Promise<any> {
+    try {
+      if (!Query.tutorId && !Query.institutionId) {
+        throw new HttpException(STATUS_CODES.UNAUTHORIZED, MESSAGES.ERROR.UNAUTHORIZED);
       }
-      const data = await this.courseRepository.findDraft(tutorId)
-      if(!data){
-        throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
+      const query: any = {};
+      if (Query.institutionId) {
+        query.institutionId = Query.institutionId;
+      } else if (Query.tutorId) {
+        query.tutorId = Query.tutorId;
+      } 
+      if (search && search.trim() !== '') {
+        query.$or = [
+          { title: { $regex: search, $options: 'i' } },
+          { department: { $regex: search, $options: 'i' } },
+          { instructor: { $regex: search, $options: 'i' } },
+        ];
       }
-    return data;
-    }catch(error){
+      query.status = 'draft';
+
+      const skip = (page - 1) * limit;
+      return await this.courseRepository.findDraft(query, skip, limit);
+    } catch (error) {
       throw error;
     }
-
   }
+  
 
 
   async createModule(id: string, moduleData: Module): Promise<CourseDocument | null> {
@@ -209,7 +226,7 @@ export class CourseService {
       }
       if(!userId){
         throw new HttpException(STATUS_CODES.BAD_REQUEST, MESSAGES.ERROR.BAD_REQUEST)
-      }
+      }      
       let cart = await this.cartRepository.findCart(userId);
 
       let course = await this.courseRepository.findById(courseId);

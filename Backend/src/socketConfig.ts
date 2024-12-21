@@ -7,6 +7,8 @@ import { DecodedToken } from './helperFunction/authHelper';
 
 class SocketConfig {
   private io: Server | null = null;
+  private onlineUsers: Map<string, Set<string>> = new Map(); 
+
 
   initializeSocket(server: HttpServer) {
     this.io = new Server(server, {
@@ -36,28 +38,86 @@ class SocketConfig {
     this.io.on('connection', (socket) => {
       // @ts-ignore
       const userId = socket.user._id;
+
+      if (!this.onlineUsers.has(userId)) {
+        this.onlineUsers.set(userId, new Set());
+      }
       
-      // Create or join a unique chat room
-      socket.on('join_chat', (chatPartnerId) => {
-        // Create a unique room ID by sorting and combining user IDs
+      socket.on('join_chat', async (chatPartnerId) => {
         const roomId = this.generateRoomId(userId, chatPartnerId);
         
-        // Join the specific room
         socket.join(roomId);
+
+        this.onlineUsers.get(userId)?.add(roomId);
+
+        const partnerOnline = this.onlineUsers.get(chatPartnerId)?.has(roomId) || false;
+
+        this.io?.to(roomId).emit('presence_update', {
+          roomId,
+          users: {
+            [userId]: true,
+            [chatPartnerId]: partnerOnline
+          }
+        });
+
+        try {
+          await MessageModel.updateMany(
+            { 
+              roomId,
+              receiverId: userId,
+              isRead: false 
+            },
+            { 
+              $set: { isRead: true } 
+            }
+          );
+
+          this.io?.to(roomId).emit('messages_read', {
+            readBy: userId,
+            timestamp: new Date(),
+          });
+          
+
+        } catch (error) {
+          console.error('Error updating message read status:', error);
+        }
         console.log(`User ${userId} joined room ${roomId}`);
       });
+
+      // socket.on('mark_messages_read', async (chatPartnerId) => {
+      //   try {
+      //     const roomId = this.generateRoomId(userId, chatPartnerId);
+          
+      //     await MessageModel.updateMany(
+      //       { 
+      //         roomId,
+      //         receiverId: userId,
+      //         isRead: false 
+      //       },
+      //       { 
+      //         $set: { isRead: true } 
+      //       }
+      //     );
+
+      //     this.io?.to(roomId).emit('messages_read', {
+      //       readBy: userId,
+      //       timestamp: new Date()
+      //     });
+
+      //   } catch (error) {
+      //     console.error('Error marking messages as read:', error);
+      //   }
+      // });
 
 
       socket.on('fetch_chat_history', async (chatPartnerId, callback) => {
         try {
           const roomId = this.generateRoomId(userId, chatPartnerId);
           
-          // Fetch messages for this room, sorted by timestamp
           const messages = await MessageModel.find({ 
             roomId: roomId 
           }).sort({ timestamp: 1 });
 
-          // Invoke callback with messages
           callback({
             success: true,
             messages: messages
@@ -83,17 +143,17 @@ class SocketConfig {
             return;
           }
       
-          // Create message in database
           const message = await MessageModel.create({
             senderId,
             receiverId,
             currentUserType: sender,
             content: text,
-            roomId, // Store room ID in message
+            roomId, 
             timestamp: timestamp || new Date(),
+            isRead:false,
+            isDelivered: true
           });
       
-          // Broadcast to the specific room
           this.io!.to(roomId).emit('receive_message', {
             id,
             senderId,
@@ -101,6 +161,8 @@ class SocketConfig {
             text,
             roomId,
             timestamp: message.timestamp,
+            isRead:false,
+            isDelivered: true
           });
       
           socket.emit('message_sent', {
@@ -113,8 +175,43 @@ class SocketConfig {
           socket.emit('error_message', { error: 'Message delivery failed' });
         }
       });
+
+      socket.on('message_seen', async ({ messageIds, senderId, receiverId }) => {
+        try {
+          const roomId = this.generateRoomId(senderId, receiverId);
+          
+          await MessageModel.updateMany(
+            { 
+              _id: { $in: messageIds },
+              receiverId: userId
+            },
+            { 
+              $set: { isRead: true }
+            }
+          );
+
+          this.io!.to(roomId).emit('messages_read_status', {
+            messageIds,
+            readBy: userId,
+            timestamp: new Date()
+          });
+        } catch (error) {
+          console.error('Error updating message read status:', error);
+        }
+      });
+
       
       socket.on('disconnect', () => {
+        const userRooms = this.onlineUsers.get(userId) || new Set();
+        this.onlineUsers.delete(userId);
+        userRooms.forEach(roomId => {
+          this.io?.to(roomId).emit('presence_update', {
+            roomId,
+            users: {
+              [userId]: false
+            }
+          });
+        });
         console.log('Socket disconnected:', socket.id);
       });
     });

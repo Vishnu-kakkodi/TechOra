@@ -19,7 +19,7 @@ export class ReviewController {
         res: Response,
         next: NextFunction
     ): Promise<void> => {
-        try {
+        try {            
             const Token = req.cookies.user
             const token = Token.accessToken;
             if(!token){

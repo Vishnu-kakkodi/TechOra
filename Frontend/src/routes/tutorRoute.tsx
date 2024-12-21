@@ -1,12 +1,10 @@
 
-
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
 import { Navigate } from 'react-router-dom';
 import TutorLogin from '../pages/tutor/TutorLogin';
-import Dashboard from '../layout/TutorLayout/Dashboard';
 import AuthRoute from './AuthRoute';
 import CourseList from '../pages/tutor/CourseList';
 import CourseDetail from '../pages/tutor/CourseDetail';
@@ -23,18 +21,13 @@ import ErrorPage from '../pages/tutor/errorPage';
 import Profile from '../pages/tutor/Profile';
 import ChangePassword from '../pages/tutor/ChangePassword';
 import ChatSession from '../pages/tutor/ChatSession';
+import TutorDashBoard from '../pages/tutor/TutorDashBoard';
 
 const TutorRoutes: React.FC = () => {
 
   const isTutorAuthenticated = useSelector((state: RootState) => state.auth.isTutorAuthenticated);
   console.log(isTutorAuthenticated)
   const navigate = useNavigate();
-
-  // useEffect(() => {
-  //   if (!isInstituteAuthenticated) {
-  //     navigate('/institute/login');
-  //   }
-  // }, [isInstituteAuthenticated, navigate]);
 
   return (
     <Routes>
@@ -46,7 +39,7 @@ const TutorRoutes: React.FC = () => {
         path="/dashboard"
         element={
           <AuthRoute role='tutor'>
-            <Dashboard />
+            <TutorDashBoard />
           </AuthRoute>
         }
       />

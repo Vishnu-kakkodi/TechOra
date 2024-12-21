@@ -6,7 +6,7 @@ const InstituteFooter: React.FC = () => {
   const instituteData = useSelector((state: RootState) => state.auth.institutionInfo);
 
   return (
-    <footer className="bg-gradient-to-r from-blue-600 via-purple-500 to-blue-600 text-white py-6">
+    <footer className="bg-gradient-to-r from-blue-600 via-purple-500 to-blue-600 text-white py-6 mb-0">
       <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-6">
         <div>
           <h3 className="font-bold mb-3">Quick Links</h3>

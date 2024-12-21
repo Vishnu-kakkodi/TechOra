@@ -19,15 +19,27 @@ export class CourseRepository extends BaseRepository<CourseDocument> {
         super(CourseModel);
     }
 
-    async findDraft(tutorId: any): Promise<CourseDocument[]> {
-        try {
-            console.log("Repoosos");
 
-            return await this.model.find({ tutorId: tutorId });
+      async findDraft(
+        query: any,
+        skip: number,
+        limit: number,
+    ): Promise<{ course: CourseDocument[]; total: number }> {
+        try {
+            const course = await this.model
+                .find(query)
+                .skip(skip)
+                .limit(limit)
+                .populate('tutorId');
+
+            const total: number = await this.model.countDocuments(query);
+
+            return { course, total };
         } catch (error) {
             throw error;
         }
     }
+      
 
 
     async findById(courseId: string): Promise<CourseDocument | null> {
@@ -35,7 +47,7 @@ export class CourseRepository extends BaseRepository<CourseDocument> {
             console.log(courseId)
             const id = new mongoose.Types.ObjectId(courseId)
             console.log("instituteId", typeof (courseId));
-            const course = await this.model.findById({ _id: id });
+            const course = await this.model.findById({ _id: id }).populate('tutorId')
             console.log(course, "ufdsakdgks");
             return course;
         } catch (error) {
@@ -139,7 +151,9 @@ export class CourseRepository extends BaseRepository<CourseDocument> {
                 .find(filter)
                 .sort(sortOptions)
                 .skip(skip)
-                .limit(limit);
+                .limit(limit)
+                .populate('tutorId');
+
 
             const total: number = await this.model.countDocuments(filter);
 
@@ -243,13 +257,21 @@ export class CourseRepository extends BaseRepository<CourseDocument> {
             const published: number = await this.model.countDocuments({ status: 'published' });
             const course = await this.model.find({ status: 'published' })
                 .sort({ createdAt: -1 })
-                .limit(4);
+                .limit(4)
+                .populate('tutorId');
             return {
                 course
             };
         } catch (error) {
             throw error;
         }
+    }
+
+    async incrementEnrolledStudents(courseIds: mongoose.Types.ObjectId[]): Promise<void> {
+        await this.model.updateMany(
+            { _id: { $in: courseIds } },
+            { $inc: { enrolledStudents: 1 } }
+        );
     }
 
 

@@ -1,6 +1,7 @@
 import React, {useEffect} from 'react'
 import InstituteSidebar from '../../components/sidebar/InstituteSidebar'
-import Dashboard from '../../layout/AdminLayout/Dashboard';
+import TutorSidebar from '../../components/sidebar/tutorSidebar';
+import Dashboard from '../../layout/TutorLayout/Dashboard';
 
 const TutorDashBoard = () => {
 
@@ -26,7 +27,6 @@ const TutorDashBoard = () => {
 
   return (
     <div className='flex'>
-    <InstituteSidebar />
     <Dashboard />
     </div>
   )

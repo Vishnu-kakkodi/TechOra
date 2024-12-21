@@ -68,8 +68,11 @@ export class CourseController {
                 throw new HttpException(STATUS_CODES.UNAUTHORIZED,MESSAGES.ERROR.UNAUTHORIZED)
             }
             const requiredRole = "institute";
-            const instituteId: string | null = decodedToken(token, requiredRole);
-            const course = await this.courseService.draftCourse(instituteId)
+            const institutionId: string | null = decodedToken(token, requiredRole);
+            const page = parseInt(req.query.page as string) || 1;
+            const limit = parseInt(req.query.limit as string) || 4;
+            const search = (req.query.search as string);
+            const course = await this.courseService.draftCourse({institutionId},page,limit,search)
             res.status(201).json({
                 message: "Approved",
                 data: course
@@ -92,7 +95,10 @@ export class CourseController {
             }
             const requiredRole = "tutor";
             const tutorId: string | null = decodedToken(token, requiredRole);
-            const course = await this.courseService.draftCourse(tutorId)
+            const page = parseInt(req.query.page as string) || 1;
+            const limit = parseInt(req.query.limit as string) || 4;
+            const search = (req.query.search as string);
+            const course = await this.courseService.draftCourse({tutorId},page,limit,search)
             res.status(201).json({
                 message: "Approved",
                 data: course

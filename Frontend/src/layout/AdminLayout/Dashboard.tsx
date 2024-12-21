@@ -17,8 +17,8 @@ import {
 } from 'lucide-react';
 import useDebouncedValue from '../../hooks/debounceHook';
 import { useInstituteListQuery } from '../../store/slices/adminSlice';
-import { InstituteDocument } from '../../../../Backend/src/interfaces/institute.interface';
 import InstitutionPieChart from './InstitutionPieChart';
+import { InstituteDocument } from '../../types/Institute/InstituteDocument';
 
 const Dashboard: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');

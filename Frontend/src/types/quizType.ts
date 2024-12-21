@@ -1,4 +1,3 @@
-import { Document, Types } from "mongoose";
 import { Institute } from "./institutionTypes";
 
 export type QuestionType = 'multiple-choice' | 'true-false' | 'short-answer';

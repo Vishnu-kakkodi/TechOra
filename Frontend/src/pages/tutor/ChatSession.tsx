@@ -18,6 +18,13 @@ interface Message {
   type: 'text' | 'file';
 }
 
+interface LastMessage {
+  message: string;
+  timestamp: number;
+  userId: string;
+}
+
+
 
 const UserChatList: React.FC = () => {
   const tutordata = useAppSelector((state) => state.auth.tutorInfo);
@@ -40,13 +47,26 @@ const UserChatList: React.FC = () => {
     const total = Data?.total || users.length;;
 
 
-  const [selectedUser, setSelectedUser] = useState<string | null>(null);
+  const [selectedUser, setSelectedUser] = useState<any | null>(null);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
+  const [lastMessages, setLastMessages] = useState<Record<string, LastMessage>>({});
+
+  const handleDataFromChild = (data: { message: string; timestamp: number }, userId: string) => {
+    setLastMessages(prev => ({
+      ...prev,
+      [userId]: {
+        message: data.message,
+        timestamp: data.timestamp,
+        userId
+      }
+    }));
+  };
+
 
   const handleOpenChatModal = (user: User) => {
-    setSelectedUser(user._id); 
+    setSelectedUser(user); 
     setIsChatOpen(true);
   
     const initialMessages: Message[] = [
@@ -99,6 +119,19 @@ const UserChatList: React.FC = () => {
     }
   };
 
+  const formatTimestamp = (timestamp: number) => {
+    const now = new Date();
+    const messageDate = new Date(timestamp);
+    
+    if (messageDate.toDateString() === now.toDateString()) {
+      return messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+    if (messageDate.getFullYear() === now.getFullYear()) {
+      return messageDate.toLocaleDateString([], { month: 'short', day: 'numeric' });
+    }
+    return messageDate.toLocaleDateString([], { year: 'numeric', month: 'short', day: 'numeric' });
+  };
+
 
   return (
     <div className='flex'>
@@ -120,13 +153,13 @@ const UserChatList: React.FC = () => {
                 </div>
       
       <div className="grid gap-4">
-        {users.map((user:any) => (
-          <div 
-            key={user.id} 
+      {users.map((user: any) => (
+          <div
+            key={user.id}
             className="bg-white rounded-lg shadow-md p-4 flex items-center justify-between hover:shadow-lg transition-shadow"
           >
             <div className="flex items-center">
-              <img 
+              <img
                 src={user.profilePhoto}
                 alt={user.name}
                 className="w-16 h-16 rounded-full mr-4"
@@ -134,11 +167,16 @@ const UserChatList: React.FC = () => {
               <div>
                 <h2 className="font-semibold text-lg">{user.userName}</h2>
                 <p className="text-gray-500">{user.email}</p>
-                {user.lastMessage && (
-                  <p className="text-sm text-gray-400 mt-1">
-                    {user.lastMessage}
-                  </p>
-                )}
+                {lastMessages[user._id] && (
+                    <div className="flex items-center text-sm text-gray-400 mt-1">
+                      <p className="truncate max-w-xs">
+                        {lastMessages[user._id].message}
+                      </p>
+                      <span className="ml-2 whitespace-nowrap">
+                        · {formatTimestamp(lastMessages[user._id].timestamp)}
+                      </span>
+                    </div>
+                  )}
               </div>
             </div>
             <div className="flex items-center">
@@ -147,7 +185,7 @@ const UserChatList: React.FC = () => {
                   {user.unreadCount} new
                 </span>
               ) : null}
-              <button 
+              <button
                 onClick={() => handleOpenChatModal(user)}
                 className="flex items-center bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600 transition-colors"
               >
@@ -211,14 +249,19 @@ const UserChatList: React.FC = () => {
           </div>
       </div>
 
-      <ChatModal
-                  isOpen={isChatOpen}
-                  onClose={() => setIsChatOpen(false)}
-                  token={tutordata?.accessToken}
-                  senderId={tutordata?._id}
-                  receiverId={(selectedUser)}
-                  currentUserType='tutor'
-                />    
+      {selectedUser && (
+        <ChatModal
+          isOpen={isChatOpen}
+          onClose={() => setIsChatOpen(false)}
+          token={tutordata?.accessToken}
+          senderId={tutordata?._id}
+          receiverId={selectedUser._id} 
+          receiverName={selectedUser.userName} 
+          receiverProfilePhoto={selectedUser.profilePhoto}
+          currentUserType="tutor"
+          sendDataToParent={(data) => handleDataFromChild(data, selectedUser._id)}
+          />
+      )}   
       <ToastContainer 
         position="bottom-right"
         autoClose={3000}

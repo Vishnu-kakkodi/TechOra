@@ -36,10 +36,10 @@ const courseService = new CourseService(courseRepository, cartRepository, userRe
 const cartController = new CartController(courseService)
 const courseController = new CourseController(courseService,quizService)
 const orderRepository = new OrderRepository()
-const orderService = new OrderService(orderRepository,cartRepository,userRepository)
+const orderService = new OrderService(orderRepository,cartRepository,userRepository,courseRepository)
 const orderController = new OrderController(orderService)
 const reviewRepository = new ReviewRepository()
-const reviewService = new ReviewService(reviewRepository)
+const reviewService = new ReviewService(reviewRepository,courseRepository)
 const reviewController = new ReviewController(reviewService)
 
 
@@ -50,7 +50,7 @@ router.get('/course-detail/:courseId',authMiddleware,courseController.courseDeta
 router.get('/my-courses',authMiddleware,userController.myCourses.bind(userController));
 router.get('/quiz-list',authMiddleware,quizController.quizList.bind(quizController));
 router.get('/review',authMiddleware,reviewController.Review.bind(reviewController));
-router.get('/home-data',authMiddleware,userController.homeData.bind(userController));
+router.get('/home-data',userController.homeData.bind(userController));
 router.get('/leaderBoard-list',authMiddleware,userController.leaderBoard.bind(userController));
 
 
@@ -68,7 +68,7 @@ router.post('/forgot-password',userController.forgotPassword.bind(userController
 router.post('/add-cart',authMiddleware,cartController.addToCart.bind(cartController));
 router.patch('/remove-cart',authMiddleware,cartController.removeCart.bind(cartController));
 router.post('/payment',authMiddleware,orderController.createOrder.bind(cartController));
-router.post('/payment',authMiddleware,orderController.createOrder.bind(cartController));
+// router.post('/payment',authMiddleware,orderController.createOrder.bind(cartController));
 router.post('/payment-success',authMiddleware,orderController.paymentSuccess.bind(orderController));
 router.post('/profile-photo',upload.single('profilePhoto'),authMiddleware,userController.profilePhoto.bind(userController));
 router.put('/profile-update',authMiddleware,userController.profileUpdate.bind(userController));

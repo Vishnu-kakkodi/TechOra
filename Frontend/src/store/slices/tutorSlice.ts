@@ -1,7 +1,5 @@
 import { createApi, BaseQueryFn, FetchArgs, fetchBaseQuery, FetchBaseQueryError } from '@reduxjs/toolkit/query/react';
-import { InstituteDocument } from '../../../../Backend/src/interfaces/institute.interface';
 import { CourseDetailResponse } from '../../types/courseType';
-import { TutorFormData } from '../../types/institutionTypes';
 import { UserRole } from './userSlice';
 
 const baseQueryWithRole = fetchBaseQuery({
@@ -55,8 +53,9 @@ export const tutorSlice = createApi({
     }),
 
    draftCourseList: builder.query({
-    query:()=>({
+    query: ({ page = 1, limit = 4, search = '', filter='all', sort='' }) => ({
       url: '/tutor/draft-course',
+      params:{ page, limit, search, filter, sort },
       method: 'GET',
       credentials: 'include'
     }),

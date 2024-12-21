@@ -82,7 +82,7 @@ export class OrderController {
                         description: product.description,
                         images: [product.thumbnail]
                     },
-                    unit_amount: Math.round(total * 100)
+                    unit_amount: Math.round(product.price * 100)
                 },
                 quantity: 1
             }));
@@ -113,10 +113,10 @@ export class OrderController {
         try {
 
             const orderId= req.body.orderId;
-            const Token = req.cookies.user
+            const Token = req.cookies.user;
             const token = Token.accessToken;
             if(!token){
-                throw new HttpException(STATUS_CODES.UNAUTHORIZED,MESSAGES.ERROR.UNAUTHORIZED)
+                throw new HttpException(STATUS_CODES.UNAUTHORIZED,MESSAGES.ERROR.UNAUTHORIZED);
             }
             const requiredRole = "user";
             const userId = decodedToken(token, requiredRole);

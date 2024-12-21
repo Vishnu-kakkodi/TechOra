@@ -83,7 +83,7 @@ const CreateQuiz: React.FC = () => {
       explanation: '',
       type: 'multiple-choice',
     }],
-    status: 'draft',
+    status: 'published',
     totalQuestions: 1,
     department: '',
     stack: '',

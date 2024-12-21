@@ -1,28 +1,3 @@
-// import { Document, Types } from "mongoose";
-// import { CourseDocument } from "./courseType";
-// import { Course } from "./courseType";
-
-// export interface cartResponse {
-//     message: string;
-//     Data: Cart | undefined;
-//   }
-
-// export interface CartItem{
-//     course: Types.ObjectId | Course;
-//     price: number;
-//     subTotal: number;
-// }
-
-// export interface Cart{
-//     id: string;
-//     userId: Types.ObjectId;
-//     items: CartItem[];
-//     totalItems: number;
-//     totalPrice: number;
-// }
-
-// export type CartDocument = Cart & Document
-
 
 export interface CartItem {
     course: {

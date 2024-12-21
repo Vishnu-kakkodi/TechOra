@@ -43,7 +43,7 @@ const SignUpButton: React.FC<SignUpButtonProps> = ({
       {handleSignUp && (
         <button
           onClick={handleSignUp}
-          className={`ml-4 text-[14px] font-normal capitalize text-white bg-transparent border-2 border-gold hover:bg-yellow-500 hover:text-black px-[30px] py-[11px] rounded-full`}>
+          className={`ml-4 text-[14px] font-medium capitalize text-white bg-black border-2 border-black hover:bg-yellow-500 hover:text-black px-[30px] py-[11px]`}>
           Sign Up
         </button>
       )}

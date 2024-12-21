@@ -314,7 +314,6 @@ const ListQuiz = () => {
                     </div>
                 </div>
             </div>
-                <InstituteFooter/>
             </div>
         </div>
     );

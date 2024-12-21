@@ -7,7 +7,6 @@ import InstituteListingPage from '../pages/admin/InstitutionListPage';
 import ErrorPage from '../pages/admin/errorPage';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
-import AdminProtectedRoute from './ProtectedRoute/AdminProtectedRoute';
 import InstituteDetail from '../pages/admin/InstituteDetail';
 import AuthRoute from './AuthRoute';
 import ApprovedInstitutionPage from '../pages/admin/ApprovedInstitutionPage';

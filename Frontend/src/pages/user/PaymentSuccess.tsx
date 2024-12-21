@@ -1,70 +1,3 @@
-// import { useEffect, useState } from 'react';
-// import { useSearchParams } from 'react-router-dom';
-// import { usePaymentSuccessMutation } from '../../store/slices/userSlice';
-
-
-// interface OrderDetails {
-// order:{
-//     _id: string;
-//     userId: string;
-//     items: Array<{
-//         course: string;
-//         price: number;
-//         subTotal: number;
-//     }>;
-//     totalItems: number;
-//     totalPrice: number;
-//     paymentStatus: string;
-//     paymentMethod: string;
-//     transactionId?: string;
-//     createdAt?: Date;
-// }
-// }
-
-// const PaymentSuccess = () => {
-//     const [searchParams] = useSearchParams();
-//     const orderId = searchParams.get('orderId');
-//     const [orderDetails, setOrderDetails] = useState<OrderDetails | null>(null);
-//     const [paymentSuccess] = usePaymentSuccessMutation();
-
-//     useEffect(() => {
-//         const updateOrderPaymentStatus = async () => {
-//             if (orderId) {
-//                 try {
-
-//                     const orderResponse = await paymentSuccess(orderId) as { data: OrderDetails };
-//                     console.log(orderResponse.data.order.totalPrice)
-//                     setOrderDetails(orderResponse.data);
-//                 } catch (err) {
-//                     console.error('Error updating payment status:', err);
-//                 }
-//             }
-//         };
-
-//         updateOrderPaymentStatus();
-//     }, [orderId, paymentSuccess]);
-
-//     if (!orderId) {
-//         return <p>No order ID found.</p>;
-//     }
-
-//     if (!orderDetails) {
-//         return <p>Loading order details...</p>;
-//     }
-
-//     return (
-//         <div>
-//             <h1>Payment Successful</h1>
-//             <p>Your order ID is: {orderId}</p>
-//             <p>Order Total: ${orderDetails.order.totalPrice}</p>
-//         </div>
-//     );
-// };
-
-// export default PaymentSuccess;
-
-
-
 
 
 import React from 'react';
@@ -181,11 +114,8 @@ const PaymentSuccess: React.FC = () => {
                                     />
                                     <div className="p-4 flex-grow">
                                         <h4 className="font-bold text-gray-900">{item.course.title}</h4>
-                                        <p className="text-gray-600 text-sm">
-                                            Instructor: {item.course.instructor}
-                                        </p>
                                         <p className="text-gray-800 font-semibold mt-2">
-                                            ${item.price.toFixed(2)}
+                                            ₹ {item.price.toFixed(2)}
                                         </p>
                                     </div>
                                 </div>

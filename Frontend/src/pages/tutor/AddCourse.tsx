@@ -32,8 +32,6 @@ const validationSchema: Yup.ObjectSchema<Partial<CourseFormValues>> = Yup.object
   title: Yup.string()
     .required('Course title is required')
     .min(3, 'Title must be at least 3 characters'),
-  department: Yup.string()
-    .required('Department is required'),
   duration: Yup.string()
     .required('Duration is required')
     .test('is-positive-integer', 'Duration must be a positive integer', (value) => {
@@ -80,7 +78,6 @@ const AddCourse: React.FC = () => {
 
   const initialValues: CourseFormValues = {
     title: '',
-    department: '',
     duration: '',
     description: '',
     startDate: '',
@@ -108,7 +105,11 @@ const AddCourse: React.FC = () => {
       }
 
       if (tutorData?.institutionId) {
-        formData.append('institutionId', tutorData.institutionId);
+        formData.append('institutionId', tutorData.institutionId._id);
+      }
+
+      if (tutorData?.department) {
+        formData.append('department', tutorData.department);
       }
 
 
@@ -147,208 +148,187 @@ const AddCourse: React.FC = () => {
 
   return (
     <>
-    <div className='flex'>
-      <TutorSidebar />
-      <div className='w-full'>
-      <div className="p-6 w-[800px] mx-auto">
-        <div className="flex items-center mb-6">
-          <button
-            onClick={() => navigate('/institute/courses')}
-            className="mr-4 p-2 hover:bg-gray-100 rounded-full"
-            type="button"
-          >
-            <ArrowLeft className="h-6 w-6" />
-          </button>
-          <div>
-            <h1 className="text-2xl font-bold">Add New Course</h1>
-            <p className="text-gray-500">Create a new course and add details</p>
-          </div>
-        </div>
-
-        <Formik
-          initialValues={initialValues}
-          validationSchema={validationSchema}
-          onSubmit={handleSubmit}
-        >
-          {({ isSubmitting, setFieldValue, errors, touched }) => (
-            <Form className="space-y-8">
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">
-                  Course Thumbnail
-                </label>
-                <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg">
-                  {previewUrl ? (
-                    <div className="relative">
-                      <img
-                        src={previewUrl}
-                        alt="Preview"
-                        className="h-48 w-96 object-cover rounded-lg"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => removeImage(setFieldValue)}
-                        className="absolute top-2 right-2 p-1 bg-white rounded-full shadow-md hover:bg-gray-100"
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="space-y-1 text-center">
-                      <Upload className="mx-auto h-12 w-12 text-gray-400" />
-                      <div className="flex text-sm text-gray-600">
-                        <label className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500">
-                          <span>Upload a file</span>
-                          <input
-                            type="file"
-                            name="thumbnail"
-                            className="sr-only"
-                            accept="image/*"
-                            onChange={(event) => handleImageChange(setFieldValue, event)}
-                          />
-                        </label>
-                      </div>
-                    </div>
-                  )}
-                </div>
-                {touched.thumbnail && errors.thumbnail && (
-                  <ErrorText>{errors.thumbnail as string}</ErrorText>
-                )}
+      <div className='flex'>
+        <TutorSidebar />
+        <div className='w-full'>
+          <div className="p-6 w-[800px] mx-auto">
+            <div className="flex items-center mb-6">
+              <button
+                onClick={() => navigate('/institute/courses')}
+                className="mr-4 p-2 hover:bg-gray-100 rounded-full"
+                type="button"
+              >
+                <ArrowLeft className="h-6 w-6" />
+              </button>
+              <div>
+                <h1 className="text-2xl font-bold">Add New Course</h1>
+                <p className="text-gray-500">Create a new course and add details</p>
               </div>
+            </div>
 
-              <div className="bg-white p-6 rounded-lg border border-gray-200">
-                <h2 className="text-lg font-semibold mb-4">Basic Information</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Course Title
+            <Formik
+              initialValues={initialValues}
+              validationSchema={validationSchema}
+              onSubmit={handleSubmit}
+            >
+              {({ isSubmitting, setFieldValue, errors, touched }) => (
+                <Form className="space-y-8">
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Course Thumbnail
                     </label>
-                    <Field
-                      type="text"
-                      name="title"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="Enter course title"
-                    />
-                    {touched.title && errors.title && (
-                      <ErrorText>{errors.title as string}</ErrorText>
+                    <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg">
+                      {previewUrl ? (
+                        <div className="relative">
+                          <img
+                            src={previewUrl}
+                            alt="Preview"
+                            className="h-48 w-96 object-cover rounded-lg"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removeImage(setFieldValue)}
+                            className="absolute top-2 right-2 p-1 bg-white rounded-full shadow-md hover:bg-gray-100"
+                          >
+                            <X className="h-4 w-4" />
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="space-y-1 text-center">
+                          <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                          <div className="flex text-sm text-gray-600">
+                            <label className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500">
+                              <span>Upload a file</span>
+                              <input
+                                type="file"
+                                name="thumbnail"
+                                className="sr-only"
+                                accept="image/*"
+                                onChange={(event) => handleImageChange(setFieldValue, event)}
+                              />
+                            </label>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    {touched.thumbnail && errors.thumbnail && (
+                      <ErrorText>{errors.thumbnail as string}</ErrorText>
                     )}
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Department
-                    </label>
-                    <Field
-                      as="select"
-                      name="department"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      <option value="">Select Department</option>
-                      <option value="computer-science">Computer Science</option>
-                      <option value="mathematics">Mathematics</option>
-                      <option value="business">Business</option>
-                      <option value="hotel-management">Hotel Management</option>
-                    </Field>
-                    {touched.department && errors.department && (
-                      <ErrorText>{errors.department as string}</ErrorText>
-                    )}
-                  </div>
+                  <div className="bg-white p-6 rounded-lg border border-gray-200">
+                    <h2 className="text-lg font-semibold mb-4">Basic Information</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Course Title
+                        </label>
+                        <Field
+                          type="text"
+                          name="title"
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="Enter course title"
+                        />
+                        {touched.title && errors.title && (
+                          <ErrorText>{errors.title as string}</ErrorText>
+                        )}
+                      </div>
 
-                  <div>
-                    <label
-                      htmlFor="duration"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      Duration (weeks)
-                    </label>
-                    <Field
-                      id="duration"
-                      type="number"
-                      name="duration"
-                      placeholder="Enter duration in weeks"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg 
+                      <div>
+                        <label
+                          htmlFor="duration"
+                          className="block text-sm font-medium text-gray-700 mb-1"
+                        >
+                          Duration (weeks)
+                        </label>
+                        <Field
+                          id="duration"
+                          type="number"
+                          name="duration"
+                          placeholder="Enter duration in weeks"
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg 
                  focus:outline-none focus:ring-2 focus:ring-blue-500 
                  focus:border-transparent
                  [appearance:textfield] 
                  [&::-webkit-outer-spin-button]:appearance-none 
                  [&::-webkit-inner-spin-button]:appearance-none"
-                    />
-                    {touched.duration && errors.duration && (
-                      <p className="mt-1 text-sm text-red-600">
-                        {errors.duration}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white p-6 rounded-lg border border-gray-200">
-                <h2 className="text-lg font-semibold mb-4">Additional Details</h2>
-                <div className="space-y-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Course Description
-                    </label>
-                    <Field
-                      as="textarea"
-                      name="description"
-                      rows={4}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="Enter course description"
-                    />
-                    {touched.description && errors.description && (
-                      <ErrorText>{errors.description as string}</ErrorText>
-                    )}
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Start Date
-                      </label>
-                      <Field
-                        type="date"
-                        name="startDate"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      />
-                      {touched.startDate && errors.startDate && (
-                        <ErrorText>{errors.startDate as string}</ErrorText>
-                      )}
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Course Fee
-                      </label>
-                      <Field
-                        type="number"
-                        name="price"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="Enter course fee"
-                      />
-                      {touched.price && errors.price && (
-                        <ErrorText>{errors.price as string}</ErrorText>
-                      )}
+                        />
+                        {touched.duration && errors.duration && (
+                          <p className="mt-1 text-sm text-red-600">
+                            {errors.duration}
+                          </p>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              </div>
 
-              <div className="flex justify-end space-x-4">
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
-                >
-                  {isSubmitting ? 'Creating...' : 'Create Course'}
-                </button>
-              </div>
-            </Form>
-          )}
-        </Formik>
+                  <div className="bg-white p-6 rounded-lg border border-gray-200">
+                    <h2 className="text-lg font-semibold mb-4">Additional Details</h2>
+                    <div className="space-y-6">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Course Description
+                        </label>
+                        <Field
+                          as="textarea"
+                          name="description"
+                          rows={4}
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="Enter course description"
+                        />
+                        {touched.description && errors.description && (
+                          <ErrorText>{errors.description as string}</ErrorText>
+                        )}
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Start Date
+                          </label>
+                          <Field
+                            type="date"
+                            name="startDate"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          />
+                          {touched.startDate && errors.startDate && (
+                            <ErrorText>{errors.startDate as string}</ErrorText>
+                          )}
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Course Fee
+                          </label>
+                          <Field
+                            type="number"
+                            name="price"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            placeholder="Enter course fee"
+                          />
+                          {touched.price && errors.price && (
+                            <ErrorText>{errors.price as string}</ErrorText>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end space-x-4">
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+                    >
+                      {isSubmitting ? 'Creating...' : 'Create Course'}
+                    </button>
+                  </div>
+                </Form>
+              )}
+            </Formik>
+          </div>
+        </div>
       </div>
-      <InstituteFooter/>
-      </div>
-    </div>
     </>
   );
 };

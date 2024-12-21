@@ -33,7 +33,7 @@ const questionSchema = new Schema({
   status: {
     type: String,
     enum: ['draft', 'published'],
-    default: 'draft'
+    default: 'published'
   },
 }, { timestamps: true });
 
@@ -109,7 +109,7 @@ const quizSchema = new Schema({
   status: {
     type: String,
     enum: ['draft', 'published'],
-    default: 'draft',
+    default: 'publishec',
     required: true
   },
   totalQuestions: {

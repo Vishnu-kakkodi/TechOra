@@ -8,7 +8,7 @@ import { useGetDepartmentQuery } from '../../store/slices/institutionSlice';
 
 const DepartmentList: React.FC = () => {
     const [page, setPage] = useState(1);
-    const [limit, setLimit] = useState(8);
+    const [limit, setLimit] = useState(5);
     const [search, setSearch] = useState("");
     const debouncedSearchTerm = useDebouncedValue(search, 500);
 
@@ -57,7 +57,6 @@ const DepartmentList: React.FC = () => {
 
   return (
 <>
-<Navbar/>
 <div className='flex'>
 <InstituteSidebar/>
     <div className="container mx-auto px-4 py-8">
@@ -92,9 +91,6 @@ const DepartmentList: React.FC = () => {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Total Tutors
               </th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Actions
-              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
@@ -110,15 +106,6 @@ const DepartmentList: React.FC = () => {
                     <Users className="w-5 h-5 mr-2 text-gray-400" />
                     {department.tutorCount}
                   </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right">
-                  <button 
-                    onClick={() => handleEditDepartment(department.id)}
-                    className="text-gray-600 hover:text-blue-600 transition-colors"
-                    title="Edit Department"
-                  >
-                    <Edit className="w-5 h-5" />
-                  </button>
                 </td>
               </tr>
             ))}

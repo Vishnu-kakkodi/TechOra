@@ -3,9 +3,9 @@ import React, { useState, useEffect } from 'react';
 import { Check, X, Building2, Mail, HashIcon, Globe, MapPin, Flag, AlertCircle } from 'lucide-react';
 import { useInstituteApproveMutation, useInstituteBlockMutation, useInstituteListQuery, useInstituteRejectMutation, useInstituteUnBlockMutation, useInstituteViewQuery } from '../../store/slices/adminSlice';
 import { useParams } from 'react-router-dom';
-import { InstituteDocument } from '../../../../Backend/src/interfaces/institute.interface';
 import { toast } from 'react-toastify';
 import Swal from 'sweetalert2';
+import { InstituteDocument } from '../../types/Institute/InstituteDocument';
 
 const InstitutionDetail = () => {
   const [status, setStatus] = useState('pending');

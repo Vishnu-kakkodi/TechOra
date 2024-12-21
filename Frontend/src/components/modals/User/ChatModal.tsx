@@ -1,9 +1,13 @@
+
+
+
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { Send, X } from "lucide-react";
+import { Send, X, Check  } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSocket } from "../../../useSocket";
 import notificationSound from "../../../assets/frontEnd/notification_sound.mp3";
 import { toast } from "react-toastify";
+import EmojiPicker from "emoji-picker-react"; // Import EmojiPicker
 
 /**
  * Message Interface
@@ -25,7 +29,11 @@ interface ChatModalProps {
   token?: string;
   senderId?: string;
   receiverId?: string | null;
+  receiverName?: string;
+  receiverProfilePhoto?: string;
   currentUserType: "user" | "tutor";
+  sendDataToParent: (data: { message: string; timestamp: number }) => void;
+
 }
 
 const ChatModal: React.FC<ChatModalProps> = ({
@@ -34,13 +42,25 @@ const ChatModal: React.FC<ChatModalProps> = ({
   token,
   senderId,
   receiverId,
+  receiverName,
+  receiverProfilePhoto,
   currentUserType,
+  sendDataToParent
 }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState<string>("");
+  const [isDarkTheme, setIsDarkTheme] = useState<boolean>(false);
+  const [isOnline, setIsOnline] = useState<boolean>(true);
   const [isFetchingOlderMessages, setIsFetchingOlderMessages] = useState(false);
+  const [isEmojiPickerVisible, setIsEmojiPickerVisible] = useState(false);
 
   const chatContainerRef = useRef<HTMLDivElement | null>(null);
+
+  const handlePresenceUpdate = useCallback((users: {[key: string]: boolean}) => {
+    if (receiverId && users[receiverId] !== undefined) {
+      setIsOnline(users[receiverId]);
+    }
+  }, [receiverId]);
 
   const handleNotification = useCallback((message: any) => {
     new Notification("New Message", {
@@ -51,7 +71,7 @@ const ChatModal: React.FC<ChatModalProps> = ({
     audio.play();
   }, []);
 
-  const { sendMessage, isConnected, fetchChatHistory } = useSocket({
+  const { sendMessage, isConnected, fetchChatHistory, markMessagesAsRead, onlineStatus } = useSocket({
     token,
     senderId,
     receiverId,
@@ -65,6 +85,7 @@ const ChatModal: React.FC<ChatModalProps> = ({
     onChatHistoryFetch: (fetchedMessages) => {
       setMessages(fetchedMessages);
     },
+    onPresenceUpdate: handlePresenceUpdate
   });
 
   useEffect(() => {
@@ -73,22 +94,24 @@ const ChatModal: React.FC<ChatModalProps> = ({
     }
   }, [isOpen, fetchChatHistory]);
 
+  useEffect(() => {
+    if (receiverId && onlineStatus[receiverId] !== undefined) {
+      setIsOnline(onlineStatus[receiverId]);
+    }
+  }, [receiverId, onlineStatus]);
+
   const fetchOlderMessages = useCallback(async () => {
     setIsFetchingOlderMessages(true);
     try {
-      // Simulate an API call for older messages
       const olderMessages: Message[] = await new Promise((resolve) =>
         setTimeout(() =>
-          resolve([
-            {
-              id: `msg_${Date.now() - 10000}`,
-              text: "This is an older message",
-              sender: currentUserType,
-              timestamp: Date.now() - 10000,
-              status: "sent",
-            },
-          ]),
-          1000
+          resolve([{
+            id: `msg_${Date.now() - 10000}`,
+            text: "This is an older message",
+            sender: currentUserType,
+            timestamp: Date.now() - 10000,
+            status: "sent",
+          }]), 1000
         )
       );
       setMessages((prev) => [...olderMessages, ...prev]);
@@ -102,8 +125,9 @@ const ChatModal: React.FC<ChatModalProps> = ({
   const handleScroll = useCallback(() => {
     if (chatContainerRef.current && chatContainerRef.current.scrollTop === 0) {
       fetchOlderMessages();
+      markMessagesAsRead();
     }
-  }, [fetchOlderMessages]);
+  }, [fetchOlderMessages,markMessagesAsRead]);
 
   useEffect(() => {
     const container = chatContainerRef.current;
@@ -137,6 +161,10 @@ const ChatModal: React.FC<ChatModalProps> = ({
         senderId,
         receiverId,
       });
+      sendDataToParent({
+        message: trimmedMessage,
+        timestamp: message.timestamp
+      });
       setNewMessage("");
     } catch (error) {
       setMessages((prev) =>
@@ -166,6 +194,19 @@ const ChatModal: React.FC<ChatModalProps> = ({
     }
   };
 
+  const handleEmojiClick = (emojiObject: any) => {
+    setNewMessage((prevMessage) => prevMessage + emojiObject.emoji);
+    setIsEmojiPickerVisible(false);
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      console.log("Selected file:", file.name);
+    }
+  };
+
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -174,10 +215,26 @@ const ChatModal: React.FC<ChatModalProps> = ({
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -20, scale: 0.95 }}
           transition={{ duration: 0.2 }}
-          className="fixed top-24 right-6 w-96 bg-gradient-to-br from-indigo-50 to-purple-100 rounded-2xl shadow-2xl border-2 border-white/50 overflow-hidden z-50"
+          className={`fixed top-24 right-6 w-96 rounded-2xl shadow-2xl border-2 border-white/50 overflow-hidden z-50 ${isDarkTheme ? "bg-gray-900 text-gray-200" : "bg-gradient-to-br from-indigo-50 to-purple-100"
+            }`}
         >
           <div className="bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white p-4 flex justify-between items-center">
-            <h3 className="font-bold text-lg drop-shadow-md">Live Chat Support</h3>
+            <div className="flex items-center gap-4">
+              <img
+                src={receiverProfilePhoto}
+                alt="Receiver Profile"
+                className="w-10 h-10 rounded-full border-2 border-white shadow-lg"
+              />
+              <div>
+                <h3 className="font-bold text-lg drop-shadow-md">{receiverName}</h3>
+                <span
+                  className={`text-sm ${isOnline ? "text-green-300" : "text-red-300"
+                    } drop-shadow-sm`}
+                >
+                  {isOnline ? "Online" : "Offline"}
+                </span>
+              </div>
+            </div>
             <button
               onClick={onClose}
               className="text-white/80 hover:text-white transition-all duration-300 transform hover:rotate-90"
@@ -185,6 +242,7 @@ const ChatModal: React.FC<ChatModalProps> = ({
               <X className="w-6 h-6" />
             </button>
           </div>
+
 
           <div
             ref={chatContainerRef}
@@ -217,8 +275,8 @@ const ChatModal: React.FC<ChatModalProps> = ({
                 >
                   <div
                     className={`relative max-w-[80%] p-3 rounded-2xl shadow-lg ${isSender
-                        ? "bg-gradient-to-br from-blue-600 to-purple-700 text-white"
-                        : "bg-gray-100 text-gray-800"
+                      ? "bg-gradient-to-br from-blue-600 to-purple-700 text-white"
+                      : "bg-gray-100 text-gray-800"
                       } ${message.status === "failed" ? "border-2 border-red-500" : ""}`}
                   >
                     <p>{message.text}</p>
@@ -244,15 +302,43 @@ const ChatModal: React.FC<ChatModalProps> = ({
             onSubmit={handleSubmit}
             className="p-4 bg-white/30 backdrop-blur-sm"
           >
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                placeholder="Type your message..."
-                disabled={!isConnected}
-                className="flex-1 p-3 bg-white/70 border-2 border-purple-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300 disabled:opacity-50"
-              />
+            <div className="relative flex items-center gap-2">
+              {/* Emoji Picker Button */}
+              <button
+                type="button"
+                onClick={() => setIsEmojiPickerVisible(!isEmojiPickerVisible)}
+                className="p-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-xl hover:from-purple-700 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 active:scale-95"
+              >
+                😊
+              </button>
+
+              {/* Input Container with File Button */}
+              <div className="relative flex-1">
+                {/* Text Input */}
+                <input
+                  type="text"
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                  placeholder="Type your message..."
+                  disabled={!isConnected}
+                  className="w-full p-3 pl-10 pr-10 bg-white/70 border-2 border-purple-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300 disabled:opacity-50"
+                />
+
+                {/* File Upload Button Inside the Input */}
+                <label
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 cursor-pointer hover:text-purple-500 transition-all duration-300"
+                >
+                  📎
+                  <input
+                    type="file"
+                    onChange={handleFileUpload} // Add your file upload handler here
+                    className="hidden"
+                    disabled={!isConnected}
+                  />
+                </label>
+              </div>
+
+              {/* Send Button */}
               <button
                 type="submit"
                 disabled={!isConnected || !newMessage.trim()}
@@ -262,12 +348,22 @@ const ChatModal: React.FC<ChatModalProps> = ({
               </button>
             </div>
 
+            {/* Disconnection Message */}
             {!isConnected && (
               <p className="text-red-500 text-xs mt-2">
                 Disconnected. Please check your connection.
               </p>
             )}
           </form>
+
+
+
+          {/* Show Emoji Picker */}
+          {isEmojiPickerVisible && (
+            <div className="absolute bottom-16 left-4 z-50">
+              <EmojiPicker onEmojiClick={handleEmojiClick} />
+            </div>
+          )}
         </motion.div>
       )}
     </AnimatePresence>
@@ -275,3 +371,10 @@ const ChatModal: React.FC<ChatModalProps> = ({
 };
 
 export default ChatModal;
+
+
+
+
+
+
+

@@ -93,8 +93,6 @@ export class TutorRepository extends BaseRepository<TutorDocument> {
             [filterKey]: id,
             ...searchQuery,
           };
-
-          console.log(filter,"Filter");
           
           const departmentCounts = await this.model.aggregate([
             { 

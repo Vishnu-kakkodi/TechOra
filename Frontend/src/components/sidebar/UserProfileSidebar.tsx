@@ -28,7 +28,7 @@ const UserAccountSidebar: React.FC = () => {
     };
 
     return (
-            <div className="h-screen w-[400px] bg-gray-900 shadow-lg">
+            <div className="h-[600px] w-[400px] bg-gray-900 shadow-lg m-5 ">
                 <div className="p-6">
                     <div className="mb-8 text-center">
                         <div className='flex justify-center items-center space-x-[30px]'>
@@ -37,7 +37,7 @@ const UserAccountSidebar: React.FC = () => {
                                 src={userdata?.profilePhoto}
                                 alt="profile"
                             />
-                            <h2 className="text-xl font-semibold text-white">Vishnu</h2>
+                            <h2 className="text-xl font-semibold text-white">{userdata?.userName}</h2>
                         </div>
                     </div>
 
@@ -73,13 +73,6 @@ const UserAccountSidebar: React.FC = () => {
                                 Financial
                             </div>
                             <button
-                                onClick={() => handleNavigate('/account/wallet')}
-                                className="flex items-center space-x-3 text-gray-300 hover:text-white p-2 rounded-md w-full"
-                            >
-                                <Wallet className="w-5 h-5" />
-                                <span>Wallet</span>
-                            </button>
-                            <button
                                 onClick={() => handleNavigate('/account/orders')}
                                 className="flex items-center space-x-3 text-gray-300 hover:text-white p-2 rounded-md w-full"
                             >
@@ -98,16 +91,6 @@ const UserAccountSidebar: React.FC = () => {
                             >
                                 <BookOpen className="w-5 h-5" />
                                 <span>Course List</span>
-                            </button>
-                        </div>
-
-                        <div className="pt-4 border-t">
-                            <button
-                                onClick={handleLogout}
-                                className="flex items-center space-x-3 text-red-600 hover:bg-red-50 p-2 rounded-md w-full"
-                            >
-                                <LogOut className="w-5 h-5" />
-                                <span>Logout</span>
                             </button>
                         </div>
                     </div>

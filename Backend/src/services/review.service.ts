@@ -13,9 +13,13 @@ import { ReviewDocument } from "../interfaces/review.interface";
 
 export class ReviewService {
     private reviewRepository: ReviewRepository;
+    private courseRepository: CourseRepository;
 
-    constructor(reviewRepository: ReviewRepository) {
+
+    constructor(reviewRepository: ReviewRepository, courseRepository: CourseRepository) {
         this.reviewRepository = reviewRepository;
+        this.courseRepository = courseRepository;
+
     }
 
     async createReview(rating: number, comment: string, userId: string, courseId: string): Promise<void> {
@@ -24,7 +28,7 @@ export class ReviewService {
             const courseID = new mongoose.Types.ObjectId(courseId);
 
             let reviewDoc = await this.reviewRepository.findOne(courseID);
-
+            const course = await this.courseRepository.findById(courseId)
             if (reviewDoc) {
                 reviewDoc.userReviews.push({
                     userId: userID,
@@ -35,6 +39,11 @@ export class ReviewService {
                 const totalRatings = reviewDoc.userReviews.reduce((acc: any, review: any) => acc + review.rating, 0);
                 reviewDoc.averageRating = totalRatings / reviewDoc.userReviews.length;
 
+                if(course){
+                    course.averageRating = totalRatings / reviewDoc.userReviews.length;
+                    course.totalReviews = reviewDoc.userReviews.length;
+                    await course.save();
+                }
                 await reviewDoc.save();
             } else {
                 const reviewData = {
@@ -48,6 +57,12 @@ export class ReviewService {
                     ],
                     averageRating: rating,
                 };
+
+                if(course){
+                    course.averageRating = rating;
+                    course.totalReviews = 1;
+                    await course.save();
+                }
 
                 await this.reviewRepository.create(reviewData);
             }

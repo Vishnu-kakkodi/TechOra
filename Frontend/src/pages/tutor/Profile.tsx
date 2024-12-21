@@ -296,6 +296,7 @@ const Profile = () => {
                 {isEditing ? (
                   <input 
                     name="department"
+                    disabled
                     value={tutorDetails.department}
                     onChange={handleInputChange}
                     placeholder="Your department"

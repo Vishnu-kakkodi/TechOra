@@ -335,7 +335,6 @@ const EditQuiz: React.FC = () => {
                         >
                           <option value="multiple-choice">Multiple Choice</option>
                           <option value="true-false">True/False</option>
-                          <option value="short-answer">Short Answer</option>
                         </Field>
                         <button
                           type="button"

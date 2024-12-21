@@ -4,9 +4,10 @@ import { CourseDocument } from "./course.interface";
 import { IUserDocument } from "./user.interface";
 
 export interface Review extends BaseInterface {
-  courseId: Types.ObjectId
+  id:string;
+  courseId: Types.ObjectId;
   userReviews: {
-    userId: Types.ObjectId
+    userId: Types.ObjectId;
     comment: string;
     rating: number;
     createdAt?: Date;

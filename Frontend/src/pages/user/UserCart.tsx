@@ -67,8 +67,6 @@ const UserCart: React.FC<UserCartProps> = ({ onRemoveItem, onCheckout }) => {
       price: item.price
   }));
 
-  console.log(orderItems)
-
   const orderDetails = {
     orderItems,
     total

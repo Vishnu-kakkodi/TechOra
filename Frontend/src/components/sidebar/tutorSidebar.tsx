@@ -29,14 +29,6 @@ const TutorSidebar: React.FC = () => {
   const [tutorLogoutCall] = useTutorLogoutCallMutation();
   const { data: course, error } = useDraftCourseListQuery(null);
 
-  const handleDraft = async () => {
-    if (course) {
-      console.log("User list fetched successfully:", course);
-      navigate('/tutor/course-drafts');
-    } else if (error) {
-      console.error("Error fetching course list:");
-    }
-  }
 
   const handleNavigate = (path: string) => {
     navigate(path);
@@ -86,7 +78,7 @@ const TutorSidebar: React.FC = () => {
               <span>Add Course</span>
             </button>
             <button
-              onClick={() => handleDraft()}
+              onClick={() => handleNavigate('/tutor/course-drafts')}
               className="flex items-center space-x-2 text-gray-300 hover:text-white w-full"
             >
               <FileEdit className="w-5 h-5" />

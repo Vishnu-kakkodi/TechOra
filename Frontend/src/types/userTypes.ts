@@ -1,5 +1,5 @@
 import { Document, Types } from "mongoose";
-import { IUserDocument } from "../../../Backend/src/interfaces/user.interface";
+import { InstituteDocument } from "./Institute/InstituteDocument";
 
 export interface Review {
   courseId: Types.ObjectId
@@ -13,9 +13,6 @@ export interface Review {
 }
 
 export type ReviewDocument = Review & Document;
-
-
-import { InstituteDocument } from "../../../Backend/src/interfaces/institute.interface";
 
 export interface User{
     _id:string | null;

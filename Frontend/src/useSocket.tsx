@@ -8,8 +8,9 @@
     sender: "user" | "tutor";
     timestamp: number;
     status?: "sending" | "sent" | "failed";
+    isRead?: boolean;
+    isDelivered?: boolean;
   }
-  
   interface UseSocketProps {
     token?: string;
     senderId?: string;
@@ -17,22 +18,22 @@
     onMessageReceive: (message: any) => void;
     onNewMessageNotification?: (message: any) => void;
     onChatHistoryFetch?: (messages: Message[]) => void;
+    onPresenceUpdate?: (users: { [key: string]: boolean }) => void; 
   }
-  
   export const useSocket = ({   
     token, 
     senderId, 
     receiverId, 
     onMessageReceive,
     onNewMessageNotification,
-    onChatHistoryFetch
+    onChatHistoryFetch,
+    onPresenceUpdate
   }: UseSocketProps) => {
     const [socket, setSocket] = useState<Socket | null>(null);
     const [isConnected, setIsConnected] = useState(false);
     const [currentRoomId, setCurrentRoomId] = useState<string | null>(null);
+    const [onlineStatus, setOnlineStatus] = useState<{[key: string]: boolean}>({});
     const socketRef = useRef<Socket | null>(null);
-  
-    // Memoized function for fetching chat history
     const fetchChatHistory = useCallback(() => {
       if (socket && receiverId) {
         socket.emit('fetch_chat_history', receiverId, (response: any) => {
@@ -42,10 +43,10 @@
               text: msg.content,
               sender: msg.currentUserType,
               timestamp: new Date(msg.timestamp).getTime(),
+
               status: "sent"
             }));
   
-            // Call the callback if provided
             if (onChatHistoryFetch) {
               onChatHistoryFetch(formattedMessages);
             }
@@ -55,8 +56,11 @@
         });
       }
     }, [socket, receiverId, senderId, onChatHistoryFetch]);
-  
-    // Handle socket connection and fetch chat history on initial render
+    const markMessagesAsRead = useCallback(() => {
+      if (socket && receiverId) {
+        socket.emit('mark_messages_read', receiverId);
+      }
+    }, [socket, receiverId]); 
     useEffect(() => {
       if (!token || !senderId || !receiverId) return;
   
@@ -64,29 +68,35 @@
         auth: { token },
         transports: ['websocket', 'polling']
       });
-  
       socketRef.current = newSocket;
-  
       newSocket.on('connect', () => {
         const roomId = [senderId, receiverId].sort().join('_');
         newSocket.emit('join_chat', receiverId);
         setCurrentRoomId(roomId);
         setIsConnected(true);
   
-        // Fetch chat history only once after connection
         fetchChatHistory();
       });
-  
+      newSocket.on('presence_update', ({ roomId, users }) => {
+        setOnlineStatus(prev => ({
+          ...prev,
+          ...users
+        }));
+        if (onPresenceUpdate) {
+          onPresenceUpdate(users);
+        }
+      });
       newSocket.on('receive_message', (message) => {
         onMessageReceive(message);
         if (onNewMessageNotification) {
           onNewMessageNotification(message);
         }
       });
-  
       setSocket(newSocket);
-  
       return () => {
+        if (receiverId) {
+          newSocket.emit('leave_chat', receiverId);
+        }
         newSocket.disconnect();
       };
     }, [token, senderId, receiverId]);
@@ -106,7 +116,9 @@
     return { 
       sendMessage, 
       isConnected,
-      fetchChatHistory
+      fetchChatHistory,
+      markMessagesAsRead,
+      onlineStatus
     };
   };
   

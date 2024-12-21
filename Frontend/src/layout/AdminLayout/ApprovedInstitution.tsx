@@ -7,9 +7,9 @@ import {
     Building2
 } from 'lucide-react';
 import { useInstituteListQuery, useDocumentDownloadMutation } from '../../store/slices/adminSlice';
-import { InstituteDocument } from '../../../../Backend/src/interfaces/institute.interface';
 import { useNavigate } from 'react-router-dom';
 import useDebouncedValue from '../../hooks/debounceHook';
+import { InstituteDocument } from '../../types/Institute/InstituteDocument';
 
 const ApprovedInstitution = () => {
     const navigate = useNavigate();

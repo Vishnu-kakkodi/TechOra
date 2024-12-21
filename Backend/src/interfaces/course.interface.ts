@@ -35,12 +35,15 @@ export interface Course extends BaseInterface {
     price: number;
     status: 'draft' | 'published';
     thumbnail?: string;
+    enrolledStudents: number;
     institutionId: Types.ObjectId | string;
     reviewId: Types.ObjectId | string;
     modules: Module[];
     totalModules: number;
     totalDuration: number;
     isListed:boolean;
+    averageRating: number;
+    totalReviews: number;
 }
 
 export type CourseDocument = Course & Document;

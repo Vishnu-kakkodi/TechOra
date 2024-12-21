@@ -4,20 +4,6 @@ import { ChevronDown } from 'lucide-react';
 const Topbar = () => {
 
 
-  // Close dropdown when clicking outside
-  // useEffect(() => {
-  //   const handleClickOutside = (event) => {
-  //     if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-  //       setIsDropdownOpen(false);
-  //     }
-  //   };
-
-  //   document.addEventListener('mousedown', handleClickOutside);
-  //   return () => {
-  //     document.removeEventListener('mousedown', handleClickOutside);
-  //   };
-  // }, []);
-
   const sortOptions = [
     { label: 'Newest', value: 'newest' },
     { label: 'Oldest', value: 'oldest' },

@@ -64,7 +64,7 @@ const CourseList = () => {
   const handleView = (courseId: string) => {
     if (course) {
       console.log("User list fetched successfully:", course);
-      navigate('/tutor/courses-view', { state: { courseId: courseId } });
+      navigate(`/tutor/course-view/${courseId}`, { state: { courseId: courseId } });
     } else {
       console.error("Error fetching course list:");
     }
@@ -161,106 +161,101 @@ const CourseList = () => {
         </div> */}
             </div>
 
-            {course.length === 0 && (
-              <div className="col-span-full flex flex-col items-center justify-center m-7 py-12 text-center">
-                <h2 className="text-2xl font-semibold text-gray-600 mb-2">
-                  No Courses Found
-                </h2>
-                <p className="text-gray-500 mb-4">
-                  {search
-                    ? `No courses match "${search}"`
-                    : "You haven't added any courses yet"
-                  }
-                </p>
-                <h2 className="text-2xl font-semibold text-gray-600 mb-2">
-                  Search correct course
-                </h2>
-              </div>
-            )}
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {course.map((course: any) => (
-                <div
-                  key={course._id}
-                  className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow duration-300"
-                >
-                  <img
-                    src={course.thumbnail}
-                    alt={course.title}
-                    className="w-full h-48 object-cover"
-                  />
-                  <div className="p-4">
-                    <div className="flex justify-between items-start mb-4">
-                      <div>
-                        <h3 className="text-lg font-semibold">{course.title}</h3>
-                        <p className="text-gray-500 text-sm">{course.department}</p>
-                      </div>
-                      <div className="relative">
-                        <button
-                          onClick={() => toggleDropdown(course._id)}
-                          className="p-1 hover:bg-gray-100 rounded-full"
-                        >
-                          <MoreVertical className="h-5 w-5 text-gray-500" />
-                        </button>
-
-                        {activeDropdowns[course._id] && (
-                          <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-10">
-                            <div className="py-1">
-                              <Link to={`/tutor/course-view/${course._id}`}>
-                                <button
-                                  className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                >
-                                  <Eye className="mr-2 h-4 w-4" />
-                                  View
-                                </button>
-                              </Link>
-                              <button
-                                onClick={() => handleEdit(course._id)}
-                                className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                              >
-                                <Edit2 className="mr-2 h-4 w-4" />
-                                Edit
-                              </button>
-                              <div className="border-t border-gray-200" />
-                              <button
-                                onClick={() => handleDelete(course._id)}
-                                className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
-                              >
-                                <Trash2 className="mr-2 h-4 w-4" />
-                                List/Unlist
-                              </button>
-                            </div>
+{course.length > 0 ? (
+            <div className="bg-white shadow overflow-hidden sm:rounded-lg">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Course</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Instructor</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Duration</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">View</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Edit</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">List?Unlist</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {course.map((courseItem: any) => (
+                    <tr key={courseItem._id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <div className="flex-shrink-0 h-10 w-10">
+                            <img 
+                              className="h-10 w-10 rounded-md object-cover" 
+                              src={courseItem.thumbnail} 
+                              alt={courseItem.title} 
+                            />
                           </div>
-                        )}
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span className="text-gray-500">Instructor</span>
-                        <span className="font-medium">{course.instructor}</span>
-                      </div>
-                      <div className="flex justify-between text-sm">
-                        <span className="text-gray-500">Duration</span>
-                        <span className="font-medium">{course.duration} Weeks</span>
-                      </div>
-                      <div className="flex justify-between text-sm">
-                        <span className="text-gray-500">Enrolled</span>
-                        <span className="font-medium">{course.enrolled} Students</span>
-                      </div>
-                      <div className="flex justify-between text-sm items-center">
-                        <span className="text-gray-500">Status</span>
-                        <span className={`px-2 py-1 rounded-full text-xs ${course.status === 'published'
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-red-100 text-red-800'
-                          }`}>
-                          {course.status}
+                          <div className="ml-4">
+                            <div className="text-sm font-medium text-gray-900">{courseItem.title}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {courseItem.tutorId.tutorname}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {courseItem.department}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {courseItem.duration} Weeks
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                          courseItem.status === 'published' 
+                            ? 'bg-green-100 text-green-800' 
+                            : 'bg-red-100 text-red-800'
+                        }`}>
+                          {courseItem.status}
                         </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                          <button 
+                            onClick={() => handleView(courseItem._id)}
+                            className="text-blue-600 hover:text-blue-900 flex items-center"
+                          >
+                            <Eye className="h-4 w-4 mr-1" /> View
+                          </button>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                          <button 
+                            onClick={() => handleEdit(courseItem._id)}
+                            className="text-green-600 hover:text-green-900 flex items-center"
+                          >
+                            <Edit2 className="h-4 w-4 mr-1" /> Edit
+                          </button>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                          <button 
+                            onClick={() => handleDelete(courseItem._id)}
+                            className="text-red-600 hover:text-red-900 flex items-center"
+                          >
+                            <Trash2 className="h-4 w-4 mr-1" /> Unlist
+                          </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
+          ) : (
+            <div className="text-center py-10">
+              <p className="text-gray-500">
+                {search 
+                  ? `No courses match "${search}"` 
+                  : "You haven't added any courses yet"
+                }
+              </p>
+              <button 
+                onClick={() => navigate('/tutor/course-add')}
+                className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              >
+                Create New Course
+              </button>
+            </div>
+          )}
           </div>
           <div className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6 mt-4">
             <div className="flex flex-1 justify-between sm:hidden">
@@ -315,7 +310,6 @@ const CourseList = () => {
             </div>
           </div>
         </div>
-        <InstituteFooter />
       </div>
     </div>
   );
