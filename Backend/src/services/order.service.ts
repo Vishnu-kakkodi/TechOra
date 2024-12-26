@@ -30,9 +30,10 @@ export class OrderService {
         }
     }
 
-    async createOrder(userId: string, orderItems: Array<{ courseId: string, price: number }>, total: number) {
+    async createOrder(orderId: string, userId: string, orderItems: Array<{ courseId: string, price: number }>, total: number) {
         try {
             return this.orderRepository.create({
+                orderId,
                 userId: new mongoose.Types.ObjectId(userId),
                 items: orderItems.map(item => ({
                     course: new mongoose.Types.ObjectId(item.courseId),
@@ -65,20 +66,57 @@ export class OrderService {
             if (courseIds && courseIds.length > 0) {
                 await this.courseRepository.incrementEnrolledStudents(courseIds);
             }
-             return updatedOrder;
+            return updatedOrder;
         } catch (error) {
             console.log(error, "Error updating payment");
             throw new HttpException(STATUS_CODES.SERVER_ERROR, MESSAGES.ERROR.SERVER_ERROR)
         }
     }
 
-    async orderList(userId: string): Promise<OrderDocument[] | null> {
+    async orderList(userId: string, page: number, limit: number, search: string, status: string, sort: string): Promise<{orders: OrderDocument[] | null; total: number}> {
         try {
-            const order = await this.orderRepository.find(userId)
-            return order;
+            const skip = (page - 1) * limit;
+            let query: any = {};
+            let sortOptions: any = {};
+            const id = new mongoose.Types.ObjectId(userId)
+            query.userId = id;
+
+            if (search && search.trim() !== '') {
+                query.$or = [
+                    { orderId: { $regex: search, $options: 'i' } },
+                ];
+            }
+
+            if (status && status.trim() !== '') {
+                console.log('Status received:', status);
+                const departmentArray = status.split(',').map((dep) => dep.trim());
+
+                query.status = { $in: departmentArray };
+            }
+            switch (sort) {
+                case 'newest':
+                  sortOptions = { createdAt: -1 };
+                  break;
+                case 'oldest':
+                  sortOptions = { createdAt: 1 };
+                  break;
+                default:
+                  sortOptions = { createdAt: -1 };
+              }
+            const {orders, total} = await this.orderRepository.find(query, skip, limit, sortOptions)
+            return {orders, total};
         } catch (error) {
             console.log(error, "Error updating payment");
             throw error
+        }
+    }
+
+    async orderDetail(orderId: string): Promise<OrderDocument | null> {
+        try {
+            return await this.orderRepository.findOne(orderId)
+        } catch (error) {
+            console.log(error, "Error updating payment");
+            throw new HttpException(STATUS_CODES.SERVER_ERROR, MESSAGES.ERROR.SERVER_ERROR)
         }
     }
 }

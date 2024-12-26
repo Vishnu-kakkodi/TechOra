@@ -22,6 +22,7 @@ import MyCourses from '../layout/userLayout/MyCourses';
 import CourseDetail from '../pages/user/CourseDetail/CourseDetail';
 import BlcokPage from '../pages/user/BlcokPage';
 import LeaderBoard from '../pages/user/LeaderBoard';
+import Wishlist from '../layout/userLayout/Wishlist';
 
 const UserRoutes: React.FC = () => {
 
@@ -123,6 +124,8 @@ const UserRoutes: React.FC = () => {
         <Route path="orders" element={<OrderList />} />
         <Route path="order-detail/:orderId" element={<OrderDetail />} />
         <Route path="my-courses" element={<MyCourses />} />
+        <Route path="favourate" element={<Wishlist />} />
+
 
 
 

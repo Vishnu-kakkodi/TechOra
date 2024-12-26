@@ -210,21 +210,21 @@ export class CourseRepository extends BaseRepository<CourseDocument> {
         searchQuery: SearchCourse,
         skip: number,
         limit: number
-    ): Promise<{ courses: CourseDocument[] | null; total: number }> {
+    ): Promise<{ course: CourseDocument[] | null; total: number }> {
         try {
             const query = {
                 _id: { $in: MyCourses },
                 ...searchQuery,
             };
 
-            const courses = await this.model
+            const course = await this.model
                 .find(query)
                 .skip(skip)
                 .limit(limit);
 
             const total = await this.model.countDocuments(query);
 
-            return { courses, total };
+            return { course, total };
         } catch (error) {
             throw error;
         }

@@ -33,6 +33,7 @@
     const [isConnected, setIsConnected] = useState(false);
     const [currentRoomId, setCurrentRoomId] = useState<string | null>(null);
     const [onlineStatus, setOnlineStatus] = useState<{[key: string]: boolean}>({});
+    const [messageReadStatus, setMessageReadStatus] = useState<{[key: string]: boolean}>({});
     const socketRef = useRef<Socket | null>(null);
     const fetchChatHistory = useCallback(() => {
       if (socket && receiverId) {
@@ -43,7 +44,7 @@
               text: msg.content,
               sender: msg.currentUserType,
               timestamp: new Date(msg.timestamp).getTime(),
-
+              isRead: msg.isRead,
               status: "sent"
             }));
   
@@ -77,6 +78,22 @@
   
         fetchChatHistory();
       });
+
+      newSocket.on('messages_read', (data: { readBy: string, timestamp: Date }) => {
+        setMessageReadStatus(prev => ({
+          ...prev,
+          [data.readBy]: true
+        }));
+        
+        if (onMessageReceive) {
+          onMessageReceive({
+            type: 'read_status_update',
+            readBy: data.readBy,
+            timestamp: data.timestamp
+          });
+        }
+      });
+
       newSocket.on('presence_update', ({ roomId, users }) => {
         setOnlineStatus(prev => ({
           ...prev,
@@ -112,12 +129,24 @@
         throw new Error('Socket not connected or no room created');
       }
     }, [socket, currentRoomId]);
+
+    const markMessageAsRead = useCallback((messageId: string) => {
+      if (socket && receiverId) {
+        socket.emit('message_seen', {
+          messageIds: [messageId],
+          senderId,
+          receiverId
+        });
+      }
+    }, [socket, senderId, receiverId]);
   
     return { 
       sendMessage, 
       isConnected,
       fetchChatHistory,
       markMessagesAsRead,
+      markMessageAsRead,
+      messageReadStatus,
       onlineStatus
     };
   };

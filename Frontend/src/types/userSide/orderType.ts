@@ -42,6 +42,7 @@ export interface orderItems{
   
   export interface Order {
     _id: string;
+    orderId: string;
     userId: string;
     items: OrderItem[];
     totalItems: number;

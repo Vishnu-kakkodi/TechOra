@@ -11,6 +11,8 @@ import { QuizRepository } from "../repositories/quiz.repository";
 import { QuizService } from "../services/quiz.service";
 import { UserRepository } from "../repositories/user.repository";
 import { TutorRepository } from "../repositories/tutor.repository";
+import { WishlistRepository } from "../repositories/wishlist.repository";
+import { authMiddleware } from "../middleware/auth.middleware";
 
 const router = Router();
 const instituteService = new InstituteService();
@@ -18,7 +20,8 @@ const courseRepository = new CourseRepository();
 const cartRepository = new CartRepository();
 const userRepository = new UserRepository();
 const tutorRepository = new TutorRepository();
-const courseService = new CourseService(courseRepository,cartRepository,userRepository,tutorRepository);
+const wishlistRepository = new WishlistRepository();
+const courseService = new CourseService(courseRepository,cartRepository,userRepository,tutorRepository,wishlistRepository);
 const instituteController = new InstitutionController(instituteService);
 const quizRepository = new QuizRepository();
 const quizService = new QuizService(quizRepository,userRepository,tutorRepository);
@@ -28,14 +31,14 @@ const courseController = new CourseController(courseService,quizService);
 
 
 
-router.get('/draft-course',courseController.draftCourse.bind(courseController));
-router.get('/course-list',courseController.courseList.bind(courseController));
-router.get('/course-detail/:courseId',courseController.courseDetailInstitute.bind(courseController));
-router.get('/tutor-list',instituteController.tutorList.bind(instituteController));
-router.get('/quiz-list',quizController.listQuiz.bind(quizController));
-router.get('/quiz-detail',quizController.quizDetail.bind(quizController));
-router.get('/chart-data',courseController.chartData.bind(courseController));
-router.get('/department-list',instituteController.getDepartment.bind(instituteController));
+router.get('/draft-course',authMiddleware,courseController.draftCourse.bind(courseController));
+router.get('/course-list',authMiddleware,courseController.courseList.bind(courseController));
+router.get('/course-detail/:courseId',authMiddleware,courseController.courseDetailInstitute.bind(courseController));
+router.get('/tutor-list',authMiddleware,instituteController.tutorList.bind(instituteController));
+router.get('/quiz-list',authMiddleware,quizController.listQuiz.bind(quizController));
+router.get('/quiz-detail',authMiddleware,quizController.quizDetail.bind(quizController));
+router.get('/chart-data',authMiddleware,courseController.chartData.bind(courseController));
+router.get('/department-list',authMiddleware,instituteController.getDepartment.bind(instituteController));
 
 
 router.post('/verify-email', instituteController.verifyEmail.bind(instituteController));
@@ -43,16 +46,11 @@ router.post('/track-status', instituteController.trackStatus.bind(instituteContr
 router.post('/verify-Otp', instituteController.verifyOtp.bind(instituteController));
 router.post('/login', instituteController.getInstitution.bind(instituteController));
 router.post('/register', upload.single('documents'), instituteController.createInstitute.bind(instituteController));
-router.post('/create-tutor',instituteController.createTutor.bind(instituteController));
-router.post('/create-course',upload.single('thumbnail'),courseController.createCourse.bind(courseController));
-router.post('/create-module',upload.single('video'),courseController.createModule.bind(courseController))
-router.post('/create-quiz',quizController.createQuiz.bind(quizController));
-router.post('/quiz-update',quizController.updateQuiz.bind(quizController));
+router.post('/create-tutor',authMiddleware,instituteController.createTutor.bind(instituteController));
 router.post('/logout', instituteController.Logout.bind(instituteController));
-router.post('/course-update',courseController.updateCourse.bind(courseController));
-router.post('/add-department',instituteController.addDepartment.bind(instituteController));
-router.patch('/list-course',courseController.courseAction.bind(courseController));
-router.delete('/module-delete',courseController.moduleDelete.bind(courseController));
+router.post('/add-department',authMiddleware,instituteController.addDepartment.bind(instituteController));
+router.patch('/list-course',authMiddleware,courseController.courseAction.bind(courseController));
+router.delete('/module-delete',authMiddleware,courseController.moduleDelete.bind(courseController));
 
 
 

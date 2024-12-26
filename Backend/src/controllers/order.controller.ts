@@ -5,6 +5,7 @@ import { decodedToken } from "../helperFunction/authHelper";
 import { HttpException } from "../middleware/error.middleware";
 import STATUS_CODES from "../constants/statusCode";
 import MESSAGES from "../constants/message";
+import generator from "../utils/orderIdGenerate";
 
 dotenv.config();
 const stripe = require('stripe')(process.env.STRIPE_SECRET, {
@@ -60,6 +61,7 @@ export class OrderController {
             const requiredRole = "user";
             const userId = decodedToken(token, requiredRole);
             let order;
+            const orderId = generator.generateID()
             if (isExistingOrder(req.body)) {
                 order = await this.orderService.getOrderById(req.body.orderDetails.orderId);
                 if (!order) {
@@ -67,6 +69,7 @@ export class OrderController {
                 }
             } else {
                 order = await this.orderService.createOrder(
+                    orderId,
                     userId,
                     orderItems,
                     total
@@ -137,6 +140,11 @@ export class OrderController {
         next: NextFunction
     ): Promise<void> {
         try {
+            const page = parseInt(req.query.page as string) || 1;
+            const limit = parseInt(req.query.limit as string) || 4;
+            const search = (req.query.search as string);
+            const filter = (req.query.filter as string);
+            const sort = (req.query.sort as string);
             const orderId= req.body.orderId;
             const Token = req.cookies.user
             const token = Token.accessToken;
@@ -146,13 +154,32 @@ export class OrderController {
             const requiredRole = "user";
             const userId = decodedToken(token, requiredRole);            
             
-            const order = await this.orderService.orderList(userId);
+            const {orders,total} = await this.orderService.orderList(userId,page,limit,search,filter,sort);
             res.json({
-                order
+                orders,
+                total
             });
 
         } catch (error) {
             next(error)
+        }
+    }
+
+    async orderDetail(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void>{
+        try{
+            const orderId = req.params.orderId
+            console.log(orderId);
+            const order = await this.orderService.orderDetail(orderId);
+            console.log(order,"O")
+            res.status(201).json({
+                order
+            });
+        }catch(error){
+            next(error);
         }
     }
 

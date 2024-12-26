@@ -1,7 +1,11 @@
 import { BaseRepository } from "./base.repository";
 import { OrderDocument } from "../interfaces/order.interface";
 import { OrderModel } from "../models/order.model";
-import mongoose from 'mongoose';
+import mongoose, { FilterQuery } from 'mongoose';
+
+export type SearchCourse = FilterQuery<{
+    orderId: string;
+}>;
 
 
 export class OrderRepository extends BaseRepository<OrderDocument>{
@@ -31,16 +35,24 @@ export class OrderRepository extends BaseRepository<OrderDocument>{
         }
     }
 
-    async find(userId: string): Promise<OrderDocument[] | null> {
+    async find(
+                searchQuery: SearchCourse,
+                skip: number,
+                limit: number,
+                sortOptions: any = { createdAt: -1 }
+    ): Promise<{orders:OrderDocument[] | null; total: number}> {
         try {
-            console.log("lalal");
-            const id = new mongoose.Types.ObjectId(userId)
-            console.log(id);
-            
-
-            return await this.model.find({userId:id}).populate({
+            const orders = await this.model.find(searchQuery)
+            .sort(sortOptions)
+            .skip(skip)
+            .limit(limit)
+            .populate({
                 path: 'items.course'
             });
+
+            const total: number = await this.model.countDocuments(searchQuery);
+
+            return {orders, total};
         } catch(error) {
             throw error;
         }

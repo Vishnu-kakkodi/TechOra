@@ -27,7 +27,6 @@ export const authMiddleware = async (
     };
 
     const tokenToValidate = getCookieByRole(role as string);
-    console.log("Token to validate lllll:", req.cookies.user);
 
     if (!tokenToValidate) {
       return res.status(401).json({
@@ -38,7 +37,6 @@ export const authMiddleware = async (
     }
 
     const { accessToken, refreshToken } = tokenToValidate;
-    console.log(accessToken,"Token")
 
     if (!accessToken) {
       return res.status(401).json({
@@ -51,9 +49,7 @@ export const authMiddleware = async (
     const secretKey = process.env.ACCESS_SECRET_KEY as string;
 
     try {
-      const decoded = jwt.verify(accessToken, secretKey) as DecodedToken;
-      console.log(decoded._id,"Pppppppppppppppppp")
-      
+      const decoded = jwt.verify(accessToken, secretKey) as DecodedToken;      
       if (role === "user") {
         const user = await UserModel.findById(decoded._id);
         if (!user || user.status !== "active") {

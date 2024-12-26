@@ -1,80 +1,147 @@
-'use client'
 
-import { motion } from 'framer-motion'
-import { ArrowRight } from 'lucide-react'
+// import HOMEPIC from '../../assets/frontEnd/HOMEPIC.png';
+
+// export default function Hero() {
+//   return (
+// <div className="relative flex justify-center items-center w-full min-h-[60vh] px-4 sm:px-0 md:px-8 lg:px-10">
+// <img
+//   src={HOMEPIC}
+//   alt="Description of the image"
+//   className="w-full object-cover"
+// />
+
+// <div className="absolute top-1/2 left-[10%] md:left-[200px] bg-white bg-opacity-90 transform -translate-y-1/2 text-black p-6 md:p-10 border-2 rounded-lg shadow-lg">
+//   <div className="text-xl md:text-3xl font-bold mb-2 text-center md:text-left">
+//     Learn, practice, succeed
+//   </div>
+
+//   <div className="text-lg md:text-2xl font-semibold mb-4 text-center md:text-left">
+//     (and save)
+//   </div>
+
+//   <div className="text-sm md:text-base font-normal text-gray-700 text-center md:text-left">
+//     <p>Courses for every step of your learning journey,</p>
+//     <p>starting at ₹499. Sale ends December 31.</p>
+//   </div>
+// </div>
+// </div>
+
+
+//   )
+// }
+
+import HOMEPIC1 from '../../assets/frontEnd/HOMEPIC.png';
+import HOMEPIC2 from '../../assets/frontEnd/Carosal2.jpg';
+import HOMEPIC3 from '../../assets/frontEnd/Carosal3.jpg';
+import { useState, useEffect } from 'react';
+import { ArrowBigLeft, ArrowBigRight } from 'lucide-react';
 
 export default function Hero() {
-  return (
-    <div className="relative bg-[#1a1a2e] overflow-hidden">
-      {/* Wave Pattern Background */}
-      <div className="absolute inset-0 z-0">
-        <svg
-          className="w-full h-full"
-          viewBox="0 0 1440 800"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M0,192L48,197.3C96,203,192,213,288,229.3C384,245,480,267,576,250.7C672,235,768,181,864,181.3C960,181,1056,235,1152,234.7C1248,235,1344,181,1392,154.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
-            fill="#4ade80"
-            fillOpacity="0.1"
-          />
-        </svg>
-      </div>
+  const [currentSlide, setCurrentSlide] = useState(0);
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
-              Everything <br />
-              <span className="text-emerald-400">Nature is the best</span> <br />
-              Instructor
-            </h1>
-            <p className="text-gray-300 text-lg mb-8 max-w-lg">
-              Welcome to TechOra Academy! Join our expert-led courses and unlock your potential in tech education.
-            </p>
-            <div className="flex gap-4">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="bg-emerald-500 text-white px-8 py-3 rounded-full flex items-center gap-2 hover:bg-emerald-600 transition-colors"
-              >
-                Get Started
-                <ArrowRight size={20} />
-              </motion.button>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="bg-white/10 text-white px-8 py-3 rounded-full hover:bg-white/20 transition-colors"
-              >
-                Watch Demo
-              </motion.button>
+  const slides = [
+    {
+      image: HOMEPIC1,
+      title: "Learn, practice, succeed",
+      subtitle: "(and save)",
+      description: [
+        "Courses for every step of your learning journey,",
+        "starting at ₹499. Sale ends December 31."
+      ],
+    },
+    {
+      image: HOMEPIC2,
+      title: "Achieve Your Goals",
+      subtitle: "With expert-led courses",
+      description: [
+        "Upskill with the latest trends in technology,",
+        "business, and more."
+      ],
+    },
+    {
+      image: HOMEPIC3,
+      title: "Future-Proof Your Career",
+      subtitle: "Invest in yourself",
+      description: [
+        "Affordable and flexible courses,",
+        "starting at just ₹299."
+      ],
+    },
+  ];
+
+  const handleNext = () => {
+    setCurrentSlide((prev) => (prev + 1) % slides.length);
+  };
+
+  const handlePrev = () => {
+    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
+  };
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
+    }, 8000); 
+
+    return () => clearInterval(interval); 
+  }, []);
+
+  return (
+    <div className="relative w-full min-h-[60vh] flex items-center overflow-hidden">
+      {/* Image Section */}
+      {slides.map((slide, index) => (
+        <div
+          key={index}
+          className={`absolute w-full transition-transform duration-700 ${
+            index === currentSlide ? "translate-x-0" : "translate-x-full"
+          }`}
+        >
+          <img
+            src={slide.image}
+            alt={`Slide ${index + 1}`}
+            className="w-full h-[60vh] object-cover"
+          />
+          <div className="absolute top-1/2 left-[10%] md:left-[200px] bg-white bg-opacity-90 transform -translate-y-1/2 text-black p-6 md:p-10 border-2 rounded-lg shadow-lg">
+            <div className="text-xl md:text-3xl font-bold mb-2 text-center md:text-left">
+              {slide.title}
             </div>
-          </motion.div>
-          <motion.div
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="relative"
-          >
-            <img
-              src="/placeholder.svg?height=500&width=600"
-              alt="Instructor teaching"
-              className="rounded-lg shadow-2xl"
-            />
-            <div className="absolute -bottom-6 -left-6 bg-white p-4 rounded-lg shadow-xl">
-              <div className="flex items-center gap-3">
-                <div className="w-3 h-3 bg-emerald-500 rounded-full animate-pulse" />
-                <span className="text-sm font-medium">Live Classes Available</span>
-              </div>
+            <div className="text-lg md:text-2xl font-semibold mb-4 text-center md:text-left">
+              {slide.subtitle}
             </div>
-          </motion.div>
+            <div className="text-sm md:text-base font-normal text-gray-700 text-center md:text-left">
+              {slide.description.map((line, i) => (
+                <p key={i}>{line}</p>
+              ))}
+            </div>
+          </div>
         </div>
+      ))}
+
+      {/* Navigation Controls */}
+      <button
+        onClick={handlePrev}
+        className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full"
+      >
+        <ArrowBigLeft />
+      </button>
+      <button
+        onClick={handleNext}
+        className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full"
+      >
+        <ArrowBigRight />
+      </button>
+
+      {/* Indicators */}
+      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
+        {slides.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => setCurrentSlide(index)}
+            className={`w-3 h-3 rounded-full ${
+              index === currentSlide ? "bg-black" : "bg-gray-400"
+            }`}
+          ></button>
+        ))}
       </div>
     </div>
-  )
+  );
 }
-

@@ -186,6 +186,34 @@ export const userSlice = createApi({
       })
     }),
 
+    addToWishlist: builder.mutation<string, { courseId: string }>({
+      query: ({courseId}) =>({
+        url: '/users/add-wishlist',
+        method: 'POST',
+        credentials: 'include',
+        body: {courseId}
+      })
+    }),
+
+    wishlistPage: builder.query({
+      query: ({ page = 1, limit = 4, search = '' }) =>({
+        url: '/users/favourates',
+        params:{ page, limit, search},
+        method: 'GET',
+        credentials: 'include',
+      }),
+      providesTags: ['User'],
+    }),
+
+    removeWishlist: builder.mutation<string, { courseId: string }>({
+      query: ({courseId}) =>({
+        url: `/users/remove-wishlist/${courseId}`,
+        method: 'DELETE',
+        credentials: 'include',
+      })
+    }),
+
+
     removeCart: builder.mutation<string, { courseId: string }>({
       query: ({courseId}) =>({
         url: '/users/remove-cart',
@@ -236,9 +264,19 @@ export const userSlice = createApi({
       invalidatesTags: ['User'],
      }),
 
-     getOrders: builder.query<OrderResponse , null>({
-      query: () =>({
+     getOrders: builder.query<any , any>({
+      query: ({ page = 1, limit = 4, search = '' }) =>({
         url: '/users/order-list',
+        params:{ page, limit, search},
+        method:'GET',
+        credentials: 'include'
+      }),
+      providesTags: ['User'],
+     }),
+
+     getOrderDetail: builder.query<any , any>({
+      query: ({orderId}) =>({
+        url: `/users/order-detail/${orderId}`,
         method:'GET',
         credentials: 'include'
       }),
@@ -367,12 +405,16 @@ export const
    useForgotPasswordMutation,
    useCartPageQuery,
    useAddToCartMutation,
+   useAddToWishlistMutation,
+   useWishlistPageQuery,
+   useRemoveWishlistMutation,
    useRemoveCartMutation,
    usePaymentMutation,
    usePaymentSuccessMutation,
    useCourseListQuery,
    useChangePasswordMutation,
    useGetOrdersQuery,
+   useGetOrderDetailQuery,
    useCoursedetailQuery,
    useMyCoursesQuery,
    useQuizListQuery,

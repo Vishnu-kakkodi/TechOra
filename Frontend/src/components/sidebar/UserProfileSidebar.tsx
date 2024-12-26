@@ -7,7 +7,8 @@ import {
     Lock,
     List,
     LogOut,
-    BookOpen
+    BookOpen,
+    Heart
 } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../../store/hook';
 import { userLogout } from '../../store/slices/authSlice';
@@ -43,9 +44,6 @@ const UserAccountSidebar: React.FC = () => {
 
                     <div className="space-y-6">
                         <div className="space-y-2">
-                            <div className="text-xs text-white  uppercase tracking-wider">
-                                Profile
-                            </div>
                             <button
                                 onClick={() => handleNavigate('/account')}
                                 className="flex items-center space-x-3 text-gray-300 hover:text-white p-2 rounded-md w-full"
@@ -56,9 +54,6 @@ const UserAccountSidebar: React.FC = () => {
                         </div>
 
                         <div className="space-y-2">
-                            <div className="text-xs text-white uppercase tracking-wider">
-                                Security
-                            </div>
                             <button
                                 onClick={() => handleNavigate('/account/change-password')}
                                 className="flex items-center space-x-3 text-gray-300 hover:text-white p-2 rounded-md w-full"
@@ -69,9 +64,6 @@ const UserAccountSidebar: React.FC = () => {
                         </div>
 
                         <div className="space-y-2">
-                            <div className="text-xs text-white uppercase tracking-wider">
-                                Financial
-                            </div>
                             <button
                                 onClick={() => handleNavigate('/account/orders')}
                                 className="flex items-center space-x-3 text-gray-300 hover:text-white p-2 rounded-md w-full"
@@ -82,15 +74,19 @@ const UserAccountSidebar: React.FC = () => {
                         </div>
 
                         <div className="space-y-2">
-                            <div className="text-xs text-white uppercase tracking-wider">
-                                My Courses
-                            </div>
                             <button
                                 onClick={() => handleNavigate('/account/my-courses')}
                                 className="flex items-center space-x-3 text-gray-300 hover:text-white p-2 rounded-md w-full"
                             >
                                 <BookOpen className="w-5 h-5" />
                                 <span>Course List</span>
+                            </button>
+                            <button
+                                onClick={() => handleNavigate('/account/favourate')}
+                                className="flex items-center space-x-3 text-gray-300 hover:text-white p-2 rounded-md w-full"
+                            >
+                                <Heart className="w-5 h-5" />
+                                <span>Favourate Course</span>
                             </button>
                         </div>
                     </div>

@@ -3,6 +3,7 @@ import { BaseInterface } from "./base.interface";
 
 
 export interface Order extends BaseInterface {
+    orderId: string,
     userId: Types.ObjectId;
     items: {
         course: Types.ObjectId;

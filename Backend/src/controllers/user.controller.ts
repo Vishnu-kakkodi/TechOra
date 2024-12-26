@@ -276,12 +276,12 @@ export class UserController {
             if (!token) {
                 throw new HttpException(STATUS_CODES.UNAUTHORIZED, MESSAGES.ERROR.UNAUTHORIZED)
             }
-            const { courses, total } = await this.userService.myCourses(token, page, limit, search);
-            if (!courses) {
+            const { course, total } = await this.userService.myCourses(token, page, limit, search);
+            if (!course) {
                 throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
             }
             res.status(201).json({
-                courses,
+                data:course,
                 total,
                 page,
                 limit,

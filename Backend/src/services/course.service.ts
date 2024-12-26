@@ -11,6 +11,8 @@ import { IUserDocument } from "../interfaces/user.interface";
 import { UserRepository } from "../repositories/user.repository";
 import { QuizDocument } from "../interfaces/quiz.interface";
 import { TutorRepository } from "../repositories/tutor.repository";
+import { WishlistRepository } from "../repositories/wishlist.repository";
+import { WishlistDocument } from "../interfaces/wishlist.interface";
 
 
 export class CourseService {
@@ -18,13 +20,15 @@ export class CourseService {
   private cartRepository: CartRepository;
   private userRepository: UserRepository;
   private tutorRepository: TutorRepository;
+  private wishlistRepository: WishlistRepository;
 
 
-  constructor(courseRepository: CourseRepository, cartRepository: CartRepository, userRepository: UserRepository, tutorRepository: TutorRepository) {
+  constructor(courseRepository: CourseRepository, cartRepository: CartRepository, userRepository: UserRepository, tutorRepository: TutorRepository, wishlistRepository: WishlistRepository) {
     this.courseRepository = courseRepository;
     this.cartRepository = cartRepository;
     this.userRepository = userRepository;
     this.tutorRepository = tutorRepository;
+    this.wishlistRepository = wishlistRepository;
   }
 
   async createCourse(courseData: CreateCourseDto, tutorId: string): Promise<Course> {
@@ -32,10 +36,10 @@ export class CourseService {
       if (!courseData.title || !courseData.institutionId) {
         throw new HttpException(400, 'Missing required fields');
       }
-      if(tutorId){
+      if (tutorId) {
         courseData.tutorId = tutorId;
       }
-      console.log(courseData.institutionId,"InstitutionId")
+      console.log(courseData.institutionId, "InstitutionId")
       const response = await this.courseRepository.create(courseData);
       if (!response) {
         throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
@@ -61,7 +65,7 @@ export class CourseService {
         query.institutionId = Query.institutionId;
       } else if (Query.tutorId) {
         query.tutorId = Query.tutorId;
-      } 
+      }
       if (search && search.trim() !== '') {
         query.$or = [
           { title: { $regex: search, $options: 'i' } },
@@ -77,19 +81,19 @@ export class CourseService {
       throw error;
     }
   }
-  
+
 
 
   async createModule(id: string, moduleData: Module): Promise<CourseDocument | null> {
     try {
-      if(!id){
+      if (!id) {
         throw new HttpException(STATUS_CODES.UNAUTHORIZED, MESSAGES.ERROR.UNAUTHORIZED)
       }
-      if(!moduleData){
+      if (!moduleData) {
         throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
       }
       const updatedCourse = await this.courseRepository.update(id, moduleData);
-      if(!updatedCourse){
+      if (!updatedCourse) {
         throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
       }
       return updatedCourse;
@@ -98,35 +102,35 @@ export class CourseService {
     }
   }
 
-  async courseList(instituteId: any, page:number,limit:number,search:string,department:string,sort:string): Promise<{ course: CourseDocument[]; total: number;}> {
+  async courseList(instituteId: any, page: number, limit: number, search: string, department: string, sort: string): Promise<{ course: CourseDocument[]; total: number; }> {
     try {
-      if(!instituteId){
+      if (!instituteId) {
         throw new HttpException(STATUS_CODES.UNAUTHORIZED, MESSAGES.ERROR.UNAUTHORIZED)
       }
       const skip = (page - 1) * limit;
-      let query:any = {};
+      let query: any = {};
       let sortOptions: any = {};
 
       if (search && search.trim() !== '') {
-          query.$or = [
-              { title: { $regex: search, $options: 'i' } },
-              { department: { $regex: search, $options: 'i' } },
-              { instructor: { $regex: search, $options: 'i' } }
+        query.$or = [
+          { title: { $regex: search, $options: 'i' } },
+          { department: { $regex: search, $options: 'i' } },
+          { instructor: { $regex: search, $options: 'i' } }
 
 
-          ];
+        ];
       }
 
       if (department && department.trim() !== '') {
-          console.log('Status received:', department);
-          const departmentArray = department.split(',').map((dep)=>dep.trim());
-          
-          query.department = { $in:departmentArray };
+        console.log('Status received:', department);
+        const departmentArray = department.split(',').map((dep) => dep.trim());
+
+        query.department = { $in: departmentArray };
       }
 
       console.log("Query:", query);
 
-      switch(sort) {
+      switch (sort) {
         case 'newest':
           sortOptions = { createdAt: -1 };
           break;
@@ -137,7 +141,7 @@ export class CourseService {
           sortOptions = { createdAt: -1 };
       }
 
-      return await this.courseRepository.findCourses("institutionId",instituteId,query,skip,limit,sortOptions);
+      return await this.courseRepository.findCourses("institutionId", instituteId, query, skip, limit, sortOptions);
 
     } catch (error) {
       throw error;
@@ -145,33 +149,33 @@ export class CourseService {
   }
 
 
-  async TutorCourseList(tutorId: any, page:number,limit:number,search:string,department:string,sort:string): Promise<{ course: CourseDocument[]; total: number;}> {
+  async TutorCourseList(tutorId: any, page: number, limit: number, search: string, department: string, sort: string): Promise<{ course: CourseDocument[]; total: number; }> {
     try {
-      if(!tutorId){
+      if (!tutorId) {
         throw new HttpException(STATUS_CODES.UNAUTHORIZED, MESSAGES.ERROR.UNAUTHORIZED)
       }
       const skip = (page - 1) * limit;
-      let query:any = {};
+      let query: any = {};
       let sortOptions: any = {};
 
       if (search && search.trim() !== '') {
-          query.$or = [
-              { title: { $regex: search, $options: 'i' } },
-              { department: { $regex: search, $options: 'i' } },
-              { instructor: { $regex: search, $options: 'i' } }
-          ];
+        query.$or = [
+          { title: { $regex: search, $options: 'i' } },
+          { department: { $regex: search, $options: 'i' } },
+          { instructor: { $regex: search, $options: 'i' } }
+        ];
       }
 
       if (department && department.trim() !== '') {
-          console.log('Status received:', department);
-          const departmentArray = department.split(',').map((dep)=>dep.trim());
-          
-          query.department = { $in:departmentArray };
+        console.log('Status received:', department);
+        const departmentArray = department.split(',').map((dep) => dep.trim());
+
+        query.department = { $in: departmentArray };
       }
 
       console.log("Query:", query);
 
-      switch(sort) {
+      switch (sort) {
         case 'newest':
           sortOptions = { createdAt: -1 };
           break;
@@ -182,7 +186,7 @@ export class CourseService {
           sortOptions = { createdAt: -1 };
       }
 
-      return await this.courseRepository.findCourses("tutorId",tutorId,query,skip,limit,sortOptions);
+      return await this.courseRepository.findCourses("tutorId", tutorId, query, skip, limit, sortOptions);
 
     } catch (error) {
       throw error;
@@ -191,11 +195,11 @@ export class CourseService {
 
   async PurchasedCourse(userId: string): Promise<IUserDocument | null> {
     try {
-      if(!userId){
+      if (!userId) {
         throw new HttpException(STATUS_CODES.BAD_REQUEST, MESSAGES.ERROR.BAD_REQUEST)
       }
       const data = await this.userRepository.findById(userId)
-      if(!data){
+      if (!data) {
         throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
       }
       return data;
@@ -206,11 +210,11 @@ export class CourseService {
 
   async courseDetail(courseId: string): Promise<CourseDocument | null> {
     try {
-      if(!courseId){
+      if (!courseId) {
         throw new HttpException(STATUS_CODES.BAD_REQUEST, MESSAGES.ERROR.BAD_REQUEST)
       }
       const data = await this.courseRepository.findById(courseId)
-      if(!data){
+      if (!data) {
         throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
       }
       return data;
@@ -220,20 +224,20 @@ export class CourseService {
   }
 
   async addToCart(userId: string | null, courseId: string): Promise<any> {
-    try {   
-      if(!courseId){
+    try {
+      if (!courseId) {
         throw new HttpException(STATUS_CODES.BAD_REQUEST, MESSAGES.ERROR.BAD_REQUEST)
       }
-      if(!userId){
+      if (!userId) {
         throw new HttpException(STATUS_CODES.BAD_REQUEST, MESSAGES.ERROR.BAD_REQUEST)
-      }      
+      }
       let cart = await this.cartRepository.findCart(userId);
 
       let course = await this.courseRepository.findById(courseId);
 
 
 
-      if(!course){
+      if (!course) {
         throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
       }
       const newItem = {
@@ -246,14 +250,14 @@ export class CourseService {
         item => item.course.id.toString() === courseId
       );
 
-      let information:string = 'Item added successfully'
+      let information: string = 'Item added successfully'
 
       if (courseExists) {
         return information = 'Already added'
       }
 
       console.log("Test");
-      
+
 
       if (cart) {
         cart.items.push(newItem);
@@ -277,11 +281,11 @@ export class CourseService {
 
   async getCartItems(userId: string | null): Promise<CartDocument | null> {
     try {
-      if(!userId){
+      if (!userId) {
         throw new HttpException(STATUS_CODES.BAD_REQUEST, MESSAGES.ERROR.BAD_REQUEST)
       }
       const data = await this.cartRepository.findCart(userId);
-      if(!data){
+      if (!data) {
         throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
       }
       return data
@@ -292,11 +296,11 @@ export class CourseService {
 
   async removeCart(userId: string | null, courseId: string): Promise<void> {
     try {
-      if(!userId){
+      if (!userId) {
         throw new HttpException(STATUS_CODES.BAD_REQUEST, MESSAGES.ERROR.BAD_REQUEST)
       }
       const cart = await this.cartRepository.findCart(userId);
-      if(!cart){
+      if (!cart) {
         throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
       }
       if (cart) {
@@ -309,32 +313,32 @@ export class CourseService {
   }
 
 
-  async userCorseList(page:number,limit:number,search:string,department:string,sort:string): Promise<{ course: CourseDocument[]; total: number; department:string[], totalCourse:number }> {
+  async userCorseList(page: number, limit: number, search: string, department: string, sort: string): Promise<{ course: CourseDocument[]; total: number; department: string[], totalCourse: number }> {
     try {
       const skip = (page - 1) * limit;
-      let query:any = {};
+      let query: any = {};
       let sortOptions: any = {};
 
       if (search && search.trim() !== '') {
-          query.$or = [
-              { title: { $regex: search, $options: 'i' } },
-              { department: { $regex: search, $options: 'i' } },
-              { instructor: { $regex: search, $options: 'i' } }
+        query.$or = [
+          { title: { $regex: search, $options: 'i' } },
+          { department: { $regex: search, $options: 'i' } },
+          { instructor: { $regex: search, $options: 'i' } }
 
 
-          ];
+        ];
       }
 
       if (department && department.trim() !== '') {
-          console.log('Status received:', department);
-          const departmentArray = department.split(',').map((dep)=>dep.trim());
-          
-          query.department = { $in:departmentArray };
+        console.log('Status received:', department);
+        const departmentArray = department.split(',').map((dep) => dep.trim());
+
+        query.department = { $in: departmentArray };
       }
 
       console.log("Query:", query);
 
-      switch(sort) {
+      switch (sort) {
         case 'newest':
           sortOptions = { createdAt: -1 };
           break;
@@ -345,19 +349,19 @@ export class CourseService {
           sortOptions = { createdAt: -1 };
       }
 
-      return await this.courseRepository.findCourse(query,skip,limit,sortOptions);
-  } catch (error) {
+      return await this.courseRepository.findCourse(query, skip, limit, sortOptions);
+    } catch (error) {
       throw error;
-  }
+    }
   }
 
   async courseAction(courseId: string): Promise<any> {
     try {
-      if(!courseId){
+      if (!courseId) {
         throw new HttpException(STATUS_CODES.BAD_REQUEST, MESSAGES.ERROR.BAD_REQUEST)
       }
       const data = await this.courseRepository.findById(courseId)
-      if(!data){
+      if (!data) {
         throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
       }
       let information
@@ -375,37 +379,115 @@ export class CourseService {
     }
   }
 
-  async updateCourse(courseData: UpdateCourseDto, courseId:string): Promise<Course|null> {
+  async updateCourse(courseData: UpdateCourseDto, courseId: string): Promise<Course | null> {
     try {
-      return await this.courseRepository.updateCourse(courseData,courseId);
+      return await this.courseRepository.updateCourse(courseData, courseId);
     } catch (error) {
       throw error;
     }
   }
 
 
-  async moduleDelete(courseId: string, moduleId:string): Promise<void> {
+  async moduleDelete(courseId: string, moduleId: string): Promise<void> {
     try {
-      return await this.courseRepository.moduleDelete(courseId,moduleId);
+      return await this.courseRepository.moduleDelete(courseId, moduleId);
     } catch (error) {
       throw error;
     }
   }
 
-  async chartData(instituteId: any): Promise<{published:number, draft:number,listed:number,unlisted:number,course:CourseDocument[]}> {
+  async chartData(instituteId: any): Promise<{ published: number, draft: number, listed: number, unlisted: number, course: CourseDocument[] }> {
     try {
-      if(!instituteId){
+      if (!instituteId) {
         throw new HttpException(STATUS_CODES.UNAUTHORIZED, MESSAGES.ERROR.UNAUTHORIZED)
       }
-      const {published,draft,listed,unlisted,course} = await this.courseRepository.chartData(instituteId)
+      const { published, draft, listed, unlisted, course } = await this.courseRepository.chartData(instituteId)
 
-      return {published,draft,listed,unlisted,course}
-      
+      return { published, draft, listed, unlisted, course }
+
     } catch (error) {
       throw error;
     }
   }
 
+  async addToWishlist(userId: string | null, courseId: string): Promise<any> {
+    try {
+      if (!courseId) {
+        throw new HttpException(STATUS_CODES.BAD_REQUEST, MESSAGES.ERROR.BAD_REQUEST)
+      }
+      if (!userId) {
+        throw new HttpException(STATUS_CODES.BAD_REQUEST, MESSAGES.ERROR.BAD_REQUEST)
+      }
+      let wishlist = await this.wishlistRepository.find(userId);
+
+      let course = await this.courseRepository.findById(courseId);
+
+      if (!course) {
+        throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
+      }
+      const newItem = {
+        course: new mongoose.Types.ObjectId(courseId),
+      };
+
+      const courseExists = wishlist?.items.some(
+        item => item.course.toString() === courseId.toString()
+    );
+
+      let information: string = 'Item added successfully'
+
+      if (courseExists) {
+        console.log("Checking")
+        return information = 'Already added'
+      }
+
+      if (wishlist) {
+        wishlist.items.push(newItem);
+        await wishlist.save();
+        return information
+      } else {
+        const createdItem = {
+          userId: new mongoose.Types.ObjectId(userId),
+          items:[
+            newItem
+          ]
+        }
+        await this.wishlistRepository.create(createdItem)
+        return information
+      }
+
+    }catch(error){
+      throw error
+    }
+  }
+
+  async wishlistPage(userId: string | null, page:number,limit:number,search:string): Promise<{favourates: WishlistDocument | null; total: number}> {
+    try {
+      if (!userId) {
+        throw new HttpException(STATUS_CODES.BAD_REQUEST, MESSAGES.ERROR.BAD_REQUEST)
+      }
+      const skip = (page - 1) * limit;
+      let query:any = {};
+      if (search && search.trim() !== '') {
+        query.$or = [
+            { title: { $regex: search, $options: 'i' } }
+        ];
+    }
+      return await this.wishlistRepository.findFavourates(userId,query,skip,limit);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async removeWishlist(userId:string, courseId:string): Promise<any>{
+    try{
+      if (!userId) {
+        throw new HttpException(STATUS_CODES.BAD_REQUEST, MESSAGES.ERROR.BAD_REQUEST)
+      }
+      return await this.wishlistRepository.removeWishlist(userId,courseId);
+    }catch(error){
+      throw error;
+    }
+  }
 }
 
 

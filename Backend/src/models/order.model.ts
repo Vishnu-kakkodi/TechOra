@@ -3,6 +3,10 @@ import { OrderDocument } from '../interfaces/order.interface';
 
 const orderSchema = new Schema<OrderDocument>(
     {
+        orderId: {
+            type: String,
+            required: true
+        },
         userId: {
             type: Schema.Types.ObjectId,
             ref: 'User',

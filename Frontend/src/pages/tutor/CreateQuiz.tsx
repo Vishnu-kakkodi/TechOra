@@ -1,5 +1,5 @@
 
-import React, { ReactNode, useState } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 import { Plus, Trash2, GripVertical, AlertCircle, Clock, RefreshCcw } from 'lucide-react';
 import { Formik, Form, Field, FieldProps } from 'formik';
 import { QuestionType, QuizStatus, Question, QuizData, QuestionBoxProps, Option } from '../../types/quizType'
@@ -8,12 +8,13 @@ import * as Yup from 'yup';
 import { useNavigate } from 'react-router-dom';
 import TutorSidebar from '../../components/sidebar/tutorSidebar';
 import { useAddQuizMutation } from '../../store/slices/tutorSlice';
+// import { useNotificationSocket } from '../../useNotificationHook';
+import { useAppSelector } from '../../store/hook';
 
 const QuizValidationSchema = Yup.object().shape({
   title: Yup.string().required('Quiz title is required'),
   duration: Yup.number().positive('Duration must be positive').required('Duration is required'),
   maxAttempts: Yup.number().positive('Max attempts must be positive').required('Max attempts is required'),
-  // maxQuestions: Yup.number().min(1, 'At least one question').max(20, 'Maximum 20 questions').required('Max questions is required'),
   department: Yup.string().required('Department selection is required'),
   stack: Yup.string().required('Stack is required'),
   difficultyLevel: Yup.string().required('Difficulty level is required'),
@@ -65,6 +66,19 @@ const CreateQuiz: React.FC = () => {
   const [addQuiz] = useAddQuizMutation();
   const [questionModal, setQuestionModal] = useState<boolean>(false);
   const navigate = useNavigate();
+  const tutordata = useAppSelector((state) => state.auth.tutorInfo);
+
+  // const { sendNotification, isConnected, connectionError } = useNotificationSocket({
+  //   token: tutordata?.accessToken,
+  //   senderId: tutordata?._id,
+  //   onNotification: (notification) => {
+  //     console.log('Received notification:', notification);
+  //   }
+  // });
+
+  // useEffect(() => {
+  //   console.log('Socket connection status:', { isConnected, connectionError });
+  // }, [isConnected, connectionError]);
 
   const initialQuizData: QuizData = {
     title: '',
@@ -197,6 +211,40 @@ const CreateQuiz: React.FC = () => {
     </button>
   );
 
+  // const handleSubmit = async (values: QuizData): Promise<void> => {
+  //   try {
+  //     const quizPayload = {
+  //       ...values,
+  //       questions: quizData.questions,
+  //       totalQuestions: quizData.questions.length,
+  //       positiveScore: Number(values.positiveScore),
+  //       negativeScore: Number(values.negativeScore),
+  //       passingScore: Number(values.passingScore)
+  //     };
+  //     const response = await addQuiz(quizPayload).unwrap();
+  //     console.log("OKKKKK")
+  //     if (response) {
+  //       console.log("Quiz Created successfully",response.data)
+  //       sendNotification({
+  //         type: 'QUIZ_CREATED',
+  //         data: {
+  //           quizId: response.data,
+  //           title: values.title,
+  //           department: values.department,
+  //           createdBy: tutordata?.id,
+  //           creatorName: tutordata?.name
+  //         },
+  //         recipients: ['admin', 'students'],
+  //         message: `New quiz "${values.title}" has been created for ${values.department} department`
+  //       });
+  //       toast.success(response.message);
+  //       navigate('/tutor/quizzes');
+  //     }
+  //   } catch (error) {
+  //     console.error('Failed to create quiz:', error);
+  //   }
+  // };
+
   const handleSubmit = async (values: QuizData): Promise<void> => {
     try {
       const quizPayload = {
@@ -207,14 +255,27 @@ const CreateQuiz: React.FC = () => {
         negativeScore: Number(values.negativeScore),
         passingScore: Number(values.passingScore)
       };
-      console.log('Quiz created successfully:', quizPayload);
+
       const response = await addQuiz(quizPayload).unwrap();
-      if (response) {
-        toast.success(response.message);
-        navigate('/tutor/quizzes');
-      }
+
+      // if (response?.data) {
+      //   try {
+      //     await sendNotification({
+      //       quizId: response.data,
+      //       title: values.title,
+      //       department: values.department,
+      //       createdBy: tutordata?.id,
+      //       creatorName: tutordata?.name
+      //     });
+      //     toast.success('Quiz created and notification sent');
+      //   } catch (error) {
+      //     console.error('Failed to send notification:', error);
+      //     toast.warning('Quiz created but notification failed');
+      //   }
+      // }
     } catch (error) {
       console.error('Failed to create quiz:', error);
+      toast.error('Failed to create quiz');
     }
   };
 
@@ -241,8 +302,8 @@ const CreateQuiz: React.FC = () => {
                     <div className="bg-white rounded-lg shadow p-6">
                       <div className="grid grid-cols-2 gap-4 mb-4">
                         <InputWrapper name="title">
-                          <label 
-                            htmlFor="title" 
+                          <label
+                            htmlFor="title"
                             className="block text-sm font-medium text-gray-700 mb-1"
                           >
                             Quiz Title
@@ -255,10 +316,10 @@ const CreateQuiz: React.FC = () => {
                             className="text-lg font-semibold px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                           />
                         </InputWrapper>
-                        
+
                         <InputWrapper name="status">
-                          <label 
-                            htmlFor="status" 
+                          <label
+                            htmlFor="status"
                             className="block text-sm font-medium text-gray-700 mb-1"
                           >
                             Quiz Status
@@ -276,43 +337,43 @@ const CreateQuiz: React.FC = () => {
                       </div>
 
                       <div className="grid grid-cols-3 gap-4 mb-4">
-                          <InputWrapper name="duration">
-                            <label 
-                              htmlFor="duration" 
-                              className="block text-sm font-medium text-gray-700 mb-1"
-                              >
-                              Quiz Duration (minutes)
-                            </label>
-                            <Field
-                              type="number"
-                              id="duration"
-                              name="duration"
-                              placeholder="Duration (minutes)"
-                              min="1"
-                              className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                          </InputWrapper>
-                        
-                          <InputWrapper name="maxAttempts">
-                            <label 
-                              htmlFor="maxAttempts" 
-                              className="block text-sm font-medium text-gray-700 mb-1"
-                              >
-                              Max No. of Attempts
-                            </label>
-                            <Field
-                              type="number"
-                              id="maxAttempts"
-                              name="maxAttempts"
-                              placeholder="Max Attempts"
-                              min="1"
-                              className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                              />
-                          </InputWrapper>
-                        
+                        <InputWrapper name="duration">
+                          <label
+                            htmlFor="duration"
+                            className="block text-sm font-medium text-gray-700 mb-1"
+                          >
+                            Quiz Duration (minutes)
+                          </label>
+                          <Field
+                            type="number"
+                            id="duration"
+                            name="duration"
+                            placeholder="Duration (minutes)"
+                            min="1"
+                            className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          />
+                        </InputWrapper>
+
+                        <InputWrapper name="maxAttempts">
+                          <label
+                            htmlFor="maxAttempts"
+                            className="block text-sm font-medium text-gray-700 mb-1"
+                          >
+                            Max No. of Attempts
+                          </label>
+                          <Field
+                            type="number"
+                            id="maxAttempts"
+                            name="maxAttempts"
+                            placeholder="Max Attempts"
+                            min="1"
+                            className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          />
+                        </InputWrapper>
+
                         <InputWrapper name="maxQuestions">
-                          <label 
-                            htmlFor="maxQuestions" 
+                          <label
+                            htmlFor="maxQuestions"
                             className="block text-sm font-medium text-gray-700 mb-1"
                           >
                             Max No. of Questions
@@ -329,10 +390,10 @@ const CreateQuiz: React.FC = () => {
                             className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                           />
                         </InputWrapper>
-                        
+
                         <InputWrapper name="department">
-                          <label 
-                            htmlFor="department" 
+                          <label
+                            htmlFor="department"
                             className="block text-sm font-medium text-gray-700 mb-1"
                           >
                             Academic Department
@@ -350,10 +411,10 @@ const CreateQuiz: React.FC = () => {
                             <option value="hotel-management">Hotel Management</option>
                           </Field>
                         </InputWrapper>
-                        
+
                         <InputWrapper name="stack">
-                          <label 
-                            htmlFor="stack" 
+                          <label
+                            htmlFor="stack"
                             className="block text-sm font-medium text-gray-700 mb-1"
                           >
                             Technology Stack
@@ -366,10 +427,10 @@ const CreateQuiz: React.FC = () => {
                             className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                           />
                         </InputWrapper>
-                        
+
                         <InputWrapper name="difficultyLevel">
-                          <label 
-                            htmlFor="difficultyLevel" 
+                          <label
+                            htmlFor="difficultyLevel"
                             className="block text-sm font-medium text-gray-700 mb-1"
                           >
                             Difficulty Level
@@ -386,10 +447,10 @@ const CreateQuiz: React.FC = () => {
                             <option value="hard">Hard</option>
                           </Field>
                         </InputWrapper>
-                        
+
                         <InputWrapper name="positiveScore">
-                          <label 
-                            htmlFor="positiveScore" 
+                          <label
+                            htmlFor="positiveScore"
                             className="block text-sm font-medium text-gray-700 mb-1"
                           >
                             Points for Correct Answer
@@ -404,10 +465,10 @@ const CreateQuiz: React.FC = () => {
                             className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                           />
                         </InputWrapper>
-                        
+
                         <InputWrapper name="negativeScore">
-                          <label 
-                            htmlFor="negativeScore" 
+                          <label
+                            htmlFor="negativeScore"
                             className="block text-sm font-medium text-gray-700 mb-1"
                           >
                             Penalty for Wrong Answer
@@ -422,10 +483,10 @@ const CreateQuiz: React.FC = () => {
                             className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                           />
                         </InputWrapper>
-                        
+
                         <InputWrapper name="passingScore">
-                          <label 
-                            htmlFor="passingScore" 
+                          <label
+                            htmlFor="passingScore"
                             className="block text-sm font-medium text-gray-700 mb-1"
                           >
                             Minimum Passing Score
@@ -441,10 +502,10 @@ const CreateQuiz: React.FC = () => {
                           />
                         </InputWrapper>
                       </div>
-                      
+
                       <InputWrapper name="description">
-                        <label 
-                          htmlFor="description" 
+                        <label
+                          htmlFor="description"
                           className="block text-sm font-medium text-gray-700 mb-1"
                         >
                           Quiz Description
@@ -460,8 +521,8 @@ const CreateQuiz: React.FC = () => {
                       </InputWrapper>
 
                       <div className="mb-4">
-                        <label 
-                          htmlFor="startDate" 
+                        <label
+                          htmlFor="startDate"
                           className="block text-sm font-medium text-gray-700 mb-1"
                         >
                           Quiz Start Date

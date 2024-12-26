@@ -291,7 +291,7 @@ export class UserService {
         }
     }
 
-    async myCourses(token:string,page:number,limit:number,search:string): Promise<{ courses: CourseDocument[] | null; total: number;}> {
+    async myCourses(token:string,page:number,limit:number,search:string): Promise<{ course: CourseDocument[] | null; total: number;}> {
         try{
             const skip = (page - 1) * limit;
             let query:any = {};

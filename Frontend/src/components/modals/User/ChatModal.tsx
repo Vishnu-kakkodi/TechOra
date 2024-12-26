@@ -2,27 +2,24 @@
 
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { Send, X, Check  } from "lucide-react";
+import { Send, X, Check } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSocket } from "../../../useSocket";
 import notificationSound from "../../../assets/frontEnd/notification_sound.mp3";
 import { toast } from "react-toastify";
-import EmojiPicker from "emoji-picker-react"; // Import EmojiPicker
+import EmojiPicker from "emoji-picker-react";
 
-/**
- * Message Interface
- */
+
 interface Message {
   id: string;
   text: string;
   sender: "user" | "tutor";
   timestamp: number;
   status?: "sending" | "sent" | "failed";
+  isRead?: boolean;
 }
 
-/**
- * ChatModal Component Props
- */
+
 interface ChatModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -32,7 +29,7 @@ interface ChatModalProps {
   receiverName?: string;
   receiverProfilePhoto?: string;
   currentUserType: "user" | "tutor";
-  sendDataToParent: (data: { message: string; timestamp: number }) => void;
+  sendDataToParent: (data: { message: string; timestamp: number;}) => void;
 
 }
 
@@ -56,7 +53,7 @@ const ChatModal: React.FC<ChatModalProps> = ({
 
   const chatContainerRef = useRef<HTMLDivElement | null>(null);
 
-  const handlePresenceUpdate = useCallback((users: {[key: string]: boolean}) => {
+  const handlePresenceUpdate = useCallback((users: { [key: string]: boolean }) => {
     if (receiverId && users[receiverId] !== undefined) {
       setIsOnline(users[receiverId]);
     }
@@ -71,22 +68,48 @@ const ChatModal: React.FC<ChatModalProps> = ({
     audio.play();
   }, []);
 
-  const { sendMessage, isConnected, fetchChatHistory, markMessagesAsRead, onlineStatus } = useSocket({
+  const { sendMessage, isConnected, fetchChatHistory, markMessagesAsRead, markMessageAsRead, messageReadStatus, onlineStatus } = useSocket({
     token,
     senderId,
     receiverId,
     onNewMessageNotification: handleNotification,
-    onMessageReceive: (receivedMessage: Message) => {
-      setMessages((prev) => {
-        const exists = prev.some((msg) => msg.id === receivedMessage.id);
-        return exists ? prev : [...prev, receivedMessage];
-      });
+    onMessageReceive: (receivedData) => {
+      if (receivedData.type === 'read_status_update') {
+        setMessages(prev => prev.map(msg => 
+          msg.sender === currentUserType ? { ...msg, isRead: true } : msg
+        ));
+      } else {
+        setMessages(prev => {
+          const exists = prev.some(msg => msg.id === receivedData.id);
+          const newMessage = {
+            ...receivedData,
+            isRead: false 
+          };
+          return exists ? prev : [...prev, newMessage];
+        });
+
+        if (isOpen && receivedData.sender !== currentUserType) {
+          markMessageAsRead(receivedData.id);
+        }
+      }
     },
     onChatHistoryFetch: (fetchedMessages) => {
       setMessages(fetchedMessages);
     },
     onPresenceUpdate: handlePresenceUpdate
   });
+
+  useEffect(() => {
+    if (isOpen && messages.length > 0) {
+      const unreadMessages = messages.filter(
+        msg => !msg.isRead && msg.sender !== currentUserType
+      );
+      
+      if (unreadMessages.length > 0) {
+        unreadMessages.forEach(msg => markMessageAsRead(msg.id));
+      }
+    }
+  }, [isOpen, messages, currentUserType, markMessageAsRead]);
 
   useEffect(() => {
     if (isOpen) {
@@ -111,6 +134,7 @@ const ChatModal: React.FC<ChatModalProps> = ({
             sender: currentUserType,
             timestamp: Date.now() - 10000,
             status: "sent",
+            isRead: true
           }]), 1000
         )
       );
@@ -127,7 +151,7 @@ const ChatModal: React.FC<ChatModalProps> = ({
       fetchOlderMessages();
       markMessagesAsRead();
     }
-  }, [fetchOlderMessages,markMessagesAsRead]);
+  }, [fetchOlderMessages, markMessagesAsRead]);
 
   useEffect(() => {
     const container = chatContainerRef.current;
@@ -151,6 +175,7 @@ const ChatModal: React.FC<ChatModalProps> = ({
       sender: currentUserType,
       timestamp: Date.now(),
       status: "sending",
+      isRead: isOnline ? true : false
     };
 
     setMessages((prev) => [...prev, message]);
@@ -271,18 +296,39 @@ const ChatModal: React.FC<ChatModalProps> = ({
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.3 }}
-                  className={`flex ${isSender ? "justify-end" : "justify-start"}`}
+                  className={`flex ${isSender ? "justify-end" : "justify-start"} mb-2`}
                 >
                   <div
-                    className={`relative max-w-[80%] p-3 rounded-2xl shadow-lg ${isSender
-                      ? "bg-gradient-to-br from-blue-600 to-purple-700 text-white"
-                      : "bg-gray-100 text-gray-800"
+                    className={`relative max-w-[80%] px-4 py-2 rounded-xl shadow-md ${isSender
+                      ? "bg-gradient-to-br from-green-500 to-green-400 text-white"
+                      : "bg-gray-200 text-gray-800"
                       } ${message.status === "failed" ? "border-2 border-red-500" : ""}`}
                   >
-                    <p>{message.text}</p>
-                    <span className="text-xs text-gray-400 mt-1 block text-right">
-                      {messageTime}
-                    </span>
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm">{message.text}</p>
+                      <div className="ml-2 flex items-center text-xs space-x-1 relative">
+                        <span className={`${isSender ? "text-gray-200" : "text-black"}`}>{messageTime}</span>
+                        {isSender && (
+                          <span
+                            className={`flex items-center font-bold text-xs ${message.isRead ? "text-blue-500" : "text-black-500"
+                              }`}
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-5 w-5" 
+                              viewBox="0 0 24 24"
+                              fill="currentColor"
+                            >
+                              <path
+                                d="M20.285 6.705a1 1 0 010 1.41l-11 11a1 1 0 01-1.41 0l-5-5a1 1 0 011.41-1.41l4.3 4.29 10.29-10.29a1 1 0 011.41 0z"
+                              />
+                            </svg>
+                          </span>
+
+                        )}
+                      </div>
+                    </div>
+
                     {message.status === "failed" && isSender && (
                       <button
                         onClick={() => retryMessage(message.id)}
@@ -294,6 +340,8 @@ const ChatModal: React.FC<ChatModalProps> = ({
                   </div>
                 </motion.div>
               );
+
+
             })}
 
           </div>
@@ -323,19 +371,6 @@ const ChatModal: React.FC<ChatModalProps> = ({
                   disabled={!isConnected}
                   className="w-full p-3 pl-10 pr-10 bg-white/70 border-2 border-purple-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300 disabled:opacity-50"
                 />
-
-                {/* File Upload Button Inside the Input */}
-                <label
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 cursor-pointer hover:text-purple-500 transition-all duration-300"
-                >
-                  📎
-                  <input
-                    type="file"
-                    onChange={handleFileUpload} // Add your file upload handler here
-                    className="hidden"
-                    disabled={!isConnected}
-                  />
-                </label>
               </div>
 
               {/* Send Button */}

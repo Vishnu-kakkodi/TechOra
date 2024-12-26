@@ -19,6 +19,8 @@ import { ReviewRepository } from "../repositories/review.repository";
 import { ReviewService } from "../services/review.service";
 import { ReviewController } from "../controllers/review.controller";
 import { TutorRepository } from "../repositories/tutor.repository";
+import { WishlistController } from "../controllers/wishlist.controller";
+import { WishlistRepository } from "../repositories/wishlist.repository";
 
 
 
@@ -27,13 +29,15 @@ const userRepository = new UserRepository();
 const courseRepository = new CourseRepository();
 const cartRepository = new CartRepository();
 const tutorRepository = new TutorRepository();
+const wishlistRepository = new WishlistRepository();
 const userService = new UserService(userRepository,courseRepository);
 const userController = new UserController(userService);
 const quizRepository = new QuizRepository()
 const quizService = new QuizService(quizRepository,userRepository,tutorRepository)
 const quizController = new QuizController(quizService)
-const courseService = new CourseService(courseRepository, cartRepository, userRepository,tutorRepository)
+const courseService = new CourseService(courseRepository, cartRepository, userRepository,tutorRepository,wishlistRepository)
 const cartController = new CartController(courseService)
+const wishlistController = new WishlistController(courseService)
 const courseController = new CourseController(courseService,quizService)
 const orderRepository = new OrderRepository()
 const orderService = new OrderService(orderRepository,cartRepository,userRepository,courseRepository)
@@ -46,8 +50,10 @@ const reviewController = new ReviewController(reviewService)
 router.get('/cart-items',authMiddleware,cartController.getCartItems.bind(cartController));
 router.get('/course-list',authMiddleware,courseController.userCourseList.bind(courseController));
 router.get('/order-list',authMiddleware,orderController.orderList.bind(orderController));
+router.get('/order-detail/:orderId',authMiddleware,orderController.orderDetail.bind(orderController));
 router.get('/course-detail/:courseId',authMiddleware,courseController.courseDetail.bind(courseController));
 router.get('/my-courses',authMiddleware,userController.myCourses.bind(userController));
+router.get('/favourates',authMiddleware,wishlistController.wishlistPage.bind(wishlistController));
 router.get('/quiz-list',authMiddleware,quizController.quizList.bind(quizController));
 router.get('/review',authMiddleware,reviewController.Review.bind(reviewController));
 router.get('/home-data',userController.homeData.bind(userController));
@@ -75,6 +81,9 @@ router.put('/profile-update',authMiddleware,userController.profileUpdate.bind(us
 router.post('/create-review',authMiddleware,reviewController.createReview.bind(reviewController));
 router.patch('/change-password',authMiddleware,userController.changePassword.bind(userController));
 router.post('/quiz-result',authMiddleware,quizController.quizResult.bind(quizController));
+router.post('/add-wishlist',authMiddleware,wishlistController.addToWishlist.bind(wishlistController));
+router.delete('/remove-wishlist/:courseId',authMiddleware,wishlistController.removeWishlist.bind(wishlistController));
+
 
 
 

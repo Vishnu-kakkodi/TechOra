@@ -20,6 +20,7 @@ interface CourseItem {
 interface OrderDetails {
     order: {
         _id: string;
+        orderId: string;
         userId: string;
         items: CourseItem[];
         totalItems: number;
@@ -85,7 +86,7 @@ const PaymentSuccess: React.FC = () => {
                     <div className="grid md:grid-cols-2 gap-6">
                         <div>
                             <p className="text-gray-600">Order ID: 
-                                <span className="font-semibold ml-2 text-gray-900">{order._id}</span>
+                                <span className="font-semibold ml-2 text-gray-900">{order.orderId}</span>
                             </p>
                             <p className="text-gray-600 mt-2">Payment Method: 
                                 <span className="font-semibold ml-2 text-gray-900">{order.paymentMethod}</span>

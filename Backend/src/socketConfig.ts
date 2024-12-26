@@ -84,30 +84,30 @@ class SocketConfig {
         console.log(`User ${userId} joined room ${roomId}`);
       });
 
-      // socket.on('mark_messages_read', async (chatPartnerId) => {
-      //   try {
-      //     const roomId = this.generateRoomId(userId, chatPartnerId);
+      socket.on('mark_messages_read', async (chatPartnerId) => {
+        try {
+          const roomId = this.generateRoomId(userId, chatPartnerId);
           
-      //     await MessageModel.updateMany(
-      //       { 
-      //         roomId,
-      //         receiverId: userId,
-      //         isRead: false 
-      //       },
-      //       { 
-      //         $set: { isRead: true } 
-      //       }
-      //     );
+          await MessageModel.updateMany(
+            { 
+              roomId,
+              receiverId: userId,
+              isRead: false 
+            },
+            { 
+              $set: { isRead: true } 
+            }
+          );
 
-      //     this.io?.to(roomId).emit('messages_read', {
-      //       readBy: userId,
-      //       timestamp: new Date()
-      //     });
+          this.io?.to(roomId).emit('messages_read', {
+            readBy: userId,
+            timestamp: new Date()
+          });
 
-      //   } catch (error) {
-      //     console.error('Error marking messages as read:', error);
-      //   }
-      // });
+        } catch (error) {
+          console.error('Error marking messages as read:', error);
+        }
+      });
 
 
       socket.on('fetch_chat_history', async (chatPartnerId, callback) => {

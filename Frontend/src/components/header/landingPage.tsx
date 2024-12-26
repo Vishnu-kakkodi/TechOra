@@ -16,8 +16,6 @@ const LandingPageHeader = () => {
 
   const [otpMode, setOtpMode] = useState<'signup' | 'verifyEmail' | 'forgotPassword'>('signup');
 
-  const searchData = ["Course", "Quiz"];
-
   const handleForgotPassword = () => {
     setLoginModalOpen(false);
     setEmailVerifyOpen(true);
@@ -46,20 +44,6 @@ const LandingPageHeader = () => {
             </div>
             {/* <SearchBar data={searchData} /> */}
 
-            <nav className="flex space-x-8">
-              <a className="text-white font-jakarta hover:text-yellow-300 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
-                Course
-              </a>
-              <a className="text-white font-jakarta hover:text-yellow-300 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
-                Quiz
-              </a>
-              <a className="text-white font-jakarta hover:text-yellow-300 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
-                Resources
-              </a>
-              <a className="text-white font-jakarta hover:text-yellow-300 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
-                About
-              </a>
-            </nav>
             <div>
               <SignUpButton handleSignUp={() => setSignUpModalOpen(true)} />
               <LoginButton handleLogin={() => setLoginModalOpen(true)} />

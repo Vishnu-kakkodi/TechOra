@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useGetOrdersQuery } from '../../store/slices/userSlice';
+import { useGetOrderDetailQuery, useGetOrdersQuery } from '../../store/slices/userSlice';
 import { AlertCircle, CheckCircle, Clock, ChevronDown, ChevronUp } from 'lucide-react';
 import { Order } from '../../types/userSide/orderType';
 import {loadStripe, Stripe} from '@stripe/stripe-js';
@@ -16,20 +16,21 @@ const OrderDetail = () => {
     const [showAll, setShowAll] = useState(false);
     const { orderId } = useParams<{ orderId: string }>();
     const navigate = useNavigate();
-    const { data: orderData, isLoading } = useGetOrdersQuery(null);
+    const { data: order, isLoading, isError } = useGetOrderDetailQuery({orderId});
     const [currentOrder, setCurrentOrder] = useState<Order | null>(null);
     const [payment] = usePaymentMutation();
 
 
     useEffect(() => {
-        if (orderId && orderData?.order) {
-            const found = orderData.order.find((order) => order._id === orderId);
-            if (found) {
-                setCurrentOrder(found);
-            }
+        if (order?.order) {
+            setCurrentOrder(order.order);
             setLoading(false);
         }
-    }, [orderData, orderId]);
+    }, [order]);   
+    
+    console.log(currentOrder)
+
+    
 
     if (isLoading || loading) {
         return (
@@ -38,6 +39,10 @@ const OrderDetail = () => {
             </div>
         );
     }
+
+    if (isError) {
+        return <div>Error fetching course data.</div>;
+      }
 
     if (!currentOrder) {
         return (
@@ -126,7 +131,7 @@ const OrderDetail = () => {
                         <div className="space-y-3">
                             <div className="bg-gray-50 p-3 rounded">
                                 <p className="text-sm text-gray-500">Order ID</p>
-                                <p className="font-medium">{currentOrder._id}</p>
+                                <p className="font-medium">{currentOrder.orderId}</p>
                             </div>
                             <div className="bg-gray-50 p-3 rounded">
                                 <p className="text-sm text-gray-500">Transaction ID</p>
@@ -197,9 +202,6 @@ const OrderDetail = () => {
                                         </div>
                                         <div className="mt-3 sm:mt-0 sm:ml-4 sm:text-right">
                                             <p className="font-semibold">₹{item.price.toFixed(2)}</p>
-                                            <p className="text-sm text-gray-500">
-                                                Subtotal: ₹{item.subTotal.toFixed(2)}
-                                            </p>
                                         </div>
                                     </div>
                                 </div>

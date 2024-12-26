@@ -6,7 +6,6 @@ import userRoutes from './routes/user.routes'
 import adminRoutes from './routes/admin.routes'
 import institutionRoutes from './routes/institution.routes'
 import tutorRoutes from './routes/tutor.routes'
-import messageRoutes from './routes/message.routes'
 import { errorMiddleware } from "./middleware/error.middleware";
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
@@ -33,7 +32,6 @@ app.use('/api/users', userRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/institution', institutionRoutes);
 app.use('/api/tutor', tutorRoutes);
-app.use('/api/message', messageRoutes);
 
 
 app.use(errorMiddleware);

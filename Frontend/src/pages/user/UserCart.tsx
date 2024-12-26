@@ -13,15 +13,6 @@ interface UserCartProps {
   onCheckout?: (selectedItems: CartItem[] | undefined) => void;
 }
 
-interface SelectedItemDetails {
-  id: string;
-  TotalPrice: number;
-}
-
-interface StripeSessionResponse {
-  id: string;
-}
-
 const UserCart: React.FC<UserCartProps> = ({ onRemoveItem, onCheckout }) => {
   const { data: cartData, refetch  } = useCartPageQuery(null);
   const cartItems = cartData?.Data;
@@ -120,8 +111,13 @@ const UserCart: React.FC<UserCartProps> = ({ onRemoveItem, onCheckout }) => {
     <div className="min-h-screen flex flex-col">
       <Navbar />
       <div className="flex-grow bg-gray-50">
+      <h1 className="text-2xl sm:text-3xl font-bold text-center mt-6 mb-6 sm:mb-8">Shopping Cart</h1>
+      {!cartItems || !cartItems?.items.length ? (
+        <div className="flex flex-col items-center justify-center min-h-[50vh] text-gray-500">
+          <p className="text-lg font-medium">Your Cart is Emppty.</p>
+        </div>
+      ) : (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <h1 className="text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-8">Shopping Cart</h1>
           <div className="lg:hidden mb-6">
             <div className="bg-white rounded-lg shadow-sm p-4">
               <h2 className="text-lg font-bold mb-3">Order Summary</h2>
@@ -153,7 +149,6 @@ const UserCart: React.FC<UserCartProps> = ({ onRemoveItem, onCheckout }) => {
               )}
             </div>
           </div>
-
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2">
               <div className="bg-white rounded-lg shadow-sm mb-4 p-4">
@@ -259,6 +254,7 @@ const UserCart: React.FC<UserCartProps> = ({ onRemoveItem, onCheckout }) => {
             </div>
           </div>
         </div>
+      )}
       </div>
       <Footer />
     </div>

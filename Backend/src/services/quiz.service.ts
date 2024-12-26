@@ -23,7 +23,7 @@ export class QuizService {
     }
 
 
-    async createQuiz(quizData: QuizDocument,tutorId: string): Promise<void> {
+    async createQuiz(quizData: QuizDocument,tutorId: string): Promise<any> {
         try {
             if(!tutorId){
                 throw new HttpException(STATUS_CODES.BAD_REQUEST, MESSAGES.ERROR.BAD_REQUEST)
@@ -34,8 +34,9 @@ export class QuizService {
                     institutionId: new mongoose.Types.ObjectId(tutorData?.institutionId),
                     tutorId: new mongoose.Types.ObjectId(tutorId)
             };
-            await this.quizRepository.create(newItem);
-            return 
+            const createdQuiz = await this.quizRepository.create(newItem);
+            console.log(createdQuiz,"Quiz");
+            return createdQuiz._id 
         } catch (error) {
             console.error('Error creating course:', error);
             throw error;

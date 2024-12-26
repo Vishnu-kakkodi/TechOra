@@ -16,8 +16,17 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
       <BrowserRouter> 
         <I18nextProvider i18n={i18n}>
           <LanguageProvider>
-            <ToastContainer />
-            <App />
+          <ToastContainer 
+              position="top-center" 
+              autoClose={5000} 
+              hideProgressBar={false} 
+              newestOnTop={false} 
+              closeOnClick 
+              rtl={false} 
+              pauseOnFocusLoss 
+              draggable 
+              pauseOnHover 
+            />              <App />
           </LanguageProvider>
         </I18nextProvider>
       </BrowserRouter>
