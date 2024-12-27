@@ -2,12 +2,10 @@ import { Request, Response, NextFunction } from "express";
 import { UserService } from "../services/user.service";
 import { CreateUserDto } from "../dtos/user.dtos";
 import { HttpException } from "../middleware/error.middleware";
-import { UserCookieData } from '../types/user.types';
 import { setCookie } from "../helperFunction/cookieUtils";
 import STATUS_CODES from "../constants/statusCode";
 import MESSAGES from "../constants/message";
 import { decodedToken } from "../helperFunction/authHelper";
-import { log } from "console";
 
 
 export class UserController {
@@ -33,7 +31,6 @@ export class UserController {
             if (!user) {
                 throw new HttpException(STATUS_CODES.BAD_REQUEST, MESSAGES.ERROR.BAD_REQUEST)
             }
-
             const userData = {
                 user: user,
                 otp: user.OTP,
@@ -45,7 +42,6 @@ export class UserController {
                 sameSite: 'strict',
                 maxAge: 5 * 60 * 1000
             });
-
             res.status(STATUS_CODES.SUCCESS).json({
                 success: true,
                 message: MESSAGES.SUCCESS.OTP_SEND,
@@ -62,23 +58,14 @@ export class UserController {
         next: NextFunction
     ): Promise<void> {
         try {
-
             const { otp } = req.body;
             const CookieData = req.cookies.userData;
             if (!CookieData) {
                 throw new HttpException(STATUS_CODES.GONE, MESSAGES.ERROR.TIME_EXPIRED);
             }
-
             const user = await this.userService.createUser(CookieData, otp);
             if (user) {
                 res.clearCookie('userData');
-
-                // const { accessToken, refreshToken, ...userDetails } = user;
-                // const Token = {
-                //     accessToken: accessToken,
-                //     refreshToken: refreshToken
-                // }
-                // setCookie(res,'user',Token);
                 res.status(201).json({ user, status: STATUS_CODES.CREATED, message: MESSAGES.SUCCESS.USER_CREATED });
             }
         } catch (error) {
@@ -93,25 +80,18 @@ export class UserController {
         next: NextFunction
     ): Promise<void> {
         try {
-
             const email = req.cookies.userData.user.email;
-
             const user: CreateUserDto = req.cookies.userData.user;
-
-
             if (!email) {
                 throw new Error('No user data found');
             }
-
             const response = await this.userService.resendOtp(email);
-
             if (response) {
                 const updatedUserData = {
                     user: user,
                     otp: response,
                     timeStamp: new Date().getTime()
                 };
-
                 res.cookie('userData', updatedUserData, {
                     httpOnly: true,
                     secure: true,
@@ -119,9 +99,7 @@ export class UserController {
                     maxAge: 5 * 60 * 1000,
                 });
             }
-
             res.status(201).json({ OTP: "Otp send successfully" })
-
         } catch (error) {
             console.error('Error', error);
             next(error)
@@ -186,7 +164,6 @@ export class UserController {
                 response,
                 email
             }
-
             if (response) {
                 res.cookie('forgotPassword', data, {
                     httpOnly: true,
@@ -211,10 +188,8 @@ export class UserController {
     ): Promise<void> {
         try {
             const { otp } = req.body;
-            console.log(otp, "controllerOTP")
             const CookieOtp: string = req.cookies.forgotPassword.response;
             const email: string = req.cookies.forgotPassword.email;
-            console.log(CookieOtp);
             const response = await this.userService.verifyOtp(otp, CookieOtp);
             if (!response) {
                 throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
@@ -407,7 +382,6 @@ export class UserController {
                 throw new HttpException(STATUS_CODES.UNAUTHORIZED, MESSAGES.ERROR.UNAUTHORIZED)
             }
             const requiredRole = "user";
-            console.log("lllll",token,"toooooooooooooooooooooo")
             const userId: string | null = decodedToken(token, requiredRole);
             const page = parseInt(req.query.page as string) || 1;
             const limit = parseInt(req.query.limit as string) || 4;

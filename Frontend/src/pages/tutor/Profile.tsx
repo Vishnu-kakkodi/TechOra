@@ -46,18 +46,34 @@ const Profile = () => {
     }
   }, [tutorData,tutorData?.profilePic]);
 
-  const handlePhotoUpload = async (event:any) => {
+  // const handlePhotoUpload = async (event:any) => {
+  //   const file = event.target.files[0];
+  //   if (file) {
+  //     setImageFile(file);
+
+  //     const reader = new FileReader();
+  //     reader.onloadend = () => {
+  //       setProfilePhoto(reader.result);
+  //     };
+  //     reader.readAsDataURL(file);
+  //   }
+  // };
+
+  const handlePhotoUpload = async (event: any) => {
     const file = event.target.files[0];
     if (file) {
       setImageFile(file);
-
+  
       const reader = new FileReader();
       reader.onloadend = () => {
-        setProfilePhoto(reader.result);
+        if (typeof reader.result === 'string') {
+          setProfilePhoto(reader.result); 
+        }
       };
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(file); 
     }
   };
+  
 
   const handleSubmitPhoto = async () => {
     if (imageFile) {

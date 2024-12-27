@@ -51,7 +51,6 @@ const CourseList = () => {
     const Colleges = courses.map((c: any) => c.institutionId.collegeName);
     const popularColleges = Array.from(new Set(Colleges));
 
-    // Animation variants
     const containerVariants = {
         hidden: { opacity: 0 },
         visible: {

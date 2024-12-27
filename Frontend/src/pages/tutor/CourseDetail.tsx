@@ -129,12 +129,12 @@ const CourseDetail = () => {
               <h3 className="text-lg font-bold mb-2">Instructor</h3>
               <div className="flex items-center space-x-4">
                 <img
-                  src={profile}
-                  alt={course.instructor}
+                  src={course.tutorId?.profilePic}
+                  alt={course.tutorId?.tutorname}
                   className="w-16 h-16 rounded-full"
                 />
                 <div>
-                  <p className="font-medium">{course.instructor}</p>
+                  <p className="font-medium">{course.tutorId?.tutorname}</p>
                   <p className="text-sm text-gray-500">{course.department}</p>
                 </div>
               </div>

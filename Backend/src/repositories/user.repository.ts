@@ -1,10 +1,8 @@
 import { BaseRepository } from "./base.repository";
 import { UserModel } from "../models/user.model";
 import { IUserDocument } from "../interfaces/user.interface";
-import { customError } from "../customError";
 import { HttpException } from "../middleware/error.middleware";
 import mongoose, { FilterQuery } from 'mongoose';
-import { MyCourses } from "../types/user.types";
 
 interface UpdateProfileData {
     userName?: string;
@@ -38,13 +36,9 @@ export class UserRepository extends BaseRepository<IUserDocument> {
 
     async find(searchQuery:SearchQueryType,skip:number,limit:number): Promise<{ users: IUserDocument[]; total: number }> { 
         try {
-            console.log("empty",searchQuery);
-            
             const users = await this.model.find(searchQuery)
             .skip(skip)
             .limit(limit)
-            // .select('- password');
-
             const total:number = await this.model.countDocuments(searchQuery);
             console.log(users);
             return { users, total };
@@ -122,14 +116,11 @@ export class UserRepository extends BaseRepository<IUserDocument> {
     }
 
     async findUsers(searchQuery:SearchQueryType,skip:number,limit:number): Promise<{ users: IUserDocument[]; total: number }> { 
-        try {
-            console.log("empty",searchQuery);
-            
+        try {  
             const users = await this.model.find(searchQuery)
             .sort({ 'quizProgress.rank': 1 })
             .skip(skip)
             .limit(limit)
-            // .select('- password');
 
             const total:number = await this.model.countDocuments(searchQuery);
             console.log(users);

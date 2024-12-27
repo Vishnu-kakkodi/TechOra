@@ -47,7 +47,6 @@ const TutorAdd: React.FC<CreateTutorProps> = ({ setTutorAdd, instituteId, depart
     validationSchema,
     onSubmit: async (values, { setSubmitting }) => {
       try {
-        // Remove confirmPassword from the data sent to the server
         const { confirmPassword, ...submitData } = values;
         const response = await createTutor({
           data: submitData
@@ -73,7 +72,6 @@ const TutorAdd: React.FC<CreateTutorProps> = ({ setTutorAdd, instituteId, depart
         <div className="p-6 overflow-y-auto max-h-[calc(90vh-80px)]">
           <form onSubmit={formik.handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
-              {/* Department Field */}
               <div>
                 <label htmlFor="department" className="block text-gray-700 font-medium mb-2">
                   Department
@@ -104,7 +102,6 @@ const TutorAdd: React.FC<CreateTutorProps> = ({ setTutorAdd, instituteId, depart
               </div>
 
 
-              {/* Tutor Name Field */}
               <div>
                 <label htmlFor="tutorname" className="block text-gray-700 font-medium mb-2">
                   Tutor Name
@@ -126,7 +123,6 @@ const TutorAdd: React.FC<CreateTutorProps> = ({ setTutorAdd, instituteId, depart
                 )}
               </div>
 
-              {/* Email Field */}
               <div>
                 <label htmlFor="tutorEmail" className="block text-gray-700 font-medium mb-2">
                   Email
@@ -148,7 +144,6 @@ const TutorAdd: React.FC<CreateTutorProps> = ({ setTutorAdd, instituteId, depart
                 )}
               </div>
 
-              {/* Password Field */}
               <div>
                 <label htmlFor="password" className="block text-gray-700 font-medium mb-2">
                   Password
@@ -170,7 +165,6 @@ const TutorAdd: React.FC<CreateTutorProps> = ({ setTutorAdd, instituteId, depart
                 )}
               </div>
 
-              {/* Confirm Password Field */}
               <div>
                 <label htmlFor="confirmPassword" className="block text-gray-700 font-medium mb-2">
                   Confirm Password
@@ -192,7 +186,6 @@ const TutorAdd: React.FC<CreateTutorProps> = ({ setTutorAdd, instituteId, depart
                 )}
               </div>
 
-              {/* Education Field */}
               <div>
                 <label htmlFor="education" className="block text-gray-700 font-medium mb-2">
                   Education
@@ -214,7 +207,6 @@ const TutorAdd: React.FC<CreateTutorProps> = ({ setTutorAdd, instituteId, depart
                 )}
               </div>
 
-              {/* Experience Field */}
               <div>
                 <label htmlFor="experiance" className="block text-gray-700 font-medium mb-2">
                   Experience
@@ -236,7 +228,6 @@ const TutorAdd: React.FC<CreateTutorProps> = ({ setTutorAdd, instituteId, depart
                 )}
               </div>
 
-              {/* Gender Field */}
               <div className="col-span-2">
                 <label htmlFor="gender" className="block text-gray-700 font-medium mb-2">
                   Gender

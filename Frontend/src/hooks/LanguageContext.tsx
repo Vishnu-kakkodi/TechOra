@@ -14,25 +14,20 @@ const LanguageContext = createContext<LanguageContextType>({
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { i18n } = useTranslation();
   const [language, setLanguage] = useState(() => {
-    // Priority: localStorage > browser language > default 'en'
     return localStorage.getItem('appLanguage') || 
            i18n.language || 
            'en';
   });
 
   const changeLanguage = (lang: string) => {
-    // Update i18n instance
     i18n.changeLanguage(lang);
     
-    // Update state
     setLanguage(lang);
     
-    // Persist in localStorage
     localStorage.setItem('appLanguage', lang);
   };
 
   useEffect(() => {
-    // Apply language on initial load and when it changes
     i18n.changeLanguage(language);
   }, [language, i18n]);
 
@@ -43,5 +38,4 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   );
 };
 
-// Custom hook to use language context
 export const useLanguage = () => useContext(LanguageContext);

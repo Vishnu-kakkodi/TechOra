@@ -18,9 +18,7 @@ const InstitutionDetail = () => {
   const [instituteUnBlock] = useInstituteUnBlockMutation();
 
   const { 
-    data, 
-    isLoading, 
-    isError, 
+    data: data,
     refetch 
   } = useInstituteViewQuery({
     instituteId: instituteId.instituteId
@@ -28,7 +26,6 @@ const InstitutionDetail = () => {
 
   const institutes = data?.data || [];
 
-console.log(institutes)
 
 
   const handleApprove = async (instituteId: string) => {

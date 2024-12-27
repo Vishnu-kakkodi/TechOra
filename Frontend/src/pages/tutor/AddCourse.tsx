@@ -15,7 +15,6 @@ import TutorSidebar from '../../components/sidebar/tutorSidebar';
 
 interface CourseFormValues {
   title: string;
-  department: string;
   duration: string;
   description: string;
   startDate: string;
@@ -28,7 +27,7 @@ interface ErrorProps {
   children: React.ReactNode;
 }
 
-const validationSchema: Yup.ObjectSchema<Partial<CourseFormValues>> = Yup.object({
+const validationSchema: Yup.ObjectSchema<CourseFormValues, Yup.AnyObject, any, "">= Yup.object({
   title: Yup.string()
     .required('Course title is required')
     .min(3, 'Title must be at least 3 characters'),
@@ -42,16 +41,27 @@ const validationSchema: Yup.ObjectSchema<Partial<CourseFormValues>> = Yup.object
   description: Yup.string()
     .required('Course description is required')
     .min(20, 'Description must be at least 20 characters'),
-  startDate: Yup.date()
+  startDate: Yup.string()
     .required('Start date is required')
-    .min(new Date(), 'Start date must be in the future'),
+    .test('is-future-date', 'Start date must be in the future', (value) => {
+      if (!value) return false;
+      const selectedDate = new Date(value);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      return selectedDate >= today;
+    }),
   price: Yup.string()
     .required('Price is required')
     .test('is-non-negative', 'Price cannot be negative', (value) => {
       if (!value) return false;
       return Number(value) >= 0;
     }),
-  thumbnail: Yup.mixed<File>()
+  status: Yup.string()
+    .oneOf(['draft', 'published'] as const)
+    .required('Status is required'),
+  thumbnail: Yup.mixed<File | null>()
+    .nullable()
+    .default(null)
     .test('fileSize', 'File size must be less than 10MB', (value) => {
       if (!value) return true;
       return value.size <= 10 * 1024 * 1024;

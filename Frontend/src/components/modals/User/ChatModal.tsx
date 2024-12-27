@@ -1,6 +1,3 @@
-
-
-
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Send, X, Check } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -351,7 +348,6 @@ const ChatModal: React.FC<ChatModalProps> = ({
             className="p-4 bg-white/30 backdrop-blur-sm"
           >
             <div className="relative flex items-center gap-2">
-              {/* Emoji Picker Button */}
               <button
                 type="button"
                 onClick={() => setIsEmojiPickerVisible(!isEmojiPickerVisible)}
@@ -360,9 +356,7 @@ const ChatModal: React.FC<ChatModalProps> = ({
                 😊
               </button>
 
-              {/* Input Container with File Button */}
               <div className="relative flex-1">
-                {/* Text Input */}
                 <input
                   type="text"
                   value={newMessage}
@@ -373,7 +367,6 @@ const ChatModal: React.FC<ChatModalProps> = ({
                 />
               </div>
 
-              {/* Send Button */}
               <button
                 type="submit"
                 disabled={!isConnected || !newMessage.trim()}
@@ -383,7 +376,6 @@ const ChatModal: React.FC<ChatModalProps> = ({
               </button>
             </div>
 
-            {/* Disconnection Message */}
             {!isConnected && (
               <p className="text-red-500 text-xs mt-2">
                 Disconnected. Please check your connection.
@@ -391,9 +383,6 @@ const ChatModal: React.FC<ChatModalProps> = ({
             )}
           </form>
 
-
-
-          {/* Show Emoji Picker */}
           {isEmojiPickerVisible && (
             <div className="absolute bottom-16 left-4 z-50">
               <EmojiPicker onEmojiClick={handleEmojiClick} />

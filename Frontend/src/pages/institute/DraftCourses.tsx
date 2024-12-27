@@ -1,11 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Trash2, ChevronDown, Search, Eye } from 'lucide-react';
+import { Search, Eye } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useDraftCourseListQuery } from '../../store/slices/institutionSlice';
-
 import InstituteSidebar from '../../components/sidebar/InstituteSidebar';
-import { Course } from '../../types/courseType';
-import InstituteFooter from '../../components/footer/InstituteFooter';
 import useDebouncedValue from '../../hooks/debounceHook';
 
 const DraftCourses = () => {
@@ -24,9 +21,7 @@ const DraftCourses = () => {
   const [draftId, setDraftId] = useState("");
 
   const {
-    data: courseData,
-    isLoading,
-    error
+    data: courseData
   } = useDraftCourseListQuery({
     page,
     limit,
@@ -62,7 +57,6 @@ const DraftCourses = () => {
 
   const handleEdit = (courseId: string) => {
     navigate('/institute/upload-videos', { state: { draftId: courseId } })
-    console.log('Form submitted:');
   };
 
   const handleNextPage = () => {

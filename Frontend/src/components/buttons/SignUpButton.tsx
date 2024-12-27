@@ -20,23 +20,6 @@ const SignUpButton: React.FC<SignUpButtonProps> = ({
 }) => {
   const dispatch = useDispatch<AppDispatch>();
 
-  // const handleLogin = async () => {
-  //   try {
-  //     const credentials: LoginCredentials = {     
-  //       email: 'johndoe@example.com',
-  //       password: 'password123'
-  //     };
-
-  //     if (setModalOpen) {
-  //       setModalOpen(false); 
-  //     }
-  //   } catch (err) {
-  //     if (setModalOpen) {
-  //       setModalOpen(true); 
-  //     }
-  //   }
-  // };
-
   return (
     <>
       

@@ -30,31 +30,12 @@ const InstituteSidebar: React.FC = () => {
   const [instituteLogoutCall] = useInstituteLogoutCallMutation();
   const { data: course } = useDraftCourseListQuery(null);
 
-  const { data: users, error } = useUserListQuery(null);
-
   const [isDepartmentModalOpen, setIsDepartmentModalOpen] = useState(false);
 
 
-  const handleDraft = async () => {
-    if (course) {
-      console.log("User list fetched successfully:", course);
-      navigate('/institute/course-drafts');
-    } else if (error) {
-      console.error("Error fetching course list:");
-    }
-  }
 
   const handleNavigate = (path: string) => {
     navigate(path);
-  };
-
-  const handleUserList = () => {
-    if (users) {
-      console.log("User list fetched successfully:", users);
-      navigate('/institute/user-list');
-    } else if (error) {
-      console.error("Error fetching user list:", error);
-    }
   };
 
   const handleLogout = async () => {
@@ -117,13 +98,6 @@ const InstituteSidebar: React.FC = () => {
                 <Brain className="w-5 h-5" />
                 <span>Quiz List</span>
               </button>
-              {/* <button 
-              onClick={() => handleNavigate('/quizzes/drafts')}
-              className="flex items-center space-x-2 text-gray-300 hover:text-white w-full"
-            >
-              <FileEdit className="w-5 h-5" />
-              <span>Draft Quizzes</span>
-            </button> */}
             </div>
           </div>
 
@@ -161,28 +135,8 @@ const InstituteSidebar: React.FC = () => {
                 <GraduationCap className="w-5 h-5" />
                 <span>Tutor List</span>
               </button>
-              {/* <button 
-              onClick={() => handleNavigate('/institute/tutor-add')}
-              className="flex items-center space-x-2 text-gray-300 hover:text-white w-full"
-            >
-              <PlusCircle className="w-5 h-5" />
-              <span>Add Tutor</span>
-            </button> */}
             </div>
           </div>
-
-          {/* <div className="mb-6 space-y-4">
-          <div className="text-gray-500 text-sm uppercase">
-            Students
-          </div>
-          <button 
-            onClick={handleUserList}
-            className="flex items-center space-x-2 text-gray-300 hover:text-white ml-5"
-          >
-            <Users className="w-5 h-5" />
-            <span>All Students</span>
-          </button>
-        </div> */}
 
           <div className="mt-8">
             <button
@@ -198,7 +152,10 @@ const InstituteSidebar: React.FC = () => {
       <DepartmentAdd
         isOpen={isDepartmentModalOpen}
         onClose={() => setIsDepartmentModalOpen(false)}
-      />
+        onAddDepartment={(departmentData) => {
+          console.log("Department added:", departmentData);
+        }} 
+        />
 
     </>
 

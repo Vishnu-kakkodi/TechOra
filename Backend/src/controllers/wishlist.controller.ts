@@ -1,9 +1,8 @@
 import {Request, Response, NextFunction} from 'express'
-import { decodedToken, DecodedToken } from '../helperFunction/authHelper'
+import { decodedToken } from '../helperFunction/authHelper'
 import { HttpException } from '../middleware/error.middleware'
 import STATUS_CODES from '../constants/statusCode'
 import MESSAGES from '../constants/message'
-import { CourseController } from './course.controller'
 import { CourseService } from '../services/course.service'
 
 export class WishlistController {

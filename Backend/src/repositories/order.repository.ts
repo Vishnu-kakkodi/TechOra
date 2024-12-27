@@ -8,8 +8,8 @@ export type SearchCourse = FilterQuery<{
 }>;
 
 
-export class OrderRepository extends BaseRepository<OrderDocument>{
-    constructor(){
+export class OrderRepository extends BaseRepository<OrderDocument> {
+    constructor() {
         super(OrderModel);
     }
 
@@ -18,16 +18,14 @@ export class OrderRepository extends BaseRepository<OrderDocument>{
             return await this.model.findById(orderId).populate({
                 path: 'items.course'
             });
-        } catch(error) {
+        } catch (error) {
             throw error;
         }
     }
 
     async findById(orderId: any): Promise<OrderDocument | any> {
         try {
-  
-            const order = await this.model.findById({_id:orderId});
-
+            const order = await this.model.findById({ _id: orderId });
             return order
         } catch (error: any) {
             console.error("Error occurred while fetching order:", error);
@@ -36,24 +34,24 @@ export class OrderRepository extends BaseRepository<OrderDocument>{
     }
 
     async find(
-                searchQuery: SearchCourse,
-                skip: number,
-                limit: number,
-                sortOptions: any = { createdAt: -1 }
-    ): Promise<{orders:OrderDocument[] | null; total: number}> {
+        searchQuery: SearchCourse,
+        skip: number,
+        limit: number,
+        sortOptions: any = { createdAt: -1 }
+    ): Promise<{ orders: OrderDocument[] | null; total: number }> {
         try {
             const orders = await this.model.find(searchQuery)
-            .sort(sortOptions)
-            .skip(skip)
-            .limit(limit)
-            .populate({
-                path: 'items.course'
-            });
+                .sort(sortOptions)
+                .skip(skip)
+                .limit(limit)
+                .populate({
+                    path: 'items.course'
+                });
 
             const total: number = await this.model.countDocuments(searchQuery);
 
-            return {orders, total};
-        } catch(error) {
+            return { orders, total };
+        } catch (error) {
             throw error;
         }
     }
@@ -61,17 +59,17 @@ export class OrderRepository extends BaseRepository<OrderDocument>{
     async updatePaymentStatus(orderId: mongoose.Types.ObjectId): Promise<OrderDocument | null> {
         try {
             return await this.model.findByIdAndUpdate(
-                orderId, 
-                { 
+                orderId,
+                {
                     paymentStatus: 'Completed',
-                }, 
-                { 
-                    new: true 
+                },
+                {
+                    new: true
                 }
             ).populate({
                 path: 'items.course'
             });
-        } catch(error) {
+        } catch (error) {
             throw error;
         }
     }

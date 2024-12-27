@@ -39,7 +39,6 @@ const InstitutionDashboard: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="container mx-auto">
-        {/* Header */}
         <header className="mb-8">
           <div className="flex justify-between items-center">
             <h1 className="text-3xl font-extrabold text-gray-800">
@@ -56,7 +55,6 @@ const InstitutionDashboard: React.FC = () => {
           </div>
         </header>
 
-        {/* Dashboard Overview */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           <div className="lg:col-span-2">
             <CardDisplay />
@@ -92,7 +90,6 @@ const InstitutionDashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Latest Courses */}
         <section className="mb-8">
           <h2 className="text-2xl font-bold text-gray-800 mb-4">Latest Courses</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -140,7 +137,6 @@ const InstitutionDashboard: React.FC = () => {
           </div>
         </section>
 
-        {/* Latest Quizzes */}
         <section>
           <h2 className="text-2xl font-bold text-gray-800 mb-4">Latest Quizzes</h2>
           <div className="bg-white shadow-lg rounded-xl overflow-hidden">
@@ -202,7 +198,6 @@ const InstitutionDashboard: React.FC = () => {
           </div>
         </section>
 
-        {/* Tutor Add Modal */}
         {tutorAdd && (
           <TutorAdd 
             setTutorAdd={setTutorAdd} 

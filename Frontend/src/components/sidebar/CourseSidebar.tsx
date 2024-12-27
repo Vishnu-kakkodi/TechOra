@@ -10,8 +10,8 @@ interface CourseSidebarProps {
 const userCourseSidebar: React.FC<CourseSidebarProps> = ({ onSearch, onFilterChange }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const { data = {} } = useCourseListQuery(null);
-  const course = data.data || [];
+  const { data: courseData } = useCourseListQuery(null);
+  const course = courseData?.data || [];
 
 
   const Categories = course.map((c: any) => c.department.toUpperCase());

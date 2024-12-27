@@ -172,9 +172,7 @@ export class OrderController {
     ): Promise<void>{
         try{
             const orderId = req.params.orderId
-            console.log(orderId);
             const order = await this.orderService.orderDetail(orderId);
-            console.log(order,"O")
             res.status(201).json({
                 order
             });

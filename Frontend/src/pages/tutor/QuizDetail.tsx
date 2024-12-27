@@ -146,8 +146,8 @@ const QuizDetail: React.FC = () => {
             </div>
 
             <button
-                onClick={() => setCurrentQuestionIndex(prev => Math.min(currentQuiz?.questions.length - 1, prev + 1))}
-                disabled={currentQuestionIndex === currentQuiz?.questions.length - 1}
+                onClick={() => setCurrentQuestionIndex(prev => Math.min((currentQuiz?.questions?.length ?? 1) - 1, prev + 1))}
+                disabled={currentQuestionIndex === (currentQuiz?.questions?.length ?? 1) - 1}
                 className="flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
                 Next
@@ -263,7 +263,7 @@ const QuizDetail: React.FC = () => {
                             </div>
 
                             <QuestionCard
-                                question={currentQuiz.questions[currentQuestionIndex]}
+                                question={currentQuiz.questions[currentQuestionIndex].question}
                                 index={currentQuestionIndex}
                             />
 

@@ -9,8 +9,6 @@ import MESSAGES from "../constants/message";
 
 export class InstitutionController{
     constructor(private readonly instituteService: InstituteService){}
-
-
     async trackStatus(
         req: Request<{}, {}>,
         res: Response,
@@ -94,13 +92,10 @@ export class InstitutionController{
         next: NextFunction
     ): Promise<void>{
         try{
-
               const fileLocation = (req.file as Express.Multer.File & { location?: string })?.location;
-
               if (!fileLocation) {
                  res.status(400).json({ message: "File upload failed." });
               }
-
             const instituteData = {
                 ...req.body,
                 documentUrl: fileLocation,
@@ -138,9 +133,7 @@ export class InstitutionController{
                 accessToken: accessToken,
                 refreshToken: refreshToken
             }
-
             setCookie(res,'institute',Token);
-
             res.json({ institute,message:"Login successfully" });
         } catch (error) {
             next(error)
@@ -191,7 +184,6 @@ export class InstitutionController{
             if (!institutes) {
                 throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
               }
-            console.log(institutes,"Ins")
             res.status(201).json({
                 institutes
             });
@@ -242,7 +234,6 @@ export class InstitutionController{
                 throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
             }
             const {department} = req.body;
-            console.log(department,"lllllllllllllllllllll")
             await this.instituteService.addDepartment(institutionId,department)
             res.status(201).json({status:'success',message:"Department added"});
 

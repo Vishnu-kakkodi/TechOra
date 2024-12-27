@@ -17,7 +17,6 @@ import { toast } from 'react-toastify';
 const Sidebar: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  // const {data: institutes} = useInstituteListQuery(null);
   const [adminLogoutCall] = useAdminLogoutCallMutation();
 
   const handleNavigate = (path: string) => {
@@ -90,22 +89,6 @@ const Sidebar: React.FC = () => {
                 <Building2 className="w-5 h-5" />
                 <span>All Institutes</span>
               </button>
-              
-              {/* <button 
-                onClick={handleInstitutionList}
-                className="flex items-center space-x-2 text-gray-300 hover:text-white w-full"
-              >
-                <Clock className="w-5 h-5" />
-                <span>Pending Approvals</span>
-              </button>
-              
-              <button 
-                onClick={handleApprovedInstitution}
-                className="flex items-center space-x-2 text-gray-300 hover:text-white w-full"
-              >
-                <CheckCircle2 className="w-5 h-5" />
-                <span>Active Institutes</span>
-              </button> */}
             </div>
           </div>
         </div>

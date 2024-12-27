@@ -35,7 +35,6 @@ export class QuizService {
                     tutorId: new mongoose.Types.ObjectId(tutorId)
             };
             const createdQuiz = await this.quizRepository.create(newItem);
-            console.log(createdQuiz,"Quiz");
             return createdQuiz._id 
         } catch (error) {
             console.error('Error creating course:', error);
@@ -61,7 +60,6 @@ export class QuizService {
             }
 
             if (department && department.trim() !== '') {
-                console.log('Status received:', department);
                 const departmentArray = department.split(',').map((dep)=>dep.trim());
                 
                 query.department = { $in:departmentArray };
@@ -102,14 +100,11 @@ export class QuizService {
             }
 
             if (department && department.trim() !== '') {
-                console.log('Status received:', department);
                 const departmentArray = department.split(',').map((dep)=>dep.trim());            
                 query.department = { $in:departmentArray };
             }
 
-            if (selectedStatus && selectedStatus.trim() !== '') {
-                console.log('Status received:', selectedStatus);
-                
+            if (selectedStatus && selectedStatus.trim() !== '') {                
                 query.status = { $regex: new RegExp(`^${selectedStatus}$`, 'i') };
             }
 
@@ -147,14 +142,11 @@ export class QuizService {
             }
 
             if (department && department.trim() !== '') {
-                console.log('Status received:', department);
                 const departmentArray = department.split(',').map((dep)=>dep.trim());            
                 query.department = { $in:departmentArray };
             }
 
-            if (selectedStatus && selectedStatus.trim() !== '') {
-                console.log('Status received:', selectedStatus);
-                
+            if (selectedStatus && selectedStatus.trim() !== '') {                
                 query.status = { $regex: new RegExp(`^${selectedStatus}$`, 'i') };
             }
 
@@ -216,10 +208,8 @@ export class QuizService {
             if(!userId){
                 throw new HttpException(STATUS_CODES.BAD_REQUEST, MESSAGES.ERROR.BAD_REQUEST)
               }
-              console.log(mark)
             const user = await this.userRepository.findById(userId);
             const quiz: QuizDocument | null = await this.quizRepository.findQuiz(quizId);
-            console.log(quiz);
             if(quiz){
                 quiz.isComplete.push(userId)
                 await quiz.save();

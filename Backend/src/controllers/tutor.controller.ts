@@ -1,6 +1,4 @@
 import { Request, Response, NextFunction } from "express";
-import { InstituteService } from "../services/institute.service";
-import { CreateUserDto, CreateTutorDto } from "../dtos/institute.dtos";
 import { HttpException } from "../middleware/error.middleware";
 import { setCookie } from "../helperFunction/cookieUtils";
 import { decodedToken } from "../helperFunction/authHelper";
@@ -10,7 +8,6 @@ import { TutorService } from "../services/tutor.service";
 
 export class TutorController{
     constructor(private readonly tutorService: TutorService){}
-
     async tutorLogin(
         req: Request<{ tutorEmail: string, password: string }>,
         res: Response,
@@ -26,9 +23,7 @@ export class TutorController{
                 accessToken: accessToken,
                 refreshToken: refreshToken
             }
-
             setCookie(res,'tutor',Token);
-
             res.json({ tutor,message:"Login successfully" });
         } catch (error) {
             next(error)
@@ -83,7 +78,6 @@ export class TutorController{
                 data: updatedTutor
             });
            }catch(error){
-
         }
     }
 

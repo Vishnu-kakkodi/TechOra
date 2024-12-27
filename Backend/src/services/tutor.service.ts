@@ -1,10 +1,5 @@
-import { Institute, InstituteDocument, InstituteStatus } from "../interfaces/institute.interface";
-import { InstituteRepository } from "../repositories/institute.repository";
-import { CreateUserDto } from "../dtos/institute.dtos";
-import nodemailer from 'nodemailer';
 import { helperFunction } from "../helperFunction/authHelper";
 import { HttpException } from "../middleware/error.middleware";
-import generator from "../utils/generateApplicationID";
 import { TutorRepository } from "../repositories/tutor.repository";
 import { TutorDocument } from "../interfaces/tutor.interface";
 import STATUS_CODES from "../constants/statusCode";
@@ -35,9 +30,6 @@ export class TutorService {
             if (tutor.password !== password) {
                 throw new HttpException(400, "Password mismatch");
             }
-            // if (tutor.status !== InstituteStatus.Active) {
-            //     throw new HttpException(400, "Institution does not exist");
-            // }
 
             const accessToken = helperFunction.accesstoken(tutor.id, "tutor");
             const refreshToken = helperFunction.refreshtoken(tutor.id, "tutor");

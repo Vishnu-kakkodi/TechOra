@@ -1,6 +1,5 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAppSelector } from '../../store/hook';
 import {
   Users,
   Building2,
@@ -28,19 +27,15 @@ const TutorSidebar: React.FC = () => {
   const dispatch = useAppDispatch();
   const [tutorLogoutCall] = useTutorLogoutCallMutation();
   const { data: course, error } = useDraftCourseListQuery(null);
-
-
   const handleNavigate = (path: string) => {
     navigate(path);
   };
-
   const handleLogout = async () => {
     const response = await tutorLogoutCall().unwrap();
     toast.success("Tutor Logout successfully");
     dispatch(tutorLogout());
     navigate('/tutor/login');
   };
-
   return (
     <div className="min-h-screen w-64 bg-gray-900 text-white">
       <div className="px-6 py-4 border-b border-gray-800">
@@ -106,13 +101,6 @@ const TutorSidebar: React.FC = () => {
               <PlusCircle className="w-5 h-5" />
               <span>Add Quiz</span>
             </button>
-            {/* <button 
-              onClick={() => handleNavigate('/quizzes/drafts')}
-              className="flex items-center space-x-2 text-gray-300 hover:text-white w-full"
-            >
-              <FileEdit className="w-5 h-5" />
-              <span>Draft Quizzes</span>
-            </button> */}
           </div>
         </div>
 
@@ -152,19 +140,6 @@ const TutorSidebar: React.FC = () => {
             </button>
           </div>
         </div>
-
-        {/* <div className="mb-6 space-y-4">
-          <div className="text-gray-500 text-sm uppercase">
-            Students
-          </div>
-          <button 
-            onClick={handleUserList}
-            className="flex items-center space-x-2 text-gray-300 hover:text-white ml-5"
-          >
-            <Users className="w-5 h-5" />
-            <span>All Students</span>
-          </button>
-        </div> */}
 
         <div className="mt-8">
           <button

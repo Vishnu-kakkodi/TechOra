@@ -72,7 +72,7 @@ const QuizAttempt: React.FC = () => {
 
   const location = useLocation();
   const navigate = useNavigate();
-  const [quiz, setQuiz] = useState<QuizDocument>(null);
+  const [quiz, setQuiz] = useState<QuizDocument | null>(null);
 
   useEffect(() => {
     const quizFromState = location.state?.quiz;
@@ -415,7 +415,15 @@ const QuizAttempt: React.FC = () => {
 export default QuizAttempt;
 
 
-export const QuizResults = ({ quiz, score, percentage, answered, correct, passMark, navigate }) => {
+export const QuizResults = ({ quiz, score, percentage, answered, correct, passMark, navigate }: {
+  quiz: any;
+  score: any;
+  percentage: any;
+  answered: any;
+  correct: any;
+  passMark: any;
+  navigate: any;
+}) => {
   return (
     <div className='flex justify-center items-center h-screen'>
       <motion.div

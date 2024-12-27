@@ -72,8 +72,8 @@ const CourseList = () => {
 
   const handleDelete = async (courseId: string) => {
     try {
-      const response = await listCourse({ courseId });
-      toast.success(response.data.message)
+      const response:any = await listCourse({ courseId });
+      toast.success(response?.data?.message)
     } catch (error) {
       toast.error("Error ocured")
     }

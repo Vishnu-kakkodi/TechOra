@@ -8,9 +8,8 @@ import STATUS_CODES from '../constants/statusCode';
 import MESSAGES from '../constants/message';
 import { generateNumericOTP } from "../utils/gererateNumericOTP";
 import { emailSend } from "../utils/emailSend";
-import bcrypt from 'bcrypt';
 import { PasswordUtils } from "../utils/passwordUtils";
-import { MyCourses, UpdatePassword, UserCookieData } from "../types/user.types";
+import { UpdatePassword, UserCookieData } from "../types/user.types";
 import { CourseRepository } from "../repositories/course.repository";
 import { CourseDocument } from "../interfaces/course.interface";
 
@@ -52,10 +51,6 @@ export class UserService {
             }
 
             const user = await this.userRepository.create(userDetail);
-            // const accessToken = helperFunction.accesstoken(user.id, "user");
-            // const refreshToken = helperFunction.refreshtoken(user.id, "user");
-            // user.accessToken = accessToken;
-            // user.refreshToken = refreshToken;
             return user;
 
 
@@ -103,7 +98,6 @@ export class UserService {
                     phoneNumber,
                 }
                 const user = await this.userRepository.create(userDetail);
-                console.log(user,"Userrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr")
                 let id : any = user._id
                 const accessToken = helperFunction.accesstoken(id, "user");
                 const refreshToken = helperFunction.refreshtoken(id, "user");

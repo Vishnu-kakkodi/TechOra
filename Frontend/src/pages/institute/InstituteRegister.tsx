@@ -73,11 +73,10 @@ const CollegeRegistration: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const institutionInfo = useAppSelector((state) => state.auth.institutionEmailInfo)
-  console.log(institutionInfo,"Info")
   const formik = useFormik<FormValues>({
     initialValues: {
       collegeName: '',
-      instituteEmail: institutionInfo || '',
+      instituteEmail: institutionInfo?.instituteEmail || '',
       collegeCode: '',
       country: '',
       state: '',

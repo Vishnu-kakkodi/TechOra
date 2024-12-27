@@ -73,7 +73,6 @@ export const authMiddleware = async (
     } catch (tokenError) {
       if (tokenError instanceof jwt.TokenExpiredError) {
         console.log("Access token expired, attempting refresh");
-        
         if (!refreshToken) {
           return res.status(401).json({
             success: false,

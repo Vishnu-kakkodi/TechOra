@@ -54,14 +54,12 @@ export class WishlistRepository extends BaseRepository<WishlistDocument> {
         courseId: string
     ): Promise<any>{
         try{
-            console.log(userId,courseId);
             const result =  await this.model.updateOne(
                 {userId:new mongoose.Types.ObjectId(userId)},
                 {$pull:{items:{course:new mongoose.Types.ObjectId(courseId)}}}
             );
 
             const res = await this.model.find({userId:userId});
-            console.log(res);
 
             if (result.modifiedCount === 0) {
                 return 'No item was removed. Ensure the itemId and userId are correct.'

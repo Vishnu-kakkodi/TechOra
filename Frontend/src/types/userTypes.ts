@@ -24,6 +24,15 @@ export interface User{
     profilePhoto?:string;  
 }
 
+export interface SignUpUser{
+  userName:string;
+  email:string;
+  password:string;
+  confirmPassword?:string;
+  phoneNumber:string;
+  profilePhoto?:string;  
+}
+
 export interface UserLogin{
     email:string;
     password:string;

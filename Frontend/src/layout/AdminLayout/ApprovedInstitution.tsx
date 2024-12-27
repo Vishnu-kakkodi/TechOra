@@ -21,18 +21,15 @@ const ApprovedInstitution = () => {
     const debouncedSearchTerm = useDebouncedValue(search, 500);
   
     const {
-      data: { institutes, total } = {},
-      isLoading,
-      error,
-      refetch
+      data: data
     } = useInstituteListQuery({
       page,
       limit,
       search: debouncedSearchTerm,
     });
   
-    console.log(institutes)
-  
+    const institutes = data?.institutes;
+    const total = data?.total || 0;  
     useEffect(() => {
       setPage(1);
     }, [debouncedSearchTerm]);

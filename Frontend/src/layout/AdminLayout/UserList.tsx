@@ -1,7 +1,3 @@
-
-
-
-
 import React, { useEffect, useState } from 'react';
 import {
   Pencil,
@@ -24,7 +20,7 @@ const UserList: React.FC = () => {
   const debouncedSearchTerm = useDebouncedValue(search, 500);
 
   const {
-    data: { users, total } = {},
+    data: data,
     isLoading,
     error,
     refetch
@@ -34,6 +30,9 @@ const UserList: React.FC = () => {
     search: debouncedSearchTerm,
     filter
   });
+
+  const userdata = data?.users;
+  const total = data?.total || 0;
 
   useEffect(() => {
     setPage(1);
@@ -60,7 +59,8 @@ const UserList: React.FC = () => {
       });
 
       if (result.isConfirmed) {
-        const response = await userAction(user._id).unwrap();
+        const userId:any = user._id
+        const response = await userAction(userId).unwrap();
 
         if (response) {
           Swal.fire({
@@ -154,8 +154,8 @@ const UserList: React.FC = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {users && users.length > 0 ? (
-              users.map((user: IUserDocument) => (
+            {userdata && userdata.length > 0 ? (
+              userdata.map((user: any) => (
                 <tr key={user.id} className="hover:bg-gray-50 transition-colors">
                   <td className="py-4 px-6">
                     <img

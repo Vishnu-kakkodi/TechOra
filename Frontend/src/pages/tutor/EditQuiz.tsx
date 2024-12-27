@@ -18,7 +18,7 @@ const EditQuiz: React.FC = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
   const [showMaxAlert, setShowMaxAlert] = useState<boolean>(false);
   const [questionModal, setQuestionModal] = useState<boolean>(false);
-  const [quizData, setQuizData] = useState<QuizData>(null);
+  const [quizData, setQuizData] = useState<Partial<QuizData | null>>(null);
   const [updateQuiz] = useUpdateQuizMutation();
 
 
@@ -60,45 +60,51 @@ const EditQuiz: React.FC = () => {
   }, [existingQuiz]);
 
   const addQuestion = (): void => {
-    if (quizData.questions.length >= maxQuestions) {
-      setShowMaxAlert(true);
-      setTimeout(() => setShowMaxAlert(false), 3000);
-      return;
+    if ((quizData?.questions?.length ?? 0) >= maxQuestions) {
+        setShowMaxAlert(true);
+        setTimeout(() => setShowMaxAlert(false), 3000);
+        return;
     }
 
     const newQuestion: Question = {
-      id: quizData.questions.length + 1,
-      question: '',
-      options: quizData.questions[0].type === 'multiple-choice'
-        ? Array(4).fill({ text: '', isCorrect: false })
-        : [],
-      explanation: '',
-      type: quizData.questions[0].type,
+        id: (quizData?.questions?.length ?? 0) + 1,
+        question: '',
+        options: quizData?.questions?.[0]?.type === 'multiple-choice'
+            ? Array(4).fill({ text: '', isCorrect: false })
+            : [],
+        explanation: '',
+        type: quizData?.questions?.[0]?.type ?? 'multiple-choice',
     };
 
-    setQuizData(prev => ({
-      ...prev,
-      questions: [...prev.questions, newQuestion],
-      totalQuestions: prev.totalQuestions + 1
-    }));
-    setCurrentQuestionIndex(quizData.questions.length);
-  };
+    setQuizData(prev => {
+        if (!prev) return prev;
+        return {
+            ...prev,
+            questions: [...(prev.questions ?? []), newQuestion],
+            totalQuestions: (prev.totalQuestions ?? 0) + 1
+        };
+    });
+    setCurrentQuestionIndex((quizData?.questions?.length ?? 0));
+};
 
-  const removeQuestion = (index: number): void => {
-    setQuizData(prev => ({
-      ...prev,
-      questions: prev.questions.filter((_, i) => i !== index),
-      totalQuestions: prev.totalQuestions - 1
-    }));
+const removeQuestion = (index: number): void => {
+    setQuizData(prev => {
+        if (!prev || !prev.questions) return prev;
+        return {
+            ...prev,
+            questions: prev.questions.filter((_, i) => i !== index),
+            totalQuestions: (prev.totalQuestions ?? 1) - 1
+        };
+    });
     if (currentQuestionIndex >= index && currentQuestionIndex > 0) {
-      setCurrentQuestionIndex(currentQuestionIndex - 1);
+        setCurrentQuestionIndex(currentQuestionIndex - 1);
     }
-  };
+};
 
   const updateQuestion = (index: number, field: keyof Question, value: string | number): void => {
     setQuizData(prev => ({
       ...prev,
-      questions: prev.questions.map((q, i) => {
+      questions: prev?.questions?.map((q, i) => {
         if (i === index) {
           return { ...q, [field]: value };
         }
@@ -110,7 +116,7 @@ const EditQuiz: React.FC = () => {
   const updateOption = (questionIndex: number, optionIndex: number, field: keyof Option, value: string | boolean): void => {
     setQuizData(prev => ({
       ...prev,
-      questions: prev.questions.map((q, i) => {
+      questions: prev?.questions?.map((q, i) => {
         if (i === questionIndex) {
           const newOptions = [...q.options];
           newOptions[optionIndex] = {
@@ -127,7 +133,7 @@ const EditQuiz: React.FC = () => {
   const handleQuestionTypeChange = (questionIndex: number, newType: QuestionType) => {
     setQuizData(prev => ({
       ...prev,
-      questions: prev.questions.map((q, i) => {
+      questions: prev?.questions?.map((q, i) => {
         if (i === questionIndex) {
           return {
             ...q,
@@ -164,8 +170,8 @@ const EditQuiz: React.FC = () => {
     try {
       const quizPayload = {
         ...values,
-        questions: quizData.questions,
-        totalQuestions: quizData.questions.length,
+        questions: quizData?.questions,
+        totalQuestions: quizData?.questions?.length,
         positiveScore: Number(values.positiveScore),
         negativeScore: Number(values.negativeScore),
         passingScore: Number(values.passingScore)
@@ -327,7 +333,7 @@ const EditQuiz: React.FC = () => {
                         <Field
                           as="select"
                           name="type"
-                          value={quizData?.questions[currentQuestionIndex].type}
+                          value={quizData?.questions?.[currentQuestionIndex].type}
                           onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
                             handleQuestionTypeChange(currentQuestionIndex, e.target.value as QuestionType)
                           }
@@ -346,7 +352,7 @@ const EditQuiz: React.FC = () => {
                       </div>
                     </div>
 
-                    {questionModal && quizData.questions[currentQuestionIndex] && (
+                    {questionModal && quizData?.questions?.[currentQuestionIndex] && (
                       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                         <div className="bg-white rounded-lg shadow-lg w-full max-w-3xl mx-4 p-6">
                           <div className="flex items-center justify-between mb-4">
@@ -364,13 +370,13 @@ const EditQuiz: React.FC = () => {
                             <textarea
                               placeholder="Enter your question"
                               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                              value={quizData?.questions[currentQuestionIndex].question}
+                              value={quizData?.questions?.[currentQuestionIndex].question}
                               onChange={(e) => updateQuestion(currentQuestionIndex, 'question', e.target.value)}
                               rows={3}
                             />
 
                             {/* Multiple Choice Options */}
-                            {quizData?.questions[currentQuestionIndex].type === 'multiple-choice' && (
+                            {quizData?.questions?.[currentQuestionIndex]?.type === 'multiple-choice' && (
                               <div className="space-y-2">
                                 {quizData?.questions[currentQuestionIndex].options.map((option, optionIndex) => (
                                   <div key={optionIndex} className="flex items-center gap-2">
@@ -397,14 +403,14 @@ const EditQuiz: React.FC = () => {
                             )}
 
                             {/* True/False Options */}
-                            {quizData?.questions[currentQuestionIndex].type === 'true-false' && (
+                            {quizData?.questions?.[currentQuestionIndex]?.type === 'true-false' && (
                               <div className="space-y-2">
                                 {['True', 'False'].map((value, index) => (
                                   <div key={index} className="flex items-center gap-2">
                                     <input
                                       type="radio"
                                       name={`correct-${currentQuestionIndex}`}
-                                      checked={quizData?.questions[currentQuestionIndex].options[index]?.isCorrect}
+                                      checked={quizData?.questions?.[currentQuestionIndex].options[index]?.isCorrect}
                                       onChange={() => {
                                         const newOptions = [
                                           { text: 'True', isCorrect: index === 0 },
@@ -412,7 +418,7 @@ const EditQuiz: React.FC = () => {
                                         ];
                                         setQuizData(prev => ({
                                           ...prev,
-                                          questions: prev.questions.map((q, i) =>
+                                          questions: prev?.questions?.map((q, i) =>
                                             i === currentQuestionIndex
                                               ? { ...q, options: newOptions }
                                               : q
@@ -428,7 +434,7 @@ const EditQuiz: React.FC = () => {
                             )}
 
                             {/* Short Answer Input */}
-                            {quizData?.questions[currentQuestionIndex].type === 'short-answer' && (
+                            {quizData?.questions?.[currentQuestionIndex].type === 'short-answer' && (
                               <input
                                 type="text"
                                 placeholder="Correct Answer"
@@ -443,7 +449,7 @@ const EditQuiz: React.FC = () => {
                             <textarea
                               placeholder="Explanation (Optional) - Provide explanation for the correct answer"
                               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                              value={quizData?.questions[currentQuestionIndex].explanation}
+                              value={quizData?.questions?.[currentQuestionIndex].explanation}
                               onChange={(e) =>
                                 updateQuestion(currentQuestionIndex, 'explanation', e.target.value)
                               }
@@ -463,7 +469,7 @@ const EditQuiz: React.FC = () => {
                                 type="button"
                                 onClick={() => removeQuestion(currentQuestionIndex)}
                                 className="px-4 py-2 text-red-600 border border-red-300 rounded-lg hover:bg-red-50"
-                                disabled={quizData.questions.length <= 1}
+                                disabled={(quizData?.questions?.length ?? 0) <= 1}
                               >
                                 Delete Question
                               </button>
@@ -479,7 +485,7 @@ const EditQuiz: React.FC = () => {
                                   type="button"
                                   onClick={addQuestion}
                                   className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-gray-300"
-                                  disabled={quizData?.questions.length >= maxQuestions}
+                                  disabled={(quizData?.questions?.length ?? 0) >= maxQuestions}
                                 >
                                   Add Another Question
                                 </button>
@@ -513,9 +519,9 @@ const EditQuiz: React.FC = () => {
 
             <div className="w-64">
             <div className="bg-white rounded-lg shadow p-4 sticky top-4">
-                <h2 className="text-lg font-semibold mb-4">Questions ({quizData?.questions.length}/{maxQuestions})</h2>
+                <h2 className="text-lg font-semibold mb-4">Questions ({quizData?.questions?.length}/{maxQuestions})</h2>
                 <div className="grid grid-cols-3 gap-2">
-                  {quizData?.questions.map((question, index) => (
+                  {quizData?.questions?.map((question, index) => (
                     <QuestionBox
                       key={question.id}
                       index={index}

@@ -19,11 +19,23 @@ export interface Module {
   draftId?: any;
 }
 
+export interface Tutor{
+  _id:string;
+  department:string;
+  tutorname:string;
+  tutorEmail:string;
+  password:string;
+  education:string;
+  experiance:string;
+  gender:string;
+  profilePic: string;
+}
+
 export interface Course {
   _id: string;
   title: string;
   department: string;
-  tutorId?: Types.ObjectId | string;
+  tutorId?: Tutor;
   duration: string;
   description: string;
   startDate?: string;
@@ -41,7 +53,7 @@ export interface Course {
 }
 
 export interface CourseListResponse {
-  data: CourseDocument[];
+  course: CourseDocument[];
   total?: number;
   department?: string[];
   totalCourse:number;

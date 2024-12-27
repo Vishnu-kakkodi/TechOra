@@ -3,7 +3,7 @@ import { ReviewModel } from "../models/review.model";
 import { CartDocument } from "../interfaces/cart.interface";
 import mongoose from 'mongoose';
 import { ReviewDocument } from "../interfaces/review.interface";
-import {Types} from 'mongoose';
+import { Types } from 'mongoose';
 
 
 
@@ -12,20 +12,18 @@ export class ReviewRepository extends BaseRepository<ReviewDocument> {
         super(ReviewModel);
     }
 
-    async findOne(courseID:Types.ObjectId): Promise<ReviewDocument|null> {
-        try { 
-            console.log("lll");
-                       
-            return await this.model.findOne({courseId:courseID}).populate('userReviews.userId');
-        } catch(error) {
+    async findOne(courseID: Types.ObjectId): Promise<ReviewDocument | null> {
+        try {
+            return await this.model.findOne({ courseId: courseID }).populate('userReviews.userId');
+        } catch (error) {
             throw error;
         }
     }
 
-    async CountDocuments(): Promise<number>{
-        try{
+    async CountDocuments(): Promise<number> {
+        try {
             return await this.model.countDocuments();
-        }catch(error){
+        } catch (error) {
             throw error
         }
     }

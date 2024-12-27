@@ -1,12 +1,5 @@
-import { HttpException } from "../middleware/error.middleware";
-import { CreateCourseDto } from "../dtos/course.dtos";
 import { CourseRepository } from "../repositories/course.repository";
-import { Course, CourseDocument, Module } from "../interfaces/course.interface";
-import { CartDocument } from "../interfaces/cart.interface";
-import { CartRepository } from "../repositories/cart.repository";
 import mongoose from "mongoose";
-import STATUS_CODES from "../constants/statusCode";
-import MESSAGES from "../constants/message";
 import { ReviewRepository } from "../repositories/review.repository";
 import { ReviewDocument } from "../interfaces/review.interface";
 

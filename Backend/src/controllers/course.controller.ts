@@ -80,7 +80,6 @@ export class CourseController {
         } catch (error) {
             next(error);
         }
-
     }
 
     public draftCourses = async (
@@ -106,7 +105,6 @@ export class CourseController {
         } catch (error) {
             next(error);
         }
-
     }
 
     public createModule = async (
@@ -233,16 +231,12 @@ export class CourseController {
         next: NextFunction
     ): Promise<void> => {
         try {
-
             const { courseId } = req.params
             const course = await this.courseService.courseDetail(courseId);
-
             const response: CourseDetailResponseInstitute = {
                 message: "Success",
                 Data: course,
             };
-
-
             res.status(201).json(response)
         } catch (error) {
             next(error)
@@ -260,8 +254,6 @@ export class CourseController {
             const search = (req.query.search as string);
             const filter = (req.query.filter as string);
             const sort = (req.query.sort as string);
-
-            console.log(filter,search)
             const {course,total,department,totalCourse} = await this.courseService.userCorseList(page,limit,search,filter,sort);
             if(!course){
                 throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
@@ -312,14 +304,10 @@ export class CourseController {
         try {
             const courseData: UpdateCourseDto = req.body;
             const courseId:string = req.query.courseId as string;
-            console.log(courseData,"Fadavddsssssssssssssssssssssssssssssssssss")
-
             if (!courseData) {
                 throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
             }
-
             await this.courseService.updateCourse(courseData,courseId);
-
             res.status(201).json({
                 status: STATUS_CODES.SUCCESS,
                 message: "Course Updated",
@@ -338,7 +326,6 @@ export class CourseController {
         try {
             const courseId = req.query.courseId as string;
             const moduleId = req.query.moduleId as string;
-
             if(!courseId){
                 throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
             }

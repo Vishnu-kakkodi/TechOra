@@ -1,8 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { HttpException } from "../middleware/error.middleware";
 import { AdminService } from "../services/admin.service";
-import { UserService } from "../services/user.service";
-import { InstituteService } from "../services/institute.service";
 import { setCookie } from "../helperFunction/cookieUtils";
 import { GetObjectOutput } from 'aws-sdk/clients/s3';
 
@@ -26,22 +24,16 @@ export class AdminController {
     ): Promise<void> {
         try {
             const { adminEmail, adminPassword } = req.body;
-
             const admin = await this.adminService.verifyAdminCredentials(adminEmail, adminPassword);
-            console.log(admin, "ffffffffffffffffffff")
-
             if (!admin) {
                 throw new HttpException(401, "Unauthorized: Invalid admin credentials");
             }
-
             const { accessToken, refreshToken, ...adminMail } = admin;
-            console.log(adminMail, "Admin")
             const Token = {
                 accessToken: accessToken,
                 refreshToken: refreshToken
             }
             setCookie(res,'admin',Token);
-
             res.status(200).json({ admin, message: "Admin verified successfully" });
         } catch (error) {
             next(error);
@@ -54,7 +46,6 @@ export class AdminController {
         next: NextFunction
     ): Promise<void> {
         try {
-            console.log("Request came")
             const page = parseInt(req.query.page as string) || 1;
             const limit = parseInt(req.query.limit as string) || 4;
             const search = (req.query.search as string);
@@ -64,7 +55,6 @@ export class AdminController {
             if (!users) {
                 throw new HttpException(404, "No users found");
             }
-            console.log(users)
             res.json({
                 users,
                 total,
@@ -84,7 +74,6 @@ export class AdminController {
         next: NextFunction
     ): Promise<void> {
         try {
-            console.log("Request Institute")
             const page = parseInt(req.query.page as string) || 1;
             const limit = parseInt(req.query.limit as string) || 4;
             const search = (req.query.search as string);
@@ -113,10 +102,7 @@ export class AdminController {
     ): Promise<void> {
         try {
             const userId: string = req.params.userId;
-            console.log("userId:", userId);
-
             const updatedUser = await this.adminService.userAction(userId);
-
             res.status(200).json({
                 message: "User status updated successfully",
                 user: updatedUser,
@@ -134,7 +120,6 @@ export class AdminController {
         try {
             const instituteId = req.query.id as string;
             const updatedInstitute = await this.adminService.InstituteAction(instituteId);
-            console.log("institute:", instituteId);
             res.status(200).json({
                 message: "Institute approved successfully",
                 institute: updatedInstitute,
@@ -153,9 +138,7 @@ export class AdminController {
         try {
             const instituteId = req.query.id as string;
             const { rejectReason } = req.body
-            console.log(rejectReason, "Reson")
             const updatedInstitute = await this.adminService.InstituteReject(instituteId, rejectReason);
-            console.log("institute:", instituteId);
             res.status(200).json({
                 message: "Application rejected",
                 institute: updatedInstitute,
@@ -173,7 +156,6 @@ export class AdminController {
         try {
             const instituteId = req.query.id as string;
             const updatedInstitute = await this.adminService.InstituteBlock(instituteId);
-            console.log("institute:", instituteId);
             res.status(200).json({
                 message: "Institute Blocked",
                 institute: updatedInstitute,
@@ -191,7 +173,6 @@ export class AdminController {
         try {
             const instituteId = req.query.id as string;
             const updatedInstitute = await this.adminService.InstituteUnBlock(instituteId);
-            console.log("institute:", instituteId);
             res.status(200).json({
                 message: "Institute Unblocked",
                 institute: updatedInstitute,
@@ -208,34 +189,24 @@ export class AdminController {
     ): Promise<void> {
         try {
             const url = req.query.url as string;
-
             if (!url) {
                 res.status(400).json({ error: 'URL is required' });
                 return;
             }
-
             const key = this.getKeyFromUrl(url);
-
-            console.log(key, "Key");
-
             if (!key) {
                 res.status(400).json({ error: 'Invalid URL format' });
                 return;
             }
-
             const data = await this.adminService.downloadDoc(url);
-
             if (!data.Body) {
                 res.status(404).json({ error: 'Document not found' });
                 return;
             }
-
             res.setHeader('Content-Type', data.ContentType || 'application/pdf');
             res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(key)}"`);
             res.setHeader('Cache-Control', 'no-cache');
             res.setHeader('Pragma', 'no-cache');
-
-            console.log(data.Body)
             res.send(data.Body);
         } catch (error) {
             next(error);
@@ -263,10 +234,7 @@ export class AdminController {
     ): Promise<void> {
         try {
             const instituteId = req.query.id as string;
-            console.log(instituteId);
-            
             const institute = await this.adminService.InstituteView(instituteId);
-            console.log("institute:", instituteId);
             res.status(200).json({
                 message: "Data fetched successfully",
                 data: institute,

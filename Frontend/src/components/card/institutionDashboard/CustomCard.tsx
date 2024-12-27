@@ -83,7 +83,6 @@ const CardDisplay: React.FC = () => {
     },
     {
       title: "Total Students",
-      // value: {instituteData?.totalStudents},
       type: "students",
     },
     {

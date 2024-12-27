@@ -6,7 +6,6 @@ export const generateToken = (res: Response, userId: string): void => {
         expiresIn: '2min'
     });
 
-    console.log("Token generated:", token);
 
     res.cookie('user_jwt', token, {
         httpOnly: true,

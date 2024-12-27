@@ -29,10 +29,7 @@ const Dashboard: React.FC = () => {
   const debouncedSearchTerm = useDebouncedValue(search, 500);
 
   const {
-    data: { institutes, total } = {},
-    isLoading,
-    error,
-    refetch
+    data: data
   } = useInstituteListQuery({
     page,
     limit,
@@ -40,16 +37,14 @@ const Dashboard: React.FC = () => {
     filter
   });
 
-  console.log(institutes)
-
+  const institutes = data?.institutes;
+  const total = data?.total || 0;  
   useEffect(() => {
     setPage(1);
   }, [debouncedSearchTerm]);
 
   const stats = {
     totalInstitutions: 24,
-
-    // totalInstitutions: (institutes.length) + 1,
     pendingApprovals: 23,
     activeInstitutions: 124,
     totalTutors: 892,

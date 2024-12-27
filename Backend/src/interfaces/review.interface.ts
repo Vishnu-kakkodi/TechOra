@@ -1,7 +1,5 @@
 import { Document, Types } from "mongoose";
 import { BaseInterface } from "./base.interface";
-import { CourseDocument } from "./course.interface";
-import { IUserDocument } from "./user.interface";
 
 export interface Review extends BaseInterface {
   id:string;

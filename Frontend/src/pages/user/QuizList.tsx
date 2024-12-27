@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Clock, FileText, Check, Cross, X, Search, Menu, PlayCircle } from 'lucide-react';
-import QuizSidebar from '../../components/sidebar/QuizSidebar';
 import Navbar from '../../components/header/Navbar';
 import { useQuizListQuery } from '../../store/slices/userSlice';
 import { QuizDocument } from '../../types/quizType';
@@ -45,11 +44,6 @@ const QuizList = () => {
   const quizzes = quizData?.quiz || [];
   const total = quizData?.total || quizzes.length;;
   const quizCategories = quizData?.department || [];
-  // const totalCourse = quizData?.totalCourse || 0;
-
-  // if (isLoading) {
-  //   return <div className="max-w-4xl mx-auto p-6">Loading quizzes...</div>;
-  // }
 
   if (isError) {
     return <div className="max-w-4xl mx-auto p-6">Error loading quizzes. Please try again.</div>;
@@ -70,7 +64,7 @@ const QuizList = () => {
       console.error('Quiz ID is required to start the quiz.');
       return;
     }
-    if(quiz.isComplete?.includes(userdata?._id)){
+    if (quiz.isComplete?.includes(userdata?._id)) {
       toast.warning("This quiz is already attempted");
       return;
     }
@@ -186,22 +180,6 @@ const QuizList = () => {
                   </div>
                 </div>
 
-                {/* <div className="mb-8">
-                                <h2 className="text-lg font-bold mb-2">Popular Colleges</h2>
-                                <div className="bg-white border rounded-lg p-4">
-                                    {popularColleges.map((college, index) => (
-                                        <label key={index} className="flex items-center py-2 hover:bg-gray-50 rounded px-2 cursor-pointer">
-                                            <input
-                                                type="checkbox"
-                                                checked={selectedColleges.includes(college)}
-                                                onChange={() => handleCollegeToggle(college)}
-                                                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                                            />
-                                            <span className="ml-3 text-sm text-gray-600">{college}</span>
-                                        </label>
-                                    ))}
-                                </div>
-                            </div> */}
               </div>
               <div className="relative ml-5" ref={dropdownRef}>
                 <div className="flex items-center space-x-2">
@@ -251,27 +229,21 @@ const QuizList = () => {
                 className="bg-white rounded-lg border border-gray-200 p-6 shadow-md"
               >
                 <div className="flex justify-between gap-6">
-                  {/* Left Section */}
                   <div className="flex flex-col items-center">
-                    {/* Expired Label */}
                     <div className="bg-red-500 text-white text-xs px-2 py-1 rounded-md text-center">
                       {quiz.status}
                     </div>
 
-                    {/* Date */}
                     <div className="text-xs border-2 border-black rounded-md bg-gray-100 p-2 mt-2 text-center">
-                      {/* Month */}
                       <div className="text-lg font-semibold bg-black text-white p-1 rounded">
                         {new Date(quiz.createdAt).toLocaleString('en-US', { month: 'short' }).toUpperCase()}
                       </div>
-                      {/* Day */}
                       <div className="text-lg font-semibold text-gray-700">
                         {new Date(quiz.createdAt).getDate()}
                       </div>
                     </div>
                   </div>
 
-                  {/* Middle Section */}
                   <div className="flex flex-col justify-center gap-2 bg-gray-100 border-2 border-red-100 p-1 rounded-[5px]">
                     <p className="text-[10px] text-gray-700">
                       <strong>START DATE:</strong> <span className="font-medium">{quiz.startDate}</span>
@@ -284,7 +256,6 @@ const QuizList = () => {
                     </p>
                   </div>
 
-                  {/* Right Section */}
                   <div className="flex flex-col justify-start gap-2">
                     <h2 className="text-lg font-bold">{quiz.title}</h2>
                     <p className="text-sm text-gray-500">
@@ -382,7 +353,7 @@ const QuizList = () => {
         </motion.div>
       </div>
 
-      <Footer/>
+      <Footer />
 
     </>
   );

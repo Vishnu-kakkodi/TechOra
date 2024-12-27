@@ -1,19 +1,16 @@
-
 import React from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import { User } from '../../types/userTypes';
+import { SignUpUser } from '../../types/userTypes';
 import Modal from '../../components/modals/Modal';
 import { toast } from 'react-toastify';
 import { useInitiateSignupMutation } from '../../store/slices/userSlice';
 import { ApiError } from '../../types/ApiError';
 
-
 interface SignUpModalProps {
   setSignUpModalOpen: (open: boolean) => void;
   setOtpModalOpen: (open: boolean) => void;
 }
-
 
 const SignUpModal: React.FC<SignUpModalProps> = ({ setSignUpModalOpen, setOtpModalOpen }) => {
 
@@ -40,7 +37,7 @@ const SignUpModal: React.FC<SignUpModalProps> = ({ setSignUpModalOpen, setOtpMod
       .required('Phone number is required'),
   });
 
-  const formik = useFormik<User>({
+  const formik = useFormik<SignUpUser>({
     initialValues: {
       userName: '',
       email: '',

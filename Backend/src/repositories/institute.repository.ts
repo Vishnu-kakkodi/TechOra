@@ -27,7 +27,6 @@ export class InstituteRepository extends BaseRepository<InstituteDocument> {
 
     async findOne(applicationId: string): Promise <InstituteDocument | null >{
         try{
-            console.log(typeof(applicationId))
             return await this.model.findOne({ applicationId: applicationId,status: { $ne: 'Active' }  });
         }catch(error){
             throw error;
@@ -41,7 +40,6 @@ export class InstituteRepository extends BaseRepository<InstituteDocument> {
             .limit(limit)
 
             const total:number = await this.model.countDocuments(searchQuery);
-            console.log(institutes);
             return { institutes, total };
 
         } catch (error) {

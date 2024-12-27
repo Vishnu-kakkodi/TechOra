@@ -92,14 +92,14 @@ const EditCourseDetail = () => {
     }));
   };
 
-  const handleModuleChange = (index: any, field: any, value: any) => {
-    const updatedModules = [...course?.modules];
-    updatedModules[index][field] = value;
-    setCourseData((prev: any) => ({
-      ...prev,
-      modules: updatedModules
-    }));
-  };
+  // const handleModuleChange = (index: any, field: any, value: any) => {
+  //   const updatedModules = [...course?.modules];
+  //   updatedModules[index][field] = value;
+  //   setCourseData((prev: any) => ({
+  //     ...prev,
+  //     modules: updatedModules
+  //   }));
+  // };
 
   const handleAddModule = () => {
     if (newModule.title && newModule.description) {
@@ -152,7 +152,7 @@ const EditCourseDetail = () => {
   };
 
 
-  const handleEditClick = (module) => {
+  const handleEditClick = (module:any) => {
     setSelectedModule(module);
     setIsModalOpen(true);
   };
@@ -170,24 +170,9 @@ const EditCourseDetail = () => {
     }
   };
 
-  const handleSaveModule = (updatedModule) => {
+  const handleSaveModule = (updatedModule:any) => {
     // Implement module update logic
   };
-
-
-  // const handleImageChange = (setFieldValue, event) => {
-  //   const file = event.target.files[0];
-  //   if (file) {
-  //     const reader = new FileReader();
-  //     reader.onloadend = () => {
-  //       setPreviewUrl(reader.result);
-  //       setFieldValue('thumbnail', file);
-  //     };
-  //     reader.readAsDataURL(file);
-  //   }
-  // };
-
-
 
   const handleSubmit = async (values: CourseFormValues): Promise<void> => {
     try {
@@ -204,9 +189,7 @@ const EditCourseDetail = () => {
     } catch (error: any) {
       console.error('Failed to create course:', error);
       setSubmitError(error.message || 'An unexpected error occurred');
-    } finally {
-      setSubmitting(false);
-    }
+    } 
   };
 
   return (
@@ -227,12 +210,14 @@ const EditCourseDetail = () => {
 
           <Formik
             initialValues={{
-              // thumbnail: course?.thumbnail || null,
               title: course?.title || '',
               department: course?.department || '',
               duration: course?.duration || '',
               description: course?.description || '',
-              price: course?.price || ''
+              price: course?.price || '',
+              instructor: course?.tutorId?.tutorname || '', 
+              startDate: course?.startDate || '', 
+              status: course?.status || 'draft',  
 
             }}
             validationSchema={validationSchema}
@@ -242,42 +227,7 @@ const EditCourseDetail = () => {
             {({ setFieldValue, values, errors, touched }) => (
               <Form>
                 <div className="lg:col-span-2">
-                  {/* <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg">
-                    <div className="space-y-1 text-center mr-10 mt-5">
-                      <Upload className="mx-auto h-6 w-6 text-gray-400" />
-                      <div className="flex text-sm text-gray-600">
-                        <label className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500">
-                          <span>Upload a file</span>
-                          <input
-                            type="file"
-                            name="thumbnail"
-                            className="sr-only"
-                            accept="image/*"
-                            onChange={(event) => handleImageChange(setFieldValue, event)}
-                          />
-                        </label>
-                      </div>
-                    </div>
-                    {(previewUrl || values.thumbnail) && (
-                      <div className="relative">
-                        <img
-                          src={previewUrl || values.thumbnail}
-                          alt="Course Thumbnail"
-                          className="h-24 w-48 object-cover rounded-lg"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setFieldValue('thumbnail', null);
-                            setPreviewUrl(null);
-                          }}
-                          className="absolute top-2 right-2 p-1 bg-white rounded-full shadow-md hover:bg-gray-100"
-                        >
-                          <X className="h-2 w-2" />
-                        </button>
-                      </div>
-                    )}
-                  </div> */}
+
                   <div className="mb-6">
                     <div className="mb-4 mt-4">
                       <label className="block text-sm font-medium text-gray-700 mb-1">Course Title</label>

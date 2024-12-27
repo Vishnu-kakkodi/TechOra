@@ -36,6 +36,29 @@ export interface Question {
 }
 
 export interface QuizData {
+  _id:string;
+  id:string
+  title: string;
+  description: string;
+  duration: string;
+  maxAttempts: string;
+  questions: Question[];
+  status: QuizStatus;
+  totalQuestions: number;
+  department?: string;
+  stack?: string;
+  difficultyLevel?: string;
+  positiveScore?: number;
+  negativeScore?: number;
+  passingScore?: number;
+  institutionId?: Institute
+  startDate?: string;
+  isComplete?: string[];
+  createdAt :Date;
+
+}
+
+export interface QuizDatas {
   title: string;
   description: string;
   duration: string;

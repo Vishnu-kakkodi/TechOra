@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from "express";
-import { CourseService } from "../services/course.service";
 import { ReviewService } from "../services/review.service"; 
 import { decodedToken } from "../helperFunction/authHelper";
 import { HttpException } from "../middleware/error.middleware";
@@ -27,15 +26,11 @@ export class ReviewController {
             }
             const requiredRole = "user";
             const userId: string | null = decodedToken(token, requiredRole);
-            console.log(req.body.courseId)
-            console.log(req.body.currentValue)
-            console.log(req.body.reviewText)
             const { courseId,currentValue,reviewText } = req.body;
             const response = await this.reviewService.createReview(currentValue,reviewText,userId,courseId);
             res.status(201).json({
                 message: response,
             });
-
         } catch (error) {
             next(error)
         }
@@ -48,18 +43,14 @@ export class ReviewController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const courseId = req.query.courseId as string;
-            console.log(courseId,"poppp");
-            
+            const courseId = req.query.courseId as string;            
             const {response,total} = await this.reviewService.Review(courseId);
             res.status(201).json({
                 message: "Review fetched",
                 data: {response,total}
             });
-
         } catch (error) {
             next(error)
         }
     }
-
 }

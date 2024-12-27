@@ -9,8 +9,6 @@ import { TutorRepository } from "../repositories/tutor.repository";
 import { TutorDocument } from "../interfaces/tutor.interface";
 import STATUS_CODES from "../constants/statusCode";
 import MESSAGES from "../constants/message";
-import mongoose from "mongoose";
-import { Department } from "../types/repository.types";
 
 export class InstituteService {
     private instituteRepository: InstituteRepository;
@@ -92,16 +90,13 @@ export class InstituteService {
 
     async createInstitute(instituteData: CreateUserDto): Promise<Institute> {
         try {
-            console.log(instituteData, "instituteData");
 
             const applicationId = generator.generateID()
             const institutedata = {
                 ...instituteData,
                 applicationId
             }
-            console.log(institutedata, "data")
             const institute = await this.instituteRepository.create(institutedata);
-            console.log("response", institute)
 
             const accessToken = helperFunction.accesstoken(institute.id, "institute");
             const refreshToken = helperFunction.refreshtoken(institute.id, "institute");
@@ -111,15 +106,6 @@ export class InstituteService {
                 accessToken,
                 refreshToken,
             };
-
-
-            // const institute = {
-            //     id: response.id,
-            //     collegeName: response.collegeName,
-            //     instituteEmail: response.instituteEmail,
-            //     accessToken,
-            //     refreshToken
-            //   };
 
         } catch (error) {
             throw new HttpException(STATUS_CODES.SERVER_ERROR, MESSAGES.ERROR.SERVER_ERROR)

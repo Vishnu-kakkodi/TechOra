@@ -1,34 +1,4 @@
 
-// import HOMEPIC from '../../assets/frontEnd/HOMEPIC.png';
-
-// export default function Hero() {
-//   return (
-// <div className="relative flex justify-center items-center w-full min-h-[60vh] px-4 sm:px-0 md:px-8 lg:px-10">
-// <img
-//   src={HOMEPIC}
-//   alt="Description of the image"
-//   className="w-full object-cover"
-// />
-
-// <div className="absolute top-1/2 left-[10%] md:left-[200px] bg-white bg-opacity-90 transform -translate-y-1/2 text-black p-6 md:p-10 border-2 rounded-lg shadow-lg">
-//   <div className="text-xl md:text-3xl font-bold mb-2 text-center md:text-left">
-//     Learn, practice, succeed
-//   </div>
-
-//   <div className="text-lg md:text-2xl font-semibold mb-4 text-center md:text-left">
-//     (and save)
-//   </div>
-
-//   <div className="text-sm md:text-base font-normal text-gray-700 text-center md:text-left">
-//     <p>Courses for every step of your learning journey,</p>
-//     <p>starting at ₹499. Sale ends December 31.</p>
-//   </div>
-// </div>
-// </div>
-
-
-//   )
-// }
 
 import HOMEPIC1 from '../../assets/frontEnd/HOMEPIC.png';
 import HOMEPIC2 from '../../assets/frontEnd/Carosal2.jpg';

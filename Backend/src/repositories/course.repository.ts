@@ -2,9 +2,7 @@ import { BaseRepository } from "./base.repository";
 import { CourseModel } from "../models/course.model";
 import { CourseDocument, Module } from "../interfaces/course.interface";
 import mongoose, { FilterQuery, Types } from 'mongoose'
-import { MyCourses } from "../types/user.types";
 import { UpdateCourseDto } from "../dtos/course.dtos";
-import { QuizDocument } from "../interfaces/quiz.interface";
 
 export type SearchCourse = FilterQuery<{
     title: string;
@@ -18,8 +16,6 @@ export class CourseRepository extends BaseRepository<CourseDocument> {
     constructor() {
         super(CourseModel);
     }
-
-
       async findDraft(
         query: any,
         skip: number,
@@ -44,11 +40,8 @@ export class CourseRepository extends BaseRepository<CourseDocument> {
 
     async findById(courseId: string): Promise<CourseDocument | null> {
         try {
-            console.log(courseId)
             const id = new mongoose.Types.ObjectId(courseId)
-            console.log("instituteId", typeof (courseId));
             const course = await this.model.findById({ _id: id }).populate('tutorId')
-            console.log(course, "ufdsakdgks");
             return course;
         } catch (error) {
             throw error;
@@ -62,15 +55,12 @@ export class CourseRepository extends BaseRepository<CourseDocument> {
             if (!existingCourse) {
                 return null;
             }
-
             existingCourse.modules.push({
                 ...data,
                 createdAt: new Date(),
                 updatedAt: new Date(),
             } as Module);
-
-            existingCourse.status = 'published'
-
+            existingCourse.status = 'published';
             await existingCourse.save();
             return existingCourse.toObject();
         } catch (error) {
@@ -83,7 +73,6 @@ export class CourseRepository extends BaseRepository<CourseDocument> {
         try {
             const id = new mongoose.Types.ObjectId(courseId)
             const existingCourse = await this.model.findById(id);
-            console.log("Goooooooooooooooooooooooooooood", existingCourse)
             if (!existingCourse) {
                 return null;
             }
@@ -99,13 +88,9 @@ export class CourseRepository extends BaseRepository<CourseDocument> {
             if (courseData.description) {
                 existingCourse.description = courseData.description
             }
-            // if (courseData.instructor) {
-            //     existingCourse.instructor = courseData.instructor
-            // }
-            if (courseData.price) {
-                existingCourse.price = courseData.price
-                console.log("Updateddddddddddddddddddddddddddddddddddddddddd");
 
+            if (courseData.price) {
+                existingCourse.price = courseData.price;
             }
 
             return await existingCourse.save();
@@ -154,7 +139,6 @@ export class CourseRepository extends BaseRepository<CourseDocument> {
                 .limit(limit)
                 .populate('tutorId');
 
-
             const total: number = await this.model.countDocuments(filter);
 
             return { course, total };
@@ -165,8 +149,6 @@ export class CourseRepository extends BaseRepository<CourseDocument> {
 
     async find(): Promise<CourseDocument[]> {
         try {
-            console.log("Repoosos");
-
             return await this.model.find({ status: 'published', isListed: true }).populate('institutionId');
         } catch (error) {
             throw error;
@@ -176,8 +158,6 @@ export class CourseRepository extends BaseRepository<CourseDocument> {
     async findCourse(searchQuery: SearchCourse, skip: number, limit: number, sortOptions: any = { createdAt: -1 }
     ): Promise<{ course: CourseDocument[]; total: number; department: string[]; totalCourse: number }> {
         try {
-            console.log("empty", searchQuery);
-
             const course = await this.model.find({ isListed: true, status: 'published', ...searchQuery })
                 .select({ 'modules.video': 0 })
                 .sort(sortOptions)
@@ -197,7 +177,6 @@ export class CourseRepository extends BaseRepository<CourseDocument> {
             const totalCourse: number = await this.model.countDocuments({ isListed: true, status: 'published' });
             const total: number = await this.model.countDocuments({ isListed: true, status: 'published' }, searchQuery);
             const department: string[] = await this.model.distinct("department");
-            console.log(course);
             return { course, total, department, totalCourse };
 
         } catch (error) {

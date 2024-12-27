@@ -1,11 +1,6 @@
-
-
-
-
-
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Formik, Form, Field, FieldArray } from 'formik';
+import { Formik, Form, Field, FieldArray, FormikErrors } from 'formik';
 import * as Yup from 'yup';
 import {
   ArrowLeft,
@@ -29,6 +24,10 @@ interface Module {
 
 interface FormValues {
   modules: Module[];
+}
+
+interface FormErrors {
+  modules?: Array<FormikErrors<Module>>;
 }
 
 const ModuleSchema = Yup.object().shape({
@@ -166,11 +165,12 @@ const CourseModules = () => {
                               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                               placeholder="Enter module title"
                             />
-                            {errors.modules?.[index]?.title && touched.modules?.[index]?.title && (
-                              <div className="text-red-500 text-sm mt-1">
-                                {errors.modules[index].title}
-                              </div>
-                            )}
+                            {(errors.modules?.[index] as FormikErrors<Module>)?.title &&
+                              touched.modules?.[index]?.title && (
+                                <div className="text-red-500 text-sm mt-1">
+                                  {(errors.modules?.[index] as FormikErrors<Module>).title}
+                                </div>
+                              )}
                           </div>
 
                           <div>
@@ -192,10 +192,10 @@ const CourseModules = () => {
                  [&::-webkit-inner-spin-button]:appearance-none"
                               placeholder="Enter duration in minutes"
                             />
-                            {errors.modules?.[index]?.duration &&
-                              touched.modules?.[index]?.duration && (
+                            {(errors.modules?.[index] as FormikErrors<Module>)?.duration &&
+                              touched.modules?.[index]?.title && (
                                 <div className="text-red-500 text-sm mt-1">
-                                  {errors.modules[index].duration}
+                                  {(errors.modules?.[index] as FormikErrors<Module>).duration}
                                 </div>
                               )}
                           </div>
@@ -212,11 +212,12 @@ const CourseModules = () => {
                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             placeholder="Enter module description"
                           />
-                          {errors.modules?.[index]?.description && touched.modules?.[index]?.description && (
-                            <div className="text-red-500 text-sm mt-1">
-                              {errors.modules[index].description}
-                            </div>
-                          )}
+                            {(errors.modules?.[index] as FormikErrors<Module>)?.description &&
+                              touched.modules?.[index]?.title && (
+                                <div className="text-red-500 text-sm mt-1">
+                                  {(errors.modules?.[index] as FormikErrors<Module>).description}
+                                </div>
+                              )}
                         </div>
 
                         <div>

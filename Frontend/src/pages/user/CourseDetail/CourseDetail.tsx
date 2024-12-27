@@ -44,7 +44,7 @@ const CourseDetail = () => {
 
   const { data: Review } = useReviewQuery(courseId as string);
 
-  const handleDataFromChild = (data: { message: string; timestamp: number }, userId: string) => {
+  const handleDataFromChild = (data: { message: string; timestamp: number }, userId: any) => {
     setLastMessages(prev => ({
       ...prev,
       [userId]: {

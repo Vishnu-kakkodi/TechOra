@@ -3,14 +3,13 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { X } from 'lucide-react';
 
-const ModuleEditModal = ({ module, isOpen, onClose, onSave }) => {
+const ModuleEditModal = ({ module, isOpen, onClose, onSave }:{module:any;isOpen:any;onClose:any;onSave:any}) => {
   const validationSchema = Yup.object().shape({
     title: Yup.string()
       .required('Title is required')
       .min(3, 'Title must be at least 3 characters'),
     duration: Yup.string()
       .required('Duration is required'),
-    //   .matches(/^\d+(\.\d+)?[hm]$/, 'Duration must be in format like "1h" or "45m"'),
     description: Yup.string()
       .required('Description is required')
       .min(10, 'Description must be at least 10 characters'),

@@ -2,13 +2,12 @@
 import React, { ReactNode, useEffect, useState } from 'react';
 import { Plus, Trash2, GripVertical, AlertCircle, Clock, RefreshCcw } from 'lucide-react';
 import { Formik, Form, Field, FieldProps } from 'formik';
-import { QuestionType, QuizStatus, Question, QuizData, QuestionBoxProps, Option } from '../../types/quizType'
+import { QuestionType, QuizStatus, Question, QuizData, QuestionBoxProps, Option, QuizDatas } from '../../types/quizType'
 import { toast } from 'react-toastify';
 import * as Yup from 'yup';
 import { useNavigate } from 'react-router-dom';
 import TutorSidebar from '../../components/sidebar/tutorSidebar';
 import { useAddQuizMutation } from '../../store/slices/tutorSlice';
-// import { useNotificationSocket } from '../../useNotificationHook';
 import { useAppSelector } from '../../store/hook';
 
 const QuizValidationSchema = Yup.object().shape({
@@ -68,19 +67,8 @@ const CreateQuiz: React.FC = () => {
   const navigate = useNavigate();
   const tutordata = useAppSelector((state) => state.auth.tutorInfo);
 
-  // const { sendNotification, isConnected, connectionError } = useNotificationSocket({
-  //   token: tutordata?.accessToken,
-  //   senderId: tutordata?._id,
-  //   onNotification: (notification) => {
-  //     console.log('Received notification:', notification);
-  //   }
-  // });
 
-  // useEffect(() => {
-  //   console.log('Socket connection status:', { isConnected, connectionError });
-  // }, [isConnected, connectionError]);
-
-  const initialQuizData: QuizData = {
+  const initialQuizData: QuizDatas = {
     title: '',
     description: '',
     duration: '30',
@@ -108,7 +96,7 @@ const CreateQuiz: React.FC = () => {
     startDate: ''
   };
 
-  const [quizData, setQuizData] = useState<QuizData>(initialQuizData);
+  const [quizData, setQuizData] = useState<QuizDatas>(initialQuizData);
 
   const addQuestion = (): void => {
     if (quizData.questions.length >= maxQuestions) {
@@ -245,7 +233,7 @@ const CreateQuiz: React.FC = () => {
   //   }
   // };
 
-  const handleSubmit = async (values: QuizData): Promise<void> => {
+  const handleSubmit = async (values: QuizDatas): Promise<void> => {
     try {
       const quizPayload = {
         ...values,

@@ -73,7 +73,7 @@ export const adminSlice = createApi({
     }),
 
 
-    userAction: builder.mutation<InstituteViewQueryResponse, { userId: string }>({
+    userAction: builder.mutation<InstituteViewQueryResponse, string >({
       query: (userId) => ({
         url: `/admin/user-action/${userId}`,
         method: 'PATCH',
@@ -81,14 +81,14 @@ export const adminSlice = createApi({
       invalidatesTags: ['User'],
     }),
 
-    instituteView: builder.query<InstituteDocument, { instituteId: string | undefined }>({
+    instituteView: builder.query<any, { instituteId: string | undefined }>({
       query: ({ instituteId }) => ({
         url: `/admin/institute-view/?id=${instituteId}`,
         method: 'GET'
       })
     }),
 
-    instituteApprove: builder.mutation<InstituteDocument, { instituteId: string }>({
+    instituteApprove: builder.mutation<InstituteDocument, string >({
       query: (instituteId) => ({
         url: `/admin/institute-approve/?id=${instituteId}`,
         method: 'PATCH'
@@ -105,14 +105,14 @@ export const adminSlice = createApi({
       })
     }),
 
-    instituteBlock: builder.mutation<InstituteDocument, { instituteId: string }>({
+    instituteBlock: builder.mutation<InstituteDocument, string >({
       query: (instituteId) => ({
         url: `/admin/institute-block/?id=${instituteId}`,
         method: 'PATCH'
       })
     }),
 
-    instituteUnBlock: builder.mutation<InstituteDocument, { instituteId: string }>({
+    instituteUnBlock: builder.mutation<InstituteDocument,string >({
       query: (instituteId) => ({
         url: `/admin/institute-unblock/?id=${instituteId}`,
         method: 'PATCH'

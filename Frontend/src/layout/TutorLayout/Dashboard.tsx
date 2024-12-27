@@ -9,12 +9,6 @@ import { RootState } from '../../store';
 import { useSelector } from 'react-redux';
 
 const Dashboard = () => {
-  // const tutorData = {
-  //   name: "Dr. Smith",
-  //   activeCourses: 5,
-  //   totalStudents: 120,
-  //   upcomingQuizzes: 3
-  // };
 
     const tutorData = useSelector((state: RootState) => state.auth.tutorInfo);
 
@@ -29,7 +23,6 @@ const Dashboard = () => {
           <p className="text-gray-600">Manage your courses and track student progress</p>
         </div>
 
-        {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
           <button className="bg-blue-600 text-white p-6 rounded-lg flex items-center justify-center gap-2 hover:bg-blue-700 transition-colors">
             <PlusCircle className="h-5 w-5" />
@@ -41,7 +34,6 @@ const Dashboard = () => {
           </button>
         </div>
 
-        {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center justify-between mb-2">
@@ -76,7 +68,6 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Recent Activity */}
         <div className="bg-white rounded-lg shadow">
           <div className="p-6 border-b">
             <h2 className="text-lg font-semibold">Recent Activity</h2>

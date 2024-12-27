@@ -5,7 +5,6 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { useTutorListQuery } from '../../store/slices/institutionSlice';
-import profile from '../../assets/frontEnd/ProfilePic.png'
 
 interface Tutor {
   id: string;

@@ -5,7 +5,11 @@ import InstituteSidebar from '../../components/sidebar/InstituteSidebar';
 import useDebouncedValue from '../../hooks/debounceHook';
 import { useGetDepartmentQuery } from '../../store/slices/institutionSlice';
 
-
+interface department{
+  id:string;
+  department: string;
+  tutorCount: number;
+}
 const DepartmentList: React.FC = () => {
     const [page, setPage] = useState(1);
     const [limit, setLimit] = useState(5);
@@ -39,7 +43,6 @@ const DepartmentList: React.FC = () => {
       };
 
   const handleEditDepartment = (departmentId: number) => {
-    // Implement edit logic
     console.log(`Editing department with ID: ${departmentId}`);
   };
 
@@ -94,7 +97,7 @@ const DepartmentList: React.FC = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {department.map((department) => (
+            {department.map((department:department) => (
               <tr key={department.id} className="hover:bg-gray-50 transition-colors">
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm font-medium text-gray-900">

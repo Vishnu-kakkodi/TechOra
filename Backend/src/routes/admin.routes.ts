@@ -13,7 +13,7 @@ router.get('/download-document',authMiddleware,adminController.downloadDoc.bind(
 router.get('/institute-view',authMiddleware,adminController.InstituteView.bind(adminController));
 
 
-router.post('/verify',authMiddleware,adminController.verifyAdmin.bind(adminController));
+router.post('/verify',adminController.verifyAdmin.bind(adminController));
 router.patch('/user-action/:userId',authMiddleware,adminController.userAction.bind(adminController));
 router.patch('/institute-approve',authMiddleware,adminController.InstituteAction.bind(adminController));
 router.patch('/institute-reject',authMiddleware,adminController.InstituteReject.bind(adminController));

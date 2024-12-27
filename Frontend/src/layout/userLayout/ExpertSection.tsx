@@ -1,7 +1,6 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Users } from 'lucide-react'
 
 export default function ExpertSection() {
   return (

@@ -3,8 +3,6 @@ import SignUpButton from '../buttons/SignUpButton';
 import SignUpModal from '../modals/SignUpModal';
 import LoginButton from '../buttons/LoginButton';
 import LoginModal from '../modals/LoginModal';
-import TutorButton from '../buttons/TutorLogin';
-import SearchBar from "../search/SearchBar";
 import OtpModal from '../modals/OtpModal';
 import EmailVerify from '../modals/EmailVerify';
 
@@ -42,8 +40,6 @@ const LandingPageHeader = () => {
               <span className="text-[35px] text-yellow-500 font-bold">techOra</span>
               <span className="text-[10px] text-white block mt-0 pt-0 ml-1">Let's Build Your Future</span>
             </div>
-            {/* <SearchBar data={searchData} /> */}
-
             <div>
               <SignUpButton handleSignUp={() => setSignUpModalOpen(true)} />
               <LoginButton handleLogin={() => setLoginModalOpen(true)} />

@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useFormik } from 'formik';
-import * as Yup from 'yup';
-import OTPIMG from '../../assets/frontEnd/OTPIMG.jpeg';
 import Modal from '../../components/modals/Modal';
 import { useRegisterMutation, useResendOtpMutation, useVerifyUserMutation } from '../../store/slices/userSlice';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { setCredentials, setInstituteEmailCredentials } from '../../store/slices/authSlice';
+import { setInstituteEmailCredentials } from '../../store/slices/authSlice';
 import { useEmailVerifyMutation, useOtpVerifyMutation } from '../../store/slices/institutionSlice';
 import { useUserOtpVerifyMutation } from '../../store/slices/userSlice';
 import { toast } from 'react-toastify';
@@ -43,17 +41,14 @@ const OtpModal: React.FC<OtpModalProps> = ({ setOtpModalOpen, mode }) => {
       try {
         switch (mode) {
           case 'signup':
-            console.log("signupppp")
             const signupResponse = await verifyUser({ otp }).unwrap();
             if (signupResponse.userDetails) {
-              // dispatch(setCredentials(signupResponse.userDetails));
               toast.success('Account verified successfully!');
               navigate('/');
             }
             break;
 
           case 'verifyEmail':
-            console.log("verifyyyyyy")
             const emailResponse = await otpVerify({ otp }).unwrap();
             if (emailResponse) {
               toast.success('Email verified successfully!');
@@ -65,7 +60,6 @@ const OtpModal: React.FC<OtpModalProps> = ({ setOtpModalOpen, mode }) => {
             break;
 
           case 'forgotPassword':
-            console.log("Forgot")
             const res:emailProps = await userOtpVerify({ otp }).unwrap();
             setEmail(res.data)
               toast.success('OTP verified successfully!');

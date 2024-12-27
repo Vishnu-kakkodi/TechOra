@@ -21,10 +21,10 @@ const LanguageSelectModal: React.FC<LanguageSelectModalProps> = ({
     setLanguageModalOpen,
 }) => {
     const { t } = useTranslation();
-    const { language, changeLanguage } = useLanguage(); // Use language context
+    const { language, changeLanguage } = useLanguage(); 
 
     const handleLanguageSelect = (languageCode: string) => {
-        changeLanguage(languageCode); // Use context method to change language
+        changeLanguage(languageCode); 
         setLanguageModalOpen(false);
     };
 

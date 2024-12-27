@@ -21,7 +21,6 @@ export class OrderService {
 
     async getOrderById(orderId: string): Promise<OrderDocument> {
         try {
-            console.log("kai");
             const order = await this.orderRepository.findById(orderId)
             return order;
         } catch (error) {
@@ -88,7 +87,6 @@ export class OrderService {
             }
 
             if (status && status.trim() !== '') {
-                console.log('Status received:', status);
                 const departmentArray = status.split(',').map((dep) => dep.trim());
 
                 query.status = { $in: departmentArray };

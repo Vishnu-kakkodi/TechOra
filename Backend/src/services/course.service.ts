@@ -9,7 +9,6 @@ import STATUS_CODES from "../constants/statusCode";
 import MESSAGES from "../constants/message";
 import { IUserDocument } from "../interfaces/user.interface";
 import { UserRepository } from "../repositories/user.repository";
-import { QuizDocument } from "../interfaces/quiz.interface";
 import { TutorRepository } from "../repositories/tutor.repository";
 import { WishlistRepository } from "../repositories/wishlist.repository";
 import { WishlistDocument } from "../interfaces/wishlist.interface";
@@ -39,7 +38,6 @@ export class CourseService {
       if (tutorId) {
         courseData.tutorId = tutorId;
       }
-      console.log(courseData.institutionId, "InstitutionId")
       const response = await this.courseRepository.create(courseData);
       if (!response) {
         throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
@@ -122,7 +120,6 @@ export class CourseService {
       }
 
       if (department && department.trim() !== '') {
-        console.log('Status received:', department);
         const departmentArray = department.split(',').map((dep) => dep.trim());
 
         query.department = { $in: departmentArray };
@@ -167,7 +164,6 @@ export class CourseService {
       }
 
       if (department && department.trim() !== '') {
-        console.log('Status received:', department);
         const departmentArray = department.split(',').map((dep) => dep.trim());
 
         query.department = { $in: departmentArray };
@@ -330,13 +326,9 @@ export class CourseService {
       }
 
       if (department && department.trim() !== '') {
-        console.log('Status received:', department);
         const departmentArray = department.split(',').map((dep) => dep.trim());
-
         query.department = { $in: departmentArray };
       }
-
-      console.log("Query:", query);
 
       switch (sort) {
         case 'newest':
@@ -436,7 +428,6 @@ export class CourseService {
       let information: string = 'Item added successfully'
 
       if (courseExists) {
-        console.log("Checking")
         return information = 'Already added'
       }
 

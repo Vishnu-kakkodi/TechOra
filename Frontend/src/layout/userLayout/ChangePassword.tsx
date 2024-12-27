@@ -27,14 +27,14 @@ const PasswordChangeSchema = Yup.object().shape({
 
 const ChangePassword: React.FC = () => {
   const [changePassword] = useChangePasswordMutation();
-  const [showPasswords, setShowPasswords] = useState({
+  const [showPasswords, setShowPasswords] = useState<any>({
     currentPassword: false,
     newPassword: false,
     confirmPassword: false
   });
 
   const togglePasswordVisibility = (field: keyof typeof showPasswords) => {
-    setShowPasswords(prev => ({
+    setShowPasswords((prev:any) => ({
       ...prev,
       [field]: !prev[field]
     }));
@@ -97,7 +97,7 @@ const ChangePassword: React.FC = () => {
                       {field.replace(/([A-Z])/g, ' $1').trim()}
                     </label>
                     <Field name={field}>
-                      {({ field: inputField, meta }) => (
+                      {({ field: inputField, meta }: { field: any; meta: any }) => (
                         <div className='relative'>
                           <input
                             {...inputField}
