@@ -40,8 +40,8 @@ export interface QuizData {
   id:string
   title: string;
   description: string;
-  duration: string;
-  maxAttempts: string;
+  duration: number;
+  maxAttempts: number;
   questions: Question[];
   status: QuizStatus;
   totalQuestions: number;
@@ -61,8 +61,8 @@ export interface QuizData {
 export interface QuizDatas {
   title: string;
   description: string;
-  duration: string;
-  maxAttempts: string;
+  duration: number;
+  maxAttempts: number;
   questions: Question[];
   status: QuizStatus;
   totalQuestions: number;

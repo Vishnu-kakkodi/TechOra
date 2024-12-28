@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Plus, Trash2, GripVertical, AlertCircle, Clock, RefreshCcw } from 'lucide-react';
 import InstituteSidebar from '../../components/sidebar/InstituteSidebar';
 import { Formik, Form, Field } from 'formik';
-import { QuestionType, QuizStatus, Question, QuizData, QuestionBoxProps, Option, QuizDocument } from '../../types/quizType'
+import { QuestionType, QuizStatus, Question, QuizData, QuestionBoxProps, Option, QuizDocument, QuizDatas } from '../../types/quizType'
 import { toast } from 'react-toastify';
 import { useParams } from 'react-router-dom';
 import { useQuizListQuery } from '../../store/slices/userSlice';
@@ -24,35 +24,80 @@ const EditQuiz: React.FC = () => {
 
   const { data: quizDatas, isLoading, isError } = useQuizDetailQuery(quizId);
 
+  interface FormValues extends Omit<QuizDatas, '_id'> {
+    title: string;
+    status: QuizStatus;
+    duration: number;
+    maxAttempts: number;
+    description: string;
+    startDate: string;
+    department: string;
+    stack: string;
+    difficultyLevel: string;
+    positiveScore: number;
+    negativeScore: number;
+    passingScore: number;
+    questions: Question[];
+    totalQuestions: number;
+  }
 
-  let existingQuiz:QuizDocument= quizDatas?.data
-    console.log(existingQuiz,"mm")
+  const defaultQuizData: FormValues = {
+    title: '',
+    status: 'draft',
+    duration: 0,
+    maxAttempts: 1,
+    description: '',
+    startDate: '',
+    department: '',
+    stack: '',
+    difficultyLevel: '',
+    positiveScore: 0,
+    negativeScore: 0,
+    passingScore: 0,
+    questions: [{
+      id: 1,
+      question: '',
+      options: [
+        { text: '', isCorrect: false },
+        { text: '', isCorrect: false },
+        { text: '', isCorrect: false },
+        { text: '', isCorrect: false }
+      ],
+      explanation: '',
+      type: 'multiple-choice',
+    }],
+    totalQuestions: 1
+  };
+
+
+  let existingQuiz: QuizDocument = quizDatas?.data
+  console.log(existingQuiz, "mm")
 
 
 
-  useEffect(()=>{
+  useEffect(() => {
     setQuizData(existingQuiz);
     setStatus(existingQuiz?.status.toLowerCase());
-},[quizDatas])
+  }, [quizDatas])
 
   useEffect(() => {
     if (existingQuiz) {
       setQuizData({
         ...existingQuiz,
-        questions: existingQuiz?.questions.length > 0 
-          ? existingQuiz?.questions 
+        questions: existingQuiz?.questions.length > 0
+          ? existingQuiz?.questions
           : [{
-              id: 1,
-              question: '',
-              options: [
-                { text: '', isCorrect: false },
-                { text: '', isCorrect: false },
-                { text: '', isCorrect: false },
-                { text: '', isCorrect: false }
-              ],
-              explanation: '',
-              type: 'multiple-choice',
-            }],
+            id: 1,
+            question: '',
+            options: [
+              { text: '', isCorrect: false },
+              { text: '', isCorrect: false },
+              { text: '', isCorrect: false },
+              { text: '', isCorrect: false }
+            ],
+            explanation: '',
+            type: 'multiple-choice',
+          }],
         totalQuestions: existingQuiz?.questions.length
       });
       setMaxQuestions(existingQuiz?.questions.length || 25);
@@ -61,45 +106,45 @@ const EditQuiz: React.FC = () => {
 
   const addQuestion = (): void => {
     if ((quizData?.questions?.length ?? 0) >= maxQuestions) {
-        setShowMaxAlert(true);
-        setTimeout(() => setShowMaxAlert(false), 3000);
-        return;
+      setShowMaxAlert(true);
+      setTimeout(() => setShowMaxAlert(false), 3000);
+      return;
     }
 
     const newQuestion: Question = {
-        id: (quizData?.questions?.length ?? 0) + 1,
-        question: '',
-        options: quizData?.questions?.[0]?.type === 'multiple-choice'
-            ? Array(4).fill({ text: '', isCorrect: false })
-            : [],
-        explanation: '',
-        type: quizData?.questions?.[0]?.type ?? 'multiple-choice',
+      id: (quizData?.questions?.length ?? 0) + 1,
+      question: '',
+      options: quizData?.questions?.[0]?.type === 'multiple-choice'
+        ? Array(4).fill({ text: '', isCorrect: false })
+        : [],
+      explanation: '',
+      type: quizData?.questions?.[0]?.type ?? 'multiple-choice',
     };
 
     setQuizData(prev => {
-        if (!prev) return prev;
-        return {
-            ...prev,
-            questions: [...(prev.questions ?? []), newQuestion],
-            totalQuestions: (prev.totalQuestions ?? 0) + 1
-        };
+      if (!prev) return prev;
+      return {
+        ...prev,
+        questions: [...(prev.questions ?? []), newQuestion],
+        totalQuestions: (prev.totalQuestions ?? 0) + 1
+      };
     });
     setCurrentQuestionIndex((quizData?.questions?.length ?? 0));
-};
+  };
 
-const removeQuestion = (index: number): void => {
+  const removeQuestion = (index: number): void => {
     setQuizData(prev => {
-        if (!prev || !prev.questions) return prev;
-        return {
-            ...prev,
-            questions: prev.questions.filter((_, i) => i !== index),
-            totalQuestions: (prev.totalQuestions ?? 1) - 1
-        };
+      if (!prev || !prev.questions) return prev;
+      return {
+        ...prev,
+        questions: prev.questions.filter((_, i) => i !== index),
+        totalQuestions: (prev.totalQuestions ?? 1) - 1
+      };
     });
     if (currentQuestionIndex >= index && currentQuestionIndex > 0) {
-        setCurrentQuestionIndex(currentQuestionIndex - 1);
+      setCurrentQuestionIndex(currentQuestionIndex - 1);
     }
-};
+  };
 
   const updateQuestion = (index: number, field: keyof Question, value: string | number): void => {
     setQuizData(prev => ({
@@ -166,7 +211,7 @@ const removeQuestion = (index: number): void => {
     </button>
   );
 
-  const handleSubmit = async (values: QuizData): Promise<void> => {
+  const handleSubmit = async (values: FormValues): Promise<void> => {
     try {
       const quizPayload = {
         ...values,
@@ -177,7 +222,7 @@ const removeQuestion = (index: number): void => {
         passingScore: Number(values.passingScore)
       };
       
-      const response = await updateQuiz({quizPayload,quizId}).unwrap();
+      const response = await updateQuiz({quizPayload, quizId}).unwrap();
       if(response){
         toast.success(response.message);
       }
@@ -186,7 +231,6 @@ const removeQuestion = (index: number): void => {
       toast.error('Failed to update quiz');
     }
   };
-
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -197,8 +241,11 @@ const removeQuestion = (index: number): void => {
       <div className="flex-1 p-6 bg-gray-50 min-h-screen">
         <div className="max-w-5xl mx-auto">
           <div className="flex gap-6">
-            <Formik
-              initialValues={quizData}
+            <Formik<FormValues>
+              initialValues={quizData ? {
+                ...defaultQuizData,
+                ...quizData,
+              } : defaultQuizData}
               enableReinitialize
               onSubmit={handleSubmit}
             >
@@ -383,7 +430,7 @@ const removeQuestion = (index: number): void => {
                                     <input
                                       type="checkbox"
                                       checked={option.isCorrect}
-                                      onChange={(e) => 
+                                      onChange={(e) =>
                                         updateOption(currentQuestionIndex, optionIndex, 'isCorrect', e.target.checked)
                                       }
                                       className="w-4 h-4 rounded border-gray-300 focus:ring-blue-500"
@@ -518,7 +565,7 @@ const removeQuestion = (index: number): void => {
             </Formik>
 
             <div className="w-64">
-            <div className="bg-white rounded-lg shadow p-4 sticky top-4">
+              <div className="bg-white rounded-lg shadow p-4 sticky top-4">
                 <h2 className="text-lg font-semibold mb-4">Questions ({quizData?.questions?.length}/{maxQuestions})</h2>
                 <div className="grid grid-cols-3 gap-2">
                   {quizData?.questions?.map((question, index) => (
@@ -571,23 +618,24 @@ const removeQuestion = (index: number): void => {
 };
 
 const isQuestionComplete = (question: Question): boolean => {
-    if (!question.question) return false;
+  if (!question.question) return false;
 
-    switch (question.type) {
-      case 'multiple-choice':
-        return question.options.length === 4 &&
-          question.options.every(opt => opt.text.trim() !== '') &&
-          question.options.some(opt => opt.isCorrect);
-  
-      case 'true-false':
-        return question.options.some(opt => opt.isCorrect);
-  
-      case 'short-answer':
-        return question.options.length > 0 &&
-          question.options[0].text.trim() !== '';
-  
-      default:
-        return false;
-    }};
+  switch (question.type) {
+    case 'multiple-choice':
+      return question.options.length === 4 &&
+        question.options.every(opt => opt.text.trim() !== '') &&
+        question.options.some(opt => opt.isCorrect);
+
+    case 'true-false':
+      return question.options.some(opt => opt.isCorrect);
+
+    case 'short-answer':
+      return question.options.length > 0 &&
+        question.options[0].text.trim() !== '';
+
+    default:
+      return false;
+  }
+};
 
 export default EditQuiz;

@@ -59,16 +59,16 @@ const validationSchema: Yup.ObjectSchema<CourseFormValues, Yup.AnyObject, any, "
   status: Yup.string()
     .oneOf(['draft', 'published'] as const)
     .required('Status is required'),
-  thumbnail: Yup.mixed<File | null>()
+    thumbnail: Yup.mixed<File>()
     .nullable()
     .default(null)
     .test('fileSize', 'File size must be less than 10MB', (value) => {
       if (!value) return true;
-      return value.size <= 10 * 1024 * 1024;
+      return value instanceof File && value.size <= 10 * 1024 * 1024;
     })
     .test('fileType', 'Unsupported file type', (value) => {
       if (!value) return true;
-      return ['image/jpeg', 'image/png', 'image/gif'].includes(value.type);
+      return value instanceof File && ['image/jpeg', 'image/png', 'image/gif'].includes(value.type);
     })
 });
 
