@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
-import { useAddToCartMutation, useAddToWishlistMutation, useHomeDataQuery } from '../../../store/slices/userSlice';
+import { useAddToCartMutation, useAddToWishlistMutation } from '../../../store/slices/userSlice';
 import { useAppSelector } from '../../../store/hook';
 import { ApiError } from '../../../types/ApiError';
 import { toast } from 'react-toastify';
@@ -161,11 +161,11 @@ const UserHome = () => {
           {/* Hero Section */}
           <div className="relative flex justify-center items-center w-full min-h-[60vh] px-4 sm:px-0 md:px-8 lg:px-10">
             {/* Image */}
-            <img
+            {/* <img
               src={HOMEPIC}
               alt="Description of the image"
               className="w-full object-cover"
-            />
+            /> */}
 
             {/* Text Overlay */}
             <div className="absolute top-1/2 left-[10%] md:left-[200px] bg-white bg-opacity-90 transform -translate-y-1/2 text-black p-6 md:p-10 border-2 rounded-lg shadow-lg">
@@ -204,13 +204,13 @@ const UserHome = () => {
                 Start a Quiz Now
               </Link>
             </div>
-            <div className="w-full md:w-1/3">
+            {/* <div className="w-full md:w-1/3">
               <img
                 src={QuizPic}
                 alt="Quiz Illustration"
                 className="w-full h-auto"
               />
-            </div>
+            </div> */}
           </div>
         </div>
 
