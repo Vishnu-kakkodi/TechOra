@@ -21,8 +21,8 @@ import CourseDetail from '../pages/user/CourseDetail/CourseDetail';
 import BlcokPage from '../pages/user/BlcokPage';
 import LeaderBoard from '../pages/user/LeaderBoard';
 import Wishlist from '../layout/userLayout/Wishlist';
-import LandingPage from '../pages/LandingPage';
-import UserHome from '../pages/user/UserHome';
+import LandingPage from '../pages/user/LandingPage/LandingPage';
+import UserHome from '../pages/user/HomePage/UserHome';
 
 
 const UserRoutes: React.FC = () => {

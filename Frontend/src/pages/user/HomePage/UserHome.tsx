@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
-import { useAddToCartMutation, useAddToWishlistMutation, useHomeDataQuery } from '../../store/slices/userSlice';
-import { useAppSelector } from '../../store/hook';
-import { ApiError } from '../../types/ApiError';
+import { useAddToCartMutation, useAddToWishlistMutation, useHomeDataQuery } from '../../../store/slices/userSlice';
+import { useAppSelector } from '../../../store/hook';
+import { ApiError } from '../../../types/ApiError';
 import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
-import LogoutButton from '../../components/buttons/LogoutButton';
+import LogoutButton from '../../../components/buttons/LogoutButton';
 import { BookOpen, Clock, Heart, Languages, Menu, User, X } from 'lucide-react';
 import HOMEPIC from '../../assets/frontEnd/HOMEPIC.png';
 import QuizPic from '../../assets/frontEnd/Quiz.jpg'
 import ReactStars from 'react-stars';
-import LanguageSelectModal from '../../components/modals/LanguageSelectModal';
-import Footer from '../../components/footer/Footer';
+import LanguageSelectModal from '../../../components/modals/LanguageSelectModal';
+import Footer from '../../../components/footer/Footer';
 
 const UserHome = () => {
 

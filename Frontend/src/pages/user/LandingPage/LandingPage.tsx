@@ -6,16 +6,16 @@ import HomePic from '../../../assets/frontEnd/HomePic.jpg'
 import { Link } from 'react-router-dom';
 import ReactStars from 'react-stars';
 import QuizPic from '../../src/assets/frontEnd/Quiz.jpg'
-import { useAppSelector } from '../store/hook';
-import { useHomeDataQuery } from '../store/slices/userSlice';
-import SignUpButton from '../components/buttons/SignUpButton';
-import Hero from '../layout/userLayout/Hero';
-import SignUpModal from '../components/modals/SignUpModal';
-import LoginModal from '../components/modals/LoginModal';
-import EmailVerify from '../components/modals/EmailVerify';
-import OtpModal from '../components/modals/OtpModal';
-import LanguageSelectModal from '../components/modals/LanguageSelectModal';
-import Footer from '../components/footer/Footer';
+import { useAppSelector } from '../../../store/hook';
+import { useHomeDataQuery } from '../../../store/slices/userSlice';
+import SignUpButton from '../../../components/buttons/SignUpButton';
+import Hero from '../../../layout/userLayout/Hero';
+import SignUpModal from '../../../components/modals/SignUpModal';
+import LoginModal from '../../../components/modals/LoginModal';
+import EmailVerify from '../../../components/modals/EmailVerify';
+import OtpModal from '../../../components/modals/OtpModal';
+import LanguageSelectModal from '../../../components/modals/LanguageSelectModal';
+import Footer from '../../../components/footer/Footer';
 
 
 interface LoginButtonProps{
