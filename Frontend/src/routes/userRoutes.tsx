@@ -1,8 +1,6 @@
 import React, { useEffect } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import LandingPage from '../pages/LandingPage';
-import UserHome from '../pages/user/UserHome';
 import { RootState } from '../store';
 import { Navigate } from 'react-router-dom';
 import ErrorPage from '../pages/user/errorPage';
@@ -23,6 +21,8 @@ import CourseDetail from '../pages/user/CourseDetail/CourseDetail';
 import BlcokPage from '../pages/user/BlcokPage';
 import LeaderBoard from '../pages/user/LeaderBoard';
 import Wishlist from '../layout/userLayout/Wishlist';
+import UserHome from '../../src/pages/user/UserHome';
+import LandingPage from '../../src/pages/LandingPage';
 
 const UserRoutes: React.FC = () => {
 

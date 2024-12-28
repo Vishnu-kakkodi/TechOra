@@ -170,7 +170,7 @@ const CourseList = () => {
                                     <div>
                                         <h2 className="text-xl font-bold mb-4 text-gray-800">Categories</h2>
                                         <div className="space-y-2">
-                                            {courseCategories.map((category, index) => (
+                                            {courseCategories.map((category:any, index:any) => (
                                                 <motion.label
                                                     key={index}
                                                     className="flex items-center py-2 px-3 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
