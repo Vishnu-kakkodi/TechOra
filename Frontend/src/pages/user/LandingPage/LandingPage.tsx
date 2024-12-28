@@ -2,10 +2,9 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, PlayCircle, Star, CheckCircle, User, X, Menu, Languages, Clock, BookOpen } from 'lucide-react';
-import HomePic from '../../../assets/frontEnd/HomePic.jpg'
 import { Link } from 'react-router-dom';
 import ReactStars from 'react-stars';
-import QuizPic from '../../src/assets/frontEnd/Quiz.jpg'
+import QuizPic from '../../../assets/frontEnd/Quiz.jpg'
 import { useAppSelector } from '../../../store/hook';
 import { useHomeDataQuery } from '../../../store/slices/userSlice';
 import SignUpButton from '../../../components/buttons/SignUpButton';
