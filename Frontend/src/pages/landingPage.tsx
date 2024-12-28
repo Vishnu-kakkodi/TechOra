@@ -9,7 +9,6 @@ import QuizPic from '../../src/assets/frontEnd/Quiz.jpg'
 import { useAppSelector } from '../store/hook';
 import { useHomeDataQuery } from '../store/slices/userSlice';
 import SignUpButton from '../components/buttons/SignUpButton';
-import LoginButton from '../components/buttons/LoginButton';
 import Hero from '../layout/userLayout/Hero';
 import SignUpModal from '../components/modals/SignUpModal';
 import LoginModal from '../components/modals/LoginModal';
@@ -18,6 +17,27 @@ import OtpModal from '../components/modals/OtpModal';
 import LanguageSelectModal from '../components/modals/LanguageSelectModal';
 import Footer from '../components/footer/Footer';
 
+
+interface LoginButtonProps{
+    label?: string;
+    className?:string;
+    handleLogin?: () => void
+    setModalOpen?: (state: boolean) => void;
+}
+
+const LoginButton: React.FC<LoginButtonProps>=({
+    handleLogin
+}) => {
+    return (
+        <>
+        <button
+        onClick={handleLogin}
+        className={`ml-4 text-[14px] font-[800] capitalize text-black bg-transparent border-2 border-black hover:bg-yellow-500 hover:text-black px-[30px] py-[11px]`}>
+            Log in
+        </button>
+        </>
+    )
+}
 
 
 const LandingPage = () => {
