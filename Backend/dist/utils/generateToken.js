@@ -9,7 +9,6 @@ const generateToken = (res, userId) => {
     const token = jsonwebtoken_1.default.sign({ userId }, process.env.JWT_SECRET, {
         expiresIn: '2min'
     });
-    console.log("Token generated:", token);
     res.cookie('user_jwt', token, {
         httpOnly: true,
         secure: true,

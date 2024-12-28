@@ -21,8 +21,8 @@ const moduleSchema = new mongoose_1.Schema({
     },
     status: {
         type: String,
-        enum: ['draft', 'published'],
-        default: 'published'
+        enum: ['list', 'unlist'],
+        default: 'unlist'
     }
 }, { timestamps: true });
 const courseSchema = new mongoose_1.Schema({
@@ -34,8 +34,9 @@ const courseSchema = new mongoose_1.Schema({
         type: String,
         required: true
     },
-    instructor: {
-        type: String,
+    tutorId: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        ref: 'Tutor',
         required: true
     },
     duration: {
@@ -51,7 +52,7 @@ const courseSchema = new mongoose_1.Schema({
         required: true
     },
     price: {
-        type: String,
+        type: Number,
         required: true
     },
     status: {
@@ -63,6 +64,21 @@ const courseSchema = new mongoose_1.Schema({
     thumbnail: {
         type: String,
         required: true
+    },
+    enrolledStudents: {
+        type: Number,
+        required: true,
+        default: 0
+    },
+    averageRating: {
+        type: Number,
+        required: true,
+        default: 0
+    },
+    totalReviews: {
+        type: Number,
+        required: true,
+        default: 0
     },
     institutionId: {
         type: mongoose_1.Schema.Types.ObjectId,
@@ -89,6 +105,10 @@ const courseSchema = new mongoose_1.Schema({
     totalDuration: {
         type: Number,
         default: 0
+    },
+    isListed: {
+        type: Boolean,
+        default: true
     }
 }, { timestamps: true });
 courseSchema.pre('save', function (next) {
@@ -103,8 +123,8 @@ courseSchema.pre('save', function (next) {
     next();
 });
 courseSchema.pre('validate', function (next) {
-    if (this.status === 'published') {
-        const hasUnpublishedModules = this.modules.some(module => module.status === 'draft');
+    if (this.status === 'draft') {
+        const hasUnpublishedModules = this.modules.some(module => module.status === 'unlist');
         if (hasUnpublishedModules) {
             next(new Error('Cannot publish course with draft modules'));
             return;

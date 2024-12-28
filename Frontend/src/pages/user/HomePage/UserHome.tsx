@@ -7,8 +7,8 @@ import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
 import LogoutButton from '../../../components/buttons/LogoutButton';
 import { BookOpen, Clock, Heart, Languages, Menu, User, X } from 'lucide-react';
-import HOMEPIC from '../../assets/frontEnd/HOMEPIC.png';
-import QuizPic from '../../assets/frontEnd/Quiz.jpg'
+import HOMEPIC from '../../../assets/frontEnd/HOMEPIC.png';
+import QuizPic from '../../../assets/frontEnd/Quiz.jpg'
 import ReactStars from 'react-stars';
 import LanguageSelectModal from '../../../components/modals/LanguageSelectModal';
 import Footer from '../../../components/footer/Footer';
