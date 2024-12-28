@@ -244,7 +244,7 @@ export const userSlice = createApi({
       }),
     }),
 
-    courseList: builder.query<CourseListResponse,any>({
+    courseList: builder.query<any,any>({
       query: ({ page = 1, limit = 4, search = '', filter='all', sort='' }) => ({
         url: '/users/course-list',
         params:{ page, limit, search, filter, sort },
@@ -292,7 +292,7 @@ export const userSlice = createApi({
       providesTags: ['User'],
      }),
 
-     myCourses: builder.query<CourseListResponse,any>({
+     myCourses: builder.query<any,any>({
       query: ({ page = 1, limit = 4, search = '' }) =>({
         url: '/users/my-courses',
         params:{ page, limit, search},

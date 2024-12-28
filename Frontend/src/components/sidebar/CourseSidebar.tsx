@@ -7,11 +7,19 @@ interface CourseSidebarProps {
   onFilterChange?: (filters: any) => void;
 }
 
+interface CourseData {
+  department: string;
+  institutionId: {
+    collegeName: string;
+  };
+}
+
+
 const userCourseSidebar: React.FC<CourseSidebarProps> = ({ onSearch, onFilterChange }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const { data: courseData } = useCourseListQuery(null);
-  const course = courseData?.data || [];
+  const course = (courseData?.data || []) as CourseData[];
 
 
   const Categories = course.map((c: any) => c.department.toUpperCase());
