@@ -71,8 +71,8 @@ const CreateQuiz: React.FC = () => {
   const initialQuizData: QuizDatas = {
     title: '',
     description: '',
-    duration: '30',
-    maxAttempts: '3',
+    duration: 30,
+    maxAttempts: 3,
     questions: [{
       id: 1,
       question: '',
