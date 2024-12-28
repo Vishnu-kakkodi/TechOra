@@ -7,8 +7,6 @@ interface LoginButtonProps{
 }
 
 const LoginButton: React.FC<LoginButtonProps>=({
-    label = 'Login',
-    className = '',
     handleLogin
 }) => {
     return (
