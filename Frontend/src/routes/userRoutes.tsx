@@ -21,8 +21,8 @@ import CourseDetail from '../pages/user/CourseDetail/CourseDetail';
 import BlcokPage from '../pages/user/BlcokPage';
 import LeaderBoard from '../pages/user/LeaderBoard';
 import Wishlist from '../layout/userLayout/Wishlist';
-import LandingPage from '../pages/LandingPage';
-import UserHome from '../pages/user/UserHome';
+// import LandingPage from '../pages/LandingPage';
+// import UserHome from '../pages/user/UserHome';
 
 
 const UserRoutes: React.FC = () => {
@@ -34,10 +34,10 @@ const UserRoutes: React.FC = () => {
   }, [isUserAuthenticated, navigate]);
   return (
     <Routes>
-      <Route
+      {/* <Route
         path="/"
         element={isUserAuthenticated ? <Navigate to="/home" replace /> : <LandingPage />}
-      />
+      /> */}
 
       <Route
         path="/forgot-password"
@@ -48,14 +48,14 @@ const UserRoutes: React.FC = () => {
         path="/account-blocked" element={<BlcokPage />}
       />
 
-      <Route
+      {/* <Route
         path="/home"
         element={
           <AuthRoute role={'user'}>
             <UserHome />
           </AuthRoute>
         }
-      />
+      /> */}
 
       <Route
         path="/cart"
