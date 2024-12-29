@@ -60,8 +60,8 @@ const LandingPage = () => {
 
 
 
-  const { data = {} } = useHomeDataQuery(null);
-  const courses = data.course || [] as any;
+  // const { data = {} } = useHomeDataQuery(null);
+  // const courses = data.course || [] as any;
 
   const handleForgotPassword = () => {
     setLoginModalOpen(false);
@@ -161,21 +161,17 @@ const LandingPage = () => {
         </div>
 
         {/* Courses Section */}
-        <div className="bg-gray-50 py-12 md:py-20">
+        {/* <div className="bg-gray-50 py-12 md:py-20">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            {/* Section Title */}
             <h2 className="text-2xl md:text-4xl font-bold text-center mb-8 md:mb-16 text-gray-800">
               Popular Courses
             </h2>
-
-            {/* Grid Container */}
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-8">
               {courses.map((course:any) => (
                 <div
                   key={course.id}
                   className="bg-white border border-gray-200 overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2"
                 >
-                  {/* Course Image */}
                   <div className="relative">
                     <img
                       src={course.thumbnail}
@@ -184,9 +180,7 @@ const LandingPage = () => {
                     />
                   </div>
 
-                  {/* Course Content */}
                   <div className="p-4 md:p-6">
-                    {/* Title and Tutor */}
                     <div className="mb-3">
                       <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-1 truncate">
                         {course.title}
@@ -197,12 +191,10 @@ const LandingPage = () => {
                       </div>
                     </div>
 
-                    {/* Description */}
                     <p className="text-gray-600 text-sm mb-3 md:mb-4 line-clamp-3">
                       {course.description}
                     </p>
 
-                    {/* Rating Section */}
                     <div className="flex items-center space-x-2 mb-3 md:mb-4">
                       <ReactStars
                         count={5}
@@ -217,7 +209,6 @@ const LandingPage = () => {
                       </span>
                     </div>
 
-                    {/* Course Details */}
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs md:text-sm text-gray-700 mb-3">
                       <div className="flex items-center">
                         <Clock size={14} className="mr-1 text-blue-500" />
@@ -233,21 +224,17 @@ const LandingPage = () => {
                       </div>
                     </div>
 
-                    {/* Price and Enroll Button */}
                     <div className="flex justify-between items-center">
                       <div className="text-base md:text-lg font-bold text-blue-700">
                         ₹{course.price.toFixed(2)}
                       </div>
-                      {/* <button className="bg-blue-600 text-white px-4 py-2 text-sm md:text-base rounded-full hover:bg-blue-700 transition-colors">
-                        Enroll Now
-                      </button> */}
                     </div>
                   </div>
                 </div>
               ))}
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
 
       <Footer/>

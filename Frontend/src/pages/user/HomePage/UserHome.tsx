@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
-import { useAddToCartMutation, useAddToWishlistMutation } from '../../../store/slices/userSlice';
+import { useAddToCartMutation, useAddToWishlistMutation, useHomeDataQuery } from '../../../store/slices/userSlice';
 import { useAppSelector } from '../../../store/hook';
 import { ApiError } from '../../../types/ApiError';
 import { toast } from 'react-toastify';
@@ -34,8 +34,8 @@ const UserHome = () => {
 
 
 
-  // const { data = {} } = useHomeDataQuery(null);
-  // const courses = data.course || [] as any;
+  const { data = {} } = useHomeDataQuery(null);
+  const courses = data.course || [] as any;
 
 
 
@@ -161,11 +161,11 @@ const UserHome = () => {
           {/* Hero Section */}
           <div className="relative flex justify-center items-center w-full min-h-[60vh] px-4 sm:px-0 md:px-8 lg:px-10">
             {/* Image */}
-            {/* <img
+            <img
               src={HOMEPIC}
               alt="Description of the image"
               className="w-full object-cover"
-            /> */}
+            />
 
             {/* Text Overlay */}
             <div className="absolute top-1/2 left-[10%] md:left-[200px] bg-white bg-opacity-90 transform -translate-y-1/2 text-black p-6 md:p-10 border-2 rounded-lg shadow-lg">
@@ -204,13 +204,13 @@ const UserHome = () => {
                 Start a Quiz Now
               </Link>
             </div>
-            {/* <div className="w-full md:w-1/3">
+            <div className="w-full md:w-1/3">
               <img
                 src={QuizPic}
                 alt="Quiz Illustration"
                 className="w-full h-auto"
               />
-            </div> */}
+            </div>
           </div>
         </div>
 
@@ -223,12 +223,14 @@ const UserHome = () => {
               Popular Courses
             </h2>
 
-            {/* <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-8">
+            {/* Grid Container */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-8">
               {courses.map((course: any) => (
                 <div
                   key={course.id}
                   className="bg-white border border-gray-200 overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2"
                 >
+                  {/* Course Image */}
                   <div className="relative">
                     <img
                       src={course.thumbnail}
@@ -237,7 +239,9 @@ const UserHome = () => {
                     />
                   </div>
 
+                  {/* Course Content */}
                   <div className="p-4 md:p-6">
+                    {/* Title and Tutor */}
                     <div className="mb-3">
                       <div className='flex justify-between gap-2'>
                         <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-1 truncate">
@@ -253,10 +257,12 @@ const UserHome = () => {
                       </div>
                     </div>
 
+                    {/* Description */}
                     <p className="text-gray-600 text-sm mb-3 md:mb-4 line-clamp-3">
                       {course.description}
                     </p>
 
+                    {/* Rating Section */}
                     <div className="flex items-center space-x-2 mb-3 md:mb-4">
                       <ReactStars
                         count={5}
@@ -271,6 +277,7 @@ const UserHome = () => {
                       </span>
                     </div>
 
+                    {/* Course Details */}
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs md:text-sm text-gray-700 mb-3">
                       <div className="flex items-center">
                         <Clock
@@ -287,6 +294,7 @@ const UserHome = () => {
                       </div>
                     </div>
 
+                    {/* Price and Enroll Button */}
                     <div className="flex justify-between items-center">
                       <div className="text-base md:text-lg font-bold text-blue-700">
                         ₹{course.price.toFixed(2)}
@@ -298,7 +306,7 @@ const UserHome = () => {
                   </div>
                 </div>
               ))}
-            </div> */}
+            </div>
           </div>
         </div>
 
