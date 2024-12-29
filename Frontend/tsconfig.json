@@ -1,12 +1,9 @@
 {
   "compilerOptions": {
     "baseUrl": "./",
-    "paths": {
-     "*": ["src/*"]
-    },
-    "target": "es5",
+    "target": "es6",
     "lib": ["dom", "dom.iterable", "esnext"],
-    "allowJs": true,
+    "allowJs": false,
     "skipLibCheck": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
@@ -21,5 +18,5 @@
     "incremental": true
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "dist"]
 }
