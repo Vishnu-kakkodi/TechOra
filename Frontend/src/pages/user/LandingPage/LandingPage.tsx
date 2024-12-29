@@ -4,11 +4,11 @@ import { motion } from 'framer-motion';
 import { ArrowRight, PlayCircle, Star, CheckCircle, User, X, Menu, Languages, Clock, BookOpen } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import ReactStars from 'react-stars';
-import QuizPic from '../../../assets/frontEnd/Quiz.jpg'
+// import QuizPic from '../../../assets/frontEnd/Quiz.jpg'
 import { useAppSelector } from '../../../store/hook';
-import { useHomeDataQuery } from '../../../store/slices/userSlice';
+// import { useHomeDataQuery } from '../../../store/slices/userSlice';
 import SignUpButton from '../../../components/buttons/SignUpButton';
-import Hero from '../../../layout/userLayout/Hero';
+// import Hero from '../../../layout/userLayout/Hero';
 import SignUpModal from '../../../components/modals/SignUpModal';
 import LoginModal from '../../../components/modals/LoginModal';
 import EmailVerify from '../../../components/modals/EmailVerify';
@@ -137,7 +137,7 @@ const LandingPage = () => {
             </div>
           </header>
 
-          <Hero/>
+          {/* <Hero/> */}
         </div>
 
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -151,11 +151,11 @@ const LandingPage = () => {
               </p>
             </div>
             <div className="w-full md:w-1/3">
-              <img
+              {/* <img
                 src={QuizPic}
                 alt="Quiz Illustration"
                 className="w-full h-auto"
-              />
+              /> */}
             </div>
           </div>
         </div>
