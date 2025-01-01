@@ -4,7 +4,7 @@ import LoginModal from '../modals/LoginModal';
 import OtpModal from '../modals/OtpModal';
 import EmailVerify from '../modals/EmailVerify';
 import { useDispatch } from 'react-redux';
-import { AppDispatch } from 'store';
+import { AppDispatch } from '../../store';
 
 interface LoginButtonProps{
     label?: string;
