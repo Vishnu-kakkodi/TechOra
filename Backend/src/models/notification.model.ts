@@ -1,22 +1,13 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema, Document, Types } from 'mongoose';
+import { INotification } from '../interfaces/notification.interface';
 
-export interface INotification extends Document {
-  type: string;
-  message: string;
-  readBy: string[];
-  createdAt: Date;
-  createdBy: string;
-}
+
 
 const NotificationSchema = new Schema({
   type: {
     type: String,
     required: true,
     enum: ['QUIZ_CREATED', 'QUIZ_UPDATED', 'QUIZ_DELETED', 'COURSE_CREATED', 'COURSE_UPDATED']
-  },
-  message: {
-    type: String,
-    required: true
   },
   title: {
     type: String,
@@ -28,7 +19,8 @@ const NotificationSchema = new Schema({
   },
   readBy: [{
     type: Schema.Types.ObjectId,
-    ref: 'User'
+    ref: 'User',
+    required: false
   }],
   createdAt: {
     type: Date,

@@ -215,6 +215,15 @@ enrolledUsers: builder.query({
   providesTags:['Tutor']
  }),
 
+ recentActivity: builder.query({
+  query: () =>({
+    url: `/tutor/recent-activity`,
+    method: 'GET',
+    credentials: 'include',
+  }),
+  providesTags:['Tutor']
+ }),
+
 
 
 
@@ -241,5 +250,6 @@ export const {
   useChartDataQuery,
   useUploadPhotoMutation,
   useUpdateProfileMutation,
-  useEnrolledUsersQuery
+  useEnrolledUsersQuery,
+  useRecentActivityQuery
 } = tutorSlice;

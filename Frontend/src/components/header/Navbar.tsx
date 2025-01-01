@@ -1,45 +1,89 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Languages, Menu, User, X, Bell, BookOpen, GraduationCap } from 'lucide-react';
 import LogoutButton from '../buttons/LogoutButton';
 import { useAppSelector } from '../../store/hook';
+import { useNotificationQuery, useNotificationReadMutation } from '../../store/slices/userSlice';
+import { useNotificationSocket } from '../../useNotificationHook';
+import { toast } from 'react-toastify';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isLanguageModalOpen, setLanguageModalOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
-  const [notifications, setNotifications] = useState([
-    {
-      id: 1,
-      type: 'course',
-      title: 'New Course: Advanced Mathematics',
-      message: 'Prof. Smith just added a new course on Calculus',
-      time: '2 minutes ago',
-      read: false
-    },
-    {
-      id: 2,
-      type: 'quiz',
-      title: 'New Quiz Available',
-      message: 'Complete the Python Basics quiz before Friday',
-      time: '1 hour ago',
-      read: false
-    }
-  ]);
+  const [toastMessage, setToastMessage] = useState('');
+  const [notificationRead] = useNotificationReadMutation();
+
 
   const userdata = useAppSelector((state) => state.auth.userInfo);
+
+  const { data: notification, refetch } = useNotificationQuery(null);
+  const userDepartment = userdata?.department || 'general';
+
+
+  const { isConnected } = useNotificationSocket({
+    token: userdata?.accessToken,
+    senderId: userdata?._id,
+    department: userDepartment,
+    onNotification: (notification) => {
+      handleNewNotification(notification);
+    }
+  });
+
+  useEffect(() => {
+    if (notification?.data) {
+      setNotifications(notification.data);
+    }
+  }, [notification]);
+
+
+  const handleNewNotification = (notification: any) => {
+    setNotifications((prev:any) => {
+      const exists = prev.some((n:any) => n._id === notification._id);
+      if (exists) return prev;
+      const updated = [notification, ...prev];
+      // toast.success(notification.title, {
+      //   position: "top-right",
+      //   autoClose: 5000,
+      //   hideProgressBar: false,
+      //   closeOnClick: true,
+      //   pauseOnHover: true,
+      //   draggable: true,
+      // });
+      return updated;
+    });
+  };
+
+  const handleMarkAsRead = (notificationId: string) => {
+    markAsRead(notificationId);
+    setNotifications(notifications.map((notif:any) =>
+      notif._id === notificationId ? { ...notif, readBy: [...(notif.readBy || []), userdata?._id] } : notif
+    ));
+  };
+
+
+  const [notifications, setNotifications] = useState(notification?.data || []);
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
 
-  const markAsRead = (id:any) => {
-    setNotifications(notifications.map(notif =>
+  const markAsRead = (id: any) => {
+    setNotifications(notifications.map((notif: any) =>
       notif.id === id ? { ...notif, read: true } : notif
     ));
   };
 
-  const unreadCount = notifications.filter(n => !n.read).length;
+  const handleRead = async (notificationId:string) => {
+    try{
+      const response = await notificationRead(notificationId);
+      refetch()
+    }catch(error){
+      console.log(error)
+    }
+  }
+
+  const unreadCount = notifications.filter((n: any) => !n.read).length;
 
   return (
     <header className="w-full top-0 shadow-lg bg-white relative z-50">
@@ -69,7 +113,7 @@ const Navbar = () => {
 
             <div className="flex items-center space-x-4">
 
-              <LogoutButton/>
+              <LogoutButton />
 
               <button
                 className="border-2 border-black p-2 rounded-md hover:bg-yellow-400 transition-colors"
@@ -90,72 +134,128 @@ const Navbar = () => {
               )}
             </div>
 
-            <div className="relative">
-                <button 
-                  onClick={() => setIsNotificationOpen(!isNotificationOpen)}
-                  className="relative p-2 text-gray-600 hover:text-yellow-400 hover:bg-gray-100 rounded-md transition-all duration-200"
-                >
-                  <Bell className="w-5 h-5" />
-                  {unreadCount > 0 && (
-                    <span className="absolute -top-1 -right-1 inline-flex items-center justify-center w-4 h-4 text-xs font-bold text-white bg-red-500 rounded-full">
-                      {unreadCount}
-                    </span>
-                  )}
-                </button>
+            {/* <div className="relative">
+              <button
+                onClick={() => setIsNotificationOpen(!isNotificationOpen)}
+                className="relative p-2 text-gray-600 hover:text-yellow-400 hover:bg-gray-100 rounded-md transition-all duration-200"
+              >
+                <Bell className="w-5 h-5" />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 inline-flex items-center justify-center w-4 h-4 text-xs font-bold text-white bg-red-500 rounded-full">
+                    {unreadCount}
+                  </span>
+                )}
+              </button>
 
-                {isNotificationOpen && (
-                  <div className="fixed right-4 top-16 w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
-                    <div className="flex items-center justify-between px-4 py-2 border-b border-gray-200">
-                      <h3 className="font-semibold text-gray-800">Notifications</h3>
-                      <button 
-                        onClick={() => setIsNotificationOpen(false)}
-                        className="text-gray-500 hover:text-gray-700"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                    </div>
-
-                    <div className="max-h-[calc(100vh-5rem)] overflow-y-auto">
-                      {notifications.length === 0 ? (
-                        <div className="p-4 text-center text-gray-500">
-                          No notifications yet
-                        </div>
-                      ) : (
-                        notifications.map((notification) => (
-                          <div
-                            key={notification.id}
-                            className={`p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer ${
-                              !notification.read ? 'bg-blue-50' : ''
-                            }`}
-                            onClick={() => markAsRead(notification.id)}
-                          >
-                            <div className="flex items-start">
-                              <div className="flex-shrink-0">
-                                {notification.type === 'course' ? (
-                                  <BookOpen className="w-5 h-5 text-blue-500" />
-                                ) : (
-                                  <GraduationCap className="w-5 h-5 text-green-500" />
-                                )}
-                              </div>
-                              <div className="ml-3 flex-1">
-                                <p className="text-sm font-medium text-gray-900">
-                                  {notification.title}
-                                </p>
-                                <p className="text-sm text-gray-500">
-                                  {notification.message}
-                                </p>
-                                <p className="text-xs text-gray-400 mt-1">
-                                  {notification.time}
-                                </p>
-                              </div>
+              {isNotificationOpen && (
+                <div className="fixed right-4 top-16 w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+                  <div className="flex items-center justify-between px-4 py-2 border-b border-gray-200">
+                    <h3 className="font-semibold text-gray-800">Notifications</h3>
+                    <button
+                      onClick={() => setIsNotificationOpen(false)}
+                      className="text-gray-500 hover:text-gray-700"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <div className="max-h-[calc(100vh-5rem)] overflow-y-auto">
+                    {notifications.length === 0 ? (
+                      <div className="p-4 text-center text-gray-500">
+                        No notifications yet
+                      </div>
+                    ) : (
+                      notifications.map((notification: any, index: any) => (
+                        <div
+                          key={notification.id}
+                          className={`p-4 hover:bg-gray-50 cursor-pointer ${!notification.read ? 'bg-blue-50' : ''
+                            } ${index !== notifications.length - 1 ? 'border-b border-gray-200' : ''}`}
+                          onClick={() => markAsRead(notification.id)}
+                        >
+                          <div className="flex items-start">
+                            <div className="ml-3 flex-1">
+                              <p className="text-sm font-medium text-gray-900">
+                                {notification?.type}
+                              </p>
+                              <p className="text-sm text-gray-500">
+                                {notification?.title}
+                              </p>
+                              <p className="text-xs text-gray-400 mt-1">
+                                {notification?.createdAt}
+                              </p>
+                            </div>
+                            <div className="flex-shrink-0">
+                              <X />
                             </div>
                           </div>
-                        ))
-                      )}
-                    </div>
+                        </div>
+                      ))
+                    )}
                   </div>
+
+                </div>
+              )}
+            </div> */}
+
+            <div className="relative">
+              <button
+                onClick={() => setIsNotificationOpen(!isNotificationOpen)}
+                className="relative p-2 text-gray-600 hover:text-yellow-400 hover:bg-gray-100 rounded-md transition-all duration-200"
+              >
+                <Bell className="w-5 h-5" />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 inline-flex items-center justify-center w-4 h-4 text-xs font-bold text-white bg-red-500 rounded-full">
+                    {unreadCount}
+                  </span>
                 )}
-              </div>
+              </button>
+
+              {isNotificationOpen && (
+                <div className="fixed right-4 top-16 w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+                  <div className="flex items-center justify-between px-4 py-2 border-b border-gray-200">
+                    <h3 className="font-semibold text-gray-800">Notifications</h3>
+                    <button
+                      onClick={() => setIsNotificationOpen(false)}
+                      className="text-gray-500 hover:text-gray-700"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <div className="max-h-[calc(100vh-5rem)] overflow-y-auto">
+                    {notifications.length === 0 ? (
+                      <div className="p-4 text-center text-gray-500">
+                        No notifications yet
+                      </div>
+                    ) : (
+                      notifications.map((notification:any) => (
+                        <div
+                          key={notification._id}
+                          className={`p-4 hover:bg-gray-50 cursor-pointer ${!notification.readBy?.includes(userdata?._id) ? 'bg-blue-50' : ''
+                            } border-b border-gray-200`}
+                          onClick={() => handleMarkAsRead(notification._id)}
+                        >
+                          <div className="flex items-start">
+                            <div className="ml-3 flex-1">
+                              <p className="text-sm font-medium text-gray-900">
+                                {notification.type}
+                              </p>
+                              <p className="text-sm text-gray-500">
+                                {notification.title}
+                              </p>
+                              <p className="text-xs text-gray-400 mt-1">
+                                {new Date(notification.createdAt).toLocaleString()}
+                              </p>
+                            </div>
+                            <div className="flex-shrink-0">
+                              <X onClick={()=>handleRead(notification._id)}/>
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
           </nav>
 
           <div className="md:hidden flex items-center">

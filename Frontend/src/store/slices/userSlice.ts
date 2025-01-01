@@ -389,6 +389,24 @@ export const userSlice = createApi({
     invalidatesTags:['User']
    }),
 
+   notification: builder.query({
+    query: () =>({
+      url: `/users/notification`,
+      method: 'GET',
+      credentials: 'include',
+    }),
+    providesTags:['User']
+   }),
+
+   notificationRead: builder.mutation({
+    query: (notificationId) =>({
+      url: `/users/notification-read/${notificationId}`,
+      method: 'PATCH',
+      credentials: 'include',
+    }),
+    invalidatesTags:['User']
+   }),
+
   }),
 
 });
@@ -425,6 +443,8 @@ export const
    useReviewQuery,
    useHomeDataQuery,
    useLeaderBoardListQuery,
-   useQuizResultMutation
+   useQuizResultMutation,
+   useNotificationQuery,
+   useNotificationReadMutation
   } = userSlice;
 

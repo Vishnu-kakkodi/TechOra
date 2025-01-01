@@ -31,7 +31,6 @@ export class QuizController {
                 throw new HttpException(STATUS_CODES.BAD_REQUEST, MESSAGES.ERROR.BAD_REQUEST)
               }
             const quizId = await this.quizService.createQuiz(quizData,tutorId);
-            console.log(quizId);
             res.status(201).json({
                 status: STATUS_CODES.SUCCESS,
                 data: quizId,

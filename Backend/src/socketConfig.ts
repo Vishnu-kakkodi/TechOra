@@ -4,11 +4,12 @@ import jwt from 'jsonwebtoken';
 import MessageModel from './models/chat.model';
 import SocketUtils from './utils/socketUtils';
 import { DecodedToken } from './helperFunction/authHelper';
+import notificationModel from './models/notification.model';
 
 class SocketConfig {
   private io: Server | null = null;
   private onlineUsers: Map<string, Set<string>> = new Map(); 
-
+  private userSockets: Map<string, string> = new Map();
 
   initializeSocket(server: HttpServer) {
     this.io = new Server(server, {
@@ -42,6 +43,93 @@ class SocketConfig {
       if (!this.onlineUsers.has(userId)) {
         this.onlineUsers.set(userId, new Set());
       }
+
+      socket.on('subscribe_notifications', async (department) => {
+        console.log(department);
+        socket.join(`notifications_${department}`);
+        
+        // Send any unread notifications to the user
+        try {
+          const unreadNotifications = await notificationModel.find({
+            readBy: { $ne: userId }
+          })
+          .sort({ createdAt: -1 })
+          .limit(10);
+
+          console.log(unreadNotifications)
+
+          socket.emit('unread_notifications', unreadNotifications);
+        } catch (error) {
+          console.error('Error fetching unread notifications:', error);
+        }
+      });
+
+      // Handle creating new notifications
+      socket.on('create_notification', async (data) => {
+        try {
+          const { type, title, department, createdBy } = data;
+
+          const notification = await notificationModel.create({
+            type,
+            title,
+            department,
+            createdBy,
+            readBy: [],
+            createdAt: new Date()
+          });
+
+          // Emit to all users in the department
+          this.io?.to(`notifications_${department}`).emit('new_notification', notification);
+
+          socket.emit('notification_created', {
+            success: true,
+            notification
+          });
+        } catch (error) {
+          console.error('Error creating notification:', error);
+          socket.emit('notification_error', {
+            message: 'Failed to create notification'
+          });
+        }
+      });
+
+      // Handle marking notifications as read
+      socket.on('mark_notification_read', async (notificationId) => {
+        try {
+          const notification = await notificationModel.findByIdAndUpdate(
+            notificationId,
+            { $addToSet: { readBy: userId } },
+            { new: true }
+          );
+
+          if (notification) {
+            socket.emit('notification_updated', notification);
+          }
+        } catch (error) {
+          console.error('Error marking notification as read:', error);
+        }
+      });
+
+      // Handle fetching notification history
+      socket.on('fetch_notifications', async (department, callback) => {
+        try {
+          const notifications = await notificationModel.find({
+            department
+          })
+          .sort({ createdAt: -1 })
+          .limit(20);
+
+          callback({
+            success: true,
+            notifications
+          });
+        } catch (error) {
+          callback({
+            success: false,
+            error: 'Failed to fetch notifications'
+          });
+        }
+      });
       
       socket.on('join_chat', async (chatPartnerId) => {
         const roomId = this.generateRoomId(userId, chatPartnerId);
@@ -202,6 +290,8 @@ class SocketConfig {
 
       
       socket.on('disconnect', () => {
+        this.userSockets.delete(userId);
+
         const userRooms = this.onlineUsers.get(userId) || new Set();
         this.onlineUsers.delete(userId);
         userRooms.forEach(roomId => {

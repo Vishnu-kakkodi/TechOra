@@ -21,6 +21,9 @@ import { ReviewController } from "../controllers/review.controller";
 import { TutorRepository } from "../repositories/tutor.repository";
 import { WishlistController } from "../controllers/wishlist.controller";
 import { WishlistRepository } from "../repositories/wishlist.repository";
+import { NotificationRepository } from "../repositories/notification.repository";
+import { NotificationService } from "../services/notification.service";
+import { NotificationController } from "../controllers/notification.controller";
 
 
 
@@ -30,6 +33,9 @@ const courseRepository = new CourseRepository();
 const cartRepository = new CartRepository();
 const tutorRepository = new TutorRepository();
 const wishlistRepository = new WishlistRepository();
+const notificationRepository = new NotificationRepository();
+const notificationService = new NotificationService(notificationRepository);
+const notificationController = new NotificationController(notificationService);
 const userService = new UserService(userRepository,courseRepository);
 const userController = new UserController(userService);
 const quizRepository = new QuizRepository()
@@ -58,6 +64,7 @@ router.get('/quiz-list',authMiddleware,quizController.quizList.bind(quizControll
 router.get('/review',authMiddleware,reviewController.Review.bind(reviewController));
 router.get('/home-data',userController.homeData.bind(userController));
 router.get('/leaderBoard-list',authMiddleware,userController.leaderBoard.bind(userController));
+router.get('/notification',authMiddleware,notificationController.notification.bind(notificationController));
 
 
 
@@ -83,6 +90,7 @@ router.patch('/change-password',authMiddleware,userController.changePassword.bin
 router.post('/quiz-result',authMiddleware,quizController.quizResult.bind(quizController));
 router.post('/add-wishlist',authMiddleware,wishlistController.addToWishlist.bind(wishlistController));
 router.delete('/remove-wishlist/:courseId',authMiddleware,wishlistController.removeWishlist.bind(wishlistController));
+router.patch('/notification-read/:notificationId',authMiddleware,notificationController.notificationRead.bind(notificationController));
 
 
 

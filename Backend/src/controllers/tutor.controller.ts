@@ -112,6 +112,30 @@ export class TutorController{
         }
     }
 
+    async recentActivity(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void>{
+        try{
+            const token = req.cookies.tutor.accessToken;
+            if(!token){
+                throw new HttpException(STATUS_CODES.UNAUTHORIZED,MESSAGES.ERROR.UNAUTHORIZED)
+            }
+            const requiredRole = "tutor";
+            const tutorId: string | null = decodedToken(token, requiredRole);
+            const data = await this.tutorService.recentActivity(tutorId);
+            if (!data) {
+                throw new HttpException(STATUS_CODES.BAD_REQUEST, MESSAGES.ERROR.BAD_REQUEST)
+              }
+              res.status(201).json({
+                data
+            });
+        } catch (error) {
+            next(error)
+        }
+    }
+
     async Logout(
         req: Request,
         res: Response,

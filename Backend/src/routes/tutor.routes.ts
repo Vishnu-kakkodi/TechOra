@@ -15,6 +15,7 @@ import { TutorService } from "../services/tutor.service";
 import { TutorController } from "../controllers/tutor.controller";
 import { WishlistRepository } from "../repositories/wishlist.repository";
 import { authMiddleware } from "../middleware/auth.middleware";
+import { NotificationRepository } from "../repositories/notification.repository";
 
 const router = Router();
 const instituteService = new InstituteService();
@@ -23,13 +24,14 @@ const cartRepository = new CartRepository();
 const userRepository = new UserRepository();
 const tutorRepository = new TutorRepository();
 const wishlistRepository = new WishlistRepository();
+const notificationRepository = new NotificationRepository();
 const courseService = new CourseService(courseRepository,cartRepository,userRepository,tutorRepository,wishlistRepository);
 const instituteController = new InstitutionController(instituteService);
 const quizRepository = new QuizRepository();
 const quizService = new QuizService(quizRepository,userRepository,tutorRepository);
 const quizController = new QuizController(quizService)
 const courseController = new CourseController(courseService,quizService);
-const tutorService = new TutorService(tutorRepository,userRepository);
+const tutorService = new TutorService(tutorRepository,userRepository,notificationRepository);
 const tutorController = new TutorController(tutorService);
 
 
@@ -42,6 +44,7 @@ router.get('/quiz-list',authMiddleware,quizController.TutorListQuiz.bind(quizCon
 router.get('/quiz-detail',authMiddleware,quizController.quizDetail.bind(quizController));
 router.get('/chart-data',authMiddleware,courseController.chartData.bind(courseController));
 router.get('/enrolled-students',authMiddleware,tutorController.enrolledStudents.bind(tutorController));
+router.get('/recent-activity',authMiddleware,tutorController.recentActivity.bind(tutorController));
 
 
 

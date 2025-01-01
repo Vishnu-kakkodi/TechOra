@@ -57,4 +57,43 @@ export class InstituteRepository extends BaseRepository<InstituteDocument> {
             throw error;
         }
     }
+
+    async CountDepartment(
+        filterKey: string, 
+        filterValue: string, 
+        searchQuery: any,
+        skip: number,
+        limit: number,
+        sortOptions: any = { createdAt: -1 }
+    ): Promise<{ departments: Array<{ department: string}>}> { 
+        try {
+            const id = new mongoose.Types.ObjectId(filterValue);
+                      
+                      const filter: Record<string, any> = {
+                        [filterKey]: id,
+                        ...searchQuery,
+                      };
+                      
+                      const departmentCounts = await this.model.aggregate([
+                        { 
+                          $match: filter 
+                        },
+                        {
+                          $project: {
+                            _id: 0,
+                            department: 1,
+                          }
+                        },
+                        { $sort: sortOptions },
+                        { $skip: skip },
+                        { $limit: limit }
+                      ]);
+                  
+                      return { 
+                        departments: departmentCounts, 
+                      };            
+        } catch (error) {
+            throw error;
+        }
+    }
 }

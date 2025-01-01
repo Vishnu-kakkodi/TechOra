@@ -7,15 +7,18 @@ import MESSAGES from "../constants/message";
 import { IUserDocument } from "../interfaces/user.interface";
 import { UserRepository } from "../repositories/user.repository";
 import mongoose from "mongoose";
+import { NotificationRepository } from "../repositories/notification.repository";
+import { INotification } from "../interfaces/notification.interface";
 
 export class TutorService {
     private tutorRepository: TutorRepository;
     private userRepository: UserRepository;
+    private notificationRepository: NotificationRepository;
 
-    constructor(tutorRepository: TutorRepository, userRepository:UserRepository) {
+    constructor(tutorRepository: TutorRepository, userRepository:UserRepository, notificationRepository:NotificationRepository) {
         this.tutorRepository = tutorRepository;
         this.userRepository = userRepository;
-
+        this.notificationRepository = notificationRepository
     }
 
     async tutorLogin(tutorEmail: string, password: string): Promise<TutorDocument | null> {
@@ -135,5 +138,13 @@ export class TutorService {
           throw error;
         }
       }
+
+      async recentActivity(tutorId: string): Promise<INotification[] | null> {
+        try {
+            return await this.notificationRepository.recentActivity(tutorId);
+        } catch (error) {
+            throw error        
+        }
+    }
       
 }

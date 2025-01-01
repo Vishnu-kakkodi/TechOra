@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import TutorSidebar from '../../components/sidebar/tutorSidebar';
 import { useAddQuizMutation } from '../../store/slices/tutorSlice';
 import { useAppSelector } from '../../store/hook';
+import { useNotificationSocket } from '../../useNotificationHook';
 
 const QuizValidationSchema = Yup.object().shape({
   title: Yup.string().required('Quiz title is required'),
@@ -67,36 +68,46 @@ const CreateQuiz: React.FC = () => {
   const navigate = useNavigate();
   const tutordata = useAppSelector((state) => state.auth.tutorInfo);
 
+  const token = tutordata?.accessToken;
+
 
   const initialQuizData: QuizDatas = {
-    title: '',
-    description: '',
+    title: 'ghhv',
+    description: 'bnn',
     duration: 30,
     maxAttempts: 3,
     questions: [{
       id: 1,
-      question: '',
+      question: '1',
       options: [
-        { text: '', isCorrect: false },
-        { text: '', isCorrect: false },
-        { text: '', isCorrect: false },
-        { text: '', isCorrect: false }
+        { text: ' vbb', isCorrect: false },
+        { text: 'bnvnv', isCorrect: false },
+        { text: 'vnbv', isCorrect: true },
+        { text: 'vbnnn', isCorrect: false }
       ],
-      explanation: '',
+      explanation: 'vgvvhgm',
       type: 'multiple-choice',
     }],
     status: 'published',
     totalQuestions: 1,
-    department: '',
-    stack: '',
-    difficultyLevel: '',
+    department: 'ghhjfh',
+    stack: 'bhbjhj',
+    difficultyLevel: 'easy',
     positiveScore: 1,
     negativeScore: 1,
     passingScore: 1,
-    startDate: ''
+    startDate: '11-09-2025'
   };
 
   const [quizData, setQuizData] = useState<QuizDatas>(initialQuizData);
+
+  const { sendNotification, isConnected } = useNotificationSocket({
+    token,
+    senderId: tutordata?._id,
+    onNotification: (notification) => {
+      console.log('Received notification:', notification);
+    }
+  });
 
   const addQuestion = (): void => {
     if (quizData.questions.length >= maxQuestions) {
@@ -199,98 +210,571 @@ const CreateQuiz: React.FC = () => {
     </button>
   );
 
-  // const handleSubmit = async (values: QuizData): Promise<void> => {
-  //   try {
-  //     const quizPayload = {
-  //       ...values,
-  //       questions: quizData.questions,
-  //       totalQuestions: quizData.questions.length,
-  //       positiveScore: Number(values.positiveScore),
-  //       negativeScore: Number(values.negativeScore),
-  //       passingScore: Number(values.passingScore)
-  //     };
-  //     const response = await addQuiz(quizPayload).unwrap();
-  //     console.log("OKKKKK")
-  //     if (response) {
-  //       console.log("Quiz Created successfully",response.data)
-  //       sendNotification({
-  //         type: 'QUIZ_CREATED',
-  //         data: {
-  //           quizId: response.data,
-  //           title: values.title,
-  //           department: values.department,
-  //           createdBy: tutordata?.id,
-  //           creatorName: tutordata?.name
-  //         },
-  //         recipients: ['admin', 'students'],
-  //         message: `New quiz "${values.title}" has been created for ${values.department} department`
-  //       });
-  //       toast.success(response.message);
-  //       navigate('/tutor/quizzes');
-  //     }
-  //   } catch (error) {
-  //     console.error('Failed to create quiz:', error);
-  //   }
-  // };
-
   const handleSubmit = async (values: QuizDatas): Promise<void> => {
     try {
-      const quizPayload = {
-        ...values,
-        questions: quizData.questions,
-        totalQuestions: quizData.questions.length,
-        positiveScore: Number(values.positiveScore),
-        negativeScore: Number(values.negativeScore),
-        passingScore: Number(values.passingScore)
-      };
+        const quizPayload = {
+            ...values,
+            questions: quizData.questions,
+            totalQuestions: quizData.questions.length,
+            positiveScore: Number(values.positiveScore),
+            negativeScore: Number(values.negativeScore),
+            passingScore: Number(values.passingScore),
+        };
 
-      const response = await addQuiz(quizPayload).unwrap();
+        const response = await addQuiz(quizPayload).unwrap();
 
-      // if (response?.data) {
-      //   try {
-      //     await sendNotification({
-      //       quizId: response.data,
-      //       title: values.title,
-      //       department: values.department,
-      //       createdBy: tutordata?.id,
-      //       creatorName: tutordata?.name
-      //     });
-      //     toast.success('Quiz created and notification sent');
-      //   } catch (error) {
-      //     console.error('Failed to send notification:', error);
-      //     toast.warning('Quiz created but notification failed');
-      //   }
-      // }
+        if (response?.data) {
+            if (isConnected) {
+                try {
+                    await sendNotification({
+                        type: 'QUIZ_CREATED',
+                        title: `New Quiz: ${values.title}`,
+                        department: values.department,
+                        createdBy: tutordata?._id,
+                    });
+                    toast.success('Quiz created and notification sent');
+                } catch (error) {
+                    console.error('Failed to send notification:', error);
+                    toast.warning('Quiz created but notification failed');
+                }
+            } else {
+                toast.error('Notification service is not connected. Please try again later.');
+            }
+        }
     } catch (error) {
-      console.error('Failed to create quiz:', error);
-      toast.error('Failed to create quiz');
+        console.error('Failed to create quiz:', error);
+        toast.error('Failed to create quiz');
     }
-  };
+};
+
 
   return (
-    <div className="flex">
-      <TutorSidebar />
-      <div className="flex-1 p-6 bg-gray-50 min-h-screen">
-        <div className="max-w-5xl mx-auto">
-          <div className="flex gap-6">
-            <Formik
-              initialValues={initialQuizData}
-              validationSchema={QuizValidationSchema}
-              onSubmit={handleSubmit}
-              validateOnChange={true}
-              validateOnBlur={true}
-            >
-              {({ isSubmitting, touched, errors }) => (
-                <Form className="space-y-8 flex-1">
-                  <div className="flex-1">
-                    <div className="mb-6">
-                      <h1 className="text-2xl font-bold mb-4">Create New Quiz</h1>
-                    </div>
+    // <div className="flex">
+    //   <TutorSidebar />
+    //   <div className="flex-1 p-6 bg-gray-50 min-h-screen">
+    //     <div className="max-w-5xl mx-auto">
+    //       <div className="flex gap-6">
+    //         <Formik
+    //           initialValues={initialQuizData}
+    //           // validationSchema={QuizValidationSchema}
+    //           onSubmit={handleSubmit}
+    //           validateOnChange={true}
+    //           validateOnBlur={true}
+    //         >
+    //           {({ isSubmitting, touched, errors }) => (
+    //             <Form className="space-y-8 flex-1">
+    //               <div className="flex-1">
+    //                 <div className="mb-6">
+    //                   <h1 className="text-2xl font-bold mb-4">Create New Quiz</h1>
+    //                 </div>
 
-                    <div className="bg-white rounded-lg shadow p-6">
-                      <div className="grid grid-cols-2 gap-4 mb-4">
-                        <InputWrapper name="title">
-                          <label
+    //                 <div className="bg-white rounded-lg shadow p-6">
+    //                   <div className="grid grid-cols-2 gap-4 mb-4">
+    //                     <InputWrapper name="title">
+    //                       <label
+    //                         htmlFor="title"
+    //                         className="block text-sm font-medium text-gray-700 mb-1"
+    //                       >
+    //                         Quiz Title
+    //                       </label>
+    //                       <Field
+    //                         type="text"
+    //                         id="title"
+    //                         name="title"
+    //                         placeholder="Enter quiz title"
+    //                         className="text-lg font-semibold px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+    //                       />
+    //                     </InputWrapper>
+
+    //                     <InputWrapper name="status">
+    //                       <label
+    //                         htmlFor="status"
+    //                         className="block text-sm font-medium text-gray-700 mb-1"
+    //                       >
+    //                         Quiz Status
+    //                       </label>
+    //                       <select
+    //                         id="status"
+    //                         value={quizData.status}
+    //                         onChange={(e) => setQuizData(prev => ({ ...prev, status: e.target.value as QuizStatus }))}
+    //                         className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+    //                       >
+    //                         <option value="draft">Draft</option>
+    //                         <option value="published">Published</option>
+    //                       </select>
+    //                     </InputWrapper>
+    //                   </div>
+
+    //                   <div className="grid grid-cols-3 gap-4 mb-4">
+    //                     <InputWrapper name="duration">
+    //                       <label
+    //                         htmlFor="duration"
+    //                         className="block text-sm font-medium text-gray-700 mb-1"
+    //                       >
+    //                         Quiz Duration (minutes)
+    //                       </label>
+    //                       <Field
+    //                         type="number"
+    //                         id="duration"
+    //                         name="duration"
+    //                         placeholder="Duration (minutes)"
+    //                         min="1"
+    //                         className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+    //                       />
+    //                     </InputWrapper>
+
+    //                     <InputWrapper name="maxAttempts">
+    //                       <label
+    //                         htmlFor="maxAttempts"
+    //                         className="block text-sm font-medium text-gray-700 mb-1"
+    //                       >
+    //                         Max No. of Attempts
+    //                       </label>
+    //                       <Field
+    //                         type="number"
+    //                         id="maxAttempts"
+    //                         name="maxAttempts"
+    //                         placeholder="Max Attempts"
+    //                         min="1"
+    //                         className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+    //                       />
+    //                     </InputWrapper>
+
+    //                     <InputWrapper name="maxQuestions">
+    //                       <label
+    //                         htmlFor="maxQuestions"
+    //                         className="block text-sm font-medium text-gray-700 mb-1"
+    //                       >
+    //                         Max No. of Questions
+    //                       </label>
+    //                       <Field
+    //                         type="number"
+    //                         id="maxQuestions"
+    //                         placeholder="Max Questions"
+    //                         name="maxQuestions"
+    //                         min="1"
+    //                         max="20"
+    //                         value={maxQuestions}
+    //                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => setMaxQuestions(parseInt(e.target.value))}
+    //                         className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+    //                       />
+    //                     </InputWrapper>
+
+    //                     <InputWrapper name="department">
+    //                       <label
+    //                         htmlFor="department"
+    //                         className="block text-sm font-medium text-gray-700 mb-1"
+    //                       >
+    //                         Academic Department
+    //                       </label>
+    //                       <Field
+    //                         as="select"
+    //                         id="department"
+    //                         name="department"
+    //                         className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+    //                       >
+    //                         <option value="">Select Department</option>
+    //                         <option value="computer-science">Computer Science</option>
+    //                         <option value="mathematics">Mathematics</option>
+    //                         <option value="business">Business</option>
+    //                         <option value="hotel-management">Hotel Management</option>
+    //                       </Field>
+    //                     </InputWrapper>
+
+    //                     <InputWrapper name="stack">
+    //                       <label
+    //                         htmlFor="stack"
+    //                         className="block text-sm font-medium text-gray-700 mb-1"
+    //                       >
+    //                         Technology Stack
+    //                       </label>
+    //                       <Field
+    //                         type="text"
+    //                         id="stack"
+    //                         name="stack"
+    //                         placeholder="Enter technology stack"
+    //                         className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+    //                       />
+    //                     </InputWrapper>
+
+    //                     <InputWrapper name="difficultyLevel">
+    //                       <label
+    //                         htmlFor="difficultyLevel"
+    //                         className="block text-sm font-medium text-gray-700 mb-1"
+    //                       >
+    //                         Difficulty Level
+    //                       </label>
+    //                       <Field
+    //                         as="select"
+    //                         id="difficultyLevel"
+    //                         name="difficultyLevel"
+    //                         className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+    //                       >
+    //                         <option value="">Select Difficulty Level</option>
+    //                         <option value="easy">Easy</option>
+    //                         <option value="medium">Medium</option>
+    //                         <option value="hard">Hard</option>
+    //                       </Field>
+    //                     </InputWrapper>
+
+    //                     <InputWrapper name="positiveScore">
+    //                       <label
+    //                         htmlFor="positiveScore"
+    //                         className="block text-sm font-medium text-gray-700 mb-1"
+    //                       >
+    //                         Points for Correct Answer
+    //                       </label>
+    //                       <Field
+    //                         type="number"
+    //                         id="positiveScore"
+    //                         name="positiveScore"
+    //                         placeholder="Score for correct"
+    //                         min="1"
+    //                         max="4"
+    //                         className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+    //                       />
+    //                     </InputWrapper>
+
+    //                     <InputWrapper name="negativeScore">
+    //                       <label
+    //                         htmlFor="negativeScore"
+    //                         className="block text-sm font-medium text-gray-700 mb-1"
+    //                       >
+    //                         Penalty for Wrong Answer
+    //                       </label>
+    //                       <Field
+    //                         type="number"
+    //                         id="negativeScore"
+    //                         name="negativeScore"
+    //                         placeholder="Score for wrong"
+    //                         min="0"
+    //                         max="1"
+    //                         className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+    //                       />
+    //                     </InputWrapper>
+
+    //                     <InputWrapper name="passingScore">
+    //                       <label
+    //                         htmlFor="passingScore"
+    //                         className="block text-sm font-medium text-gray-700 mb-1"
+    //                       >
+    //                         Minimum Passing Score
+    //                       </label>
+    //                       <Field
+    //                         type="number"
+    //                         id="passingScore"
+    //                         name="passingScore"
+    //                         placeholder="Passing Score"
+    //                         min="1"
+    //                         max="100"
+    //                         className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+    //                       />
+    //                     </InputWrapper>
+    //                   </div>
+
+    //                   <InputWrapper name="description">
+    //                     <label
+    //                       htmlFor="description"
+    //                       className="block text-sm font-medium text-gray-700 mb-1"
+    //                     >
+    //                       Quiz Description
+    //                     </label>
+    //                     <Field
+    //                       as="textarea"
+    //                       id="description"
+    //                       name="description"
+    //                       placeholder="Provide a detailed description of the quiz"
+    //                       className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
+    //                       rows={3}
+    //                     />
+    //                   </InputWrapper>
+
+    //                   <div className="mb-4">
+    //                     <label
+    //                       htmlFor="startDate"
+    //                       className="block text-sm font-medium text-gray-700 mb-1"
+    //                     >
+    //                       Quiz Start Date
+    //                     </label>
+    //                     <InputWrapper name="startDate">
+    //                       <Field
+    //                         type="date"
+    //                         id="startDate"
+    //                         name="startDate"
+    //                         className="w-[200px] px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+    //                       />
+    //                     </InputWrapper>
+    //                   </div>
+
+    //                   <div className="flex justify-between items-center gap-4">
+    //                     <h3 className="text-lg font-medium">Question Type</h3>
+    //                     <label htmlFor="questionType" className="sr-only">Select Question Type</label>
+    //                     <Field
+    //                       as="select"
+    //                       id="questionType"
+    //                       name="type"
+    //                       value={quizData.questions[currentQuestionIndex].type}
+    //                       onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+    //                         handleQuestionTypeChange(currentQuestionIndex, e.target.value as QuestionType)
+    //                       }
+    //                       className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+    //                     >
+    //                       <option value="multiple-choice">Multiple Choice</option>
+    //                       <option value="true-false">True/False</option>
+    //                     </Field>
+    //                     <button
+    //                       type="button"
+    //                       onClick={() => setQuestionModal(true)}
+    //                       className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+    //                     >
+    //                       Continue to Questions
+    //                     </button>
+    //                   </div>
+    //                 </div>
+
+    //                 {questionModal && quizData.questions[currentQuestionIndex] && (
+    //                   <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    //                     <div className="bg-white rounded-lg shadow-lg w-full max-w-3xl mx-4 p-6">
+    //                       <div className="flex items-center justify-between mb-4">
+    //                         <h3 className="text-lg font-medium">Question {currentQuestionIndex + 1}</h3>
+    //                         <button
+    //                           type="button"
+    //                           onClick={() => setQuestionModal(false)}
+    //                           className="text-gray-500 hover:text-gray-700"
+    //                         >
+    //                           ×
+    //                         </button>
+    //                       </div>
+
+    //                       <div className="space-y-4">
+    //                         <textarea
+    //                           placeholder="Enter your question"
+    //                           name="question"
+    //                           className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+    //                           value={quizData.questions[currentQuestionIndex].question}
+    //                           onChange={(e) => updateQuestion(currentQuestionIndex, 'question', e.target.value)}
+    //                           rows={3}
+    //                         />
+
+    //                         {quizData.questions[currentQuestionIndex].type === 'multiple-choice' && (
+    //                           <div className="space-y-2">
+    //                             {quizData.questions[currentQuestionIndex].options.map((option, optionIndex) => (
+    //                               <div key={optionIndex} className="flex items-center gap-2">
+    //                                 <input
+    //                                   type="checkbox"
+    //                                   checked={option.isCorrect}
+    //                                   onChange={(e) =>
+    //                                     updateOption(currentQuestionIndex, optionIndex, 'isCorrect', e.target.checked)
+    //                                   }
+    //                                   className="w-4 h-4 rounded border-gray-300 focus:ring-blue-500"
+    //                                 />
+    //                                 <input
+    //                                   type="text"
+    //                                   placeholder={`Option ${optionIndex + 1}`}
+    //                                   className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+    //                                   value={option.text}
+    //                                   onChange={(e) =>
+    //                                     updateOption(currentQuestionIndex, optionIndex, 'text', e.target.value)
+    //                                   }
+    //                                 />
+    //                               </div>
+    //                             ))}
+    //                           </div>
+    //                         )}
+
+    //                         {quizData.questions[currentQuestionIndex].type === 'true-false' && (
+    //                           <div className="space-y-2">
+    //                             {['True', 'False'].map((value, index) => (
+    //                               <div key={index} className="flex items-center gap-2">
+    //                                 <input
+    //                                   type="radio"
+    //                                   name={`correct-${currentQuestionIndex}`}
+    //                                   checked={quizData.questions[currentQuestionIndex].options[index]?.isCorrect}
+    //                                   onChange={() => {
+    //                                     const newOptions = [
+    //                                       { text: 'True', isCorrect: index === 0 },
+    //                                       { text: 'False', isCorrect: index === 1 }
+    //                                     ];
+    //                                     setQuizData(prev => ({
+    //                                       ...prev,
+    //                                       questions: prev.questions.map((q, i) =>
+    //                                         i === currentQuestionIndex
+    //                                           ? { ...q, options: newOptions }
+    //                                           : q
+    //                                       )
+    //                                     }));
+    //                                   }}
+    //                                   className="w-4 h-4 border-gray-300 focus:ring-blue-500"
+    //                                 />
+    //                                 <span className="text-gray-700">{value}</span>
+    //                               </div>
+    //                             ))}
+    //                           </div>
+    //                         )}
+
+    //                         {quizData.questions[currentQuestionIndex].type === 'short-answer' && (
+    //                           <input
+    //                             type="text"
+    //                             placeholder="Correct Answer"
+    //                             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+    //                             value={quizData.questions[currentQuestionIndex].options[0]?.text || ''}
+    //                             onChange={(e) =>
+    //                               updateOption(currentQuestionIndex, 0, 'text', e.target.value)
+    //                             }
+    //                           />
+    //                         )}
+
+    //                         <textarea
+    //                           placeholder="Explanation (Optional) - Provide explanation for the correct answer"
+    //                           className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+    //                           value={quizData.questions[currentQuestionIndex].explanation}
+    //                           onChange={(e) =>
+    //                             updateQuestion(currentQuestionIndex, 'explanation', e.target.value)
+    //                           }
+    //                           rows={3}
+    //                         />
+    //                         {/* {touched.questions?.[currentQuestionIndex]?.question &&
+    //                           errors.questions?.[currentQuestionIndex]?.question && (
+    //                             <div className="text-red-500 text-sm mt-1">
+    //                               {errors.questions[currentQuestionIndex].question}
+    //                             </div>
+    //                           )} */}
+
+    //                         {showMaxAlert && (
+    //                           <div className="bg-yellow-50 border border-yellow-400 text-yellow-800 px-4 py-3 rounded relative">
+    //                             <span className="block sm:inline">
+    //                               Maximum questions limit reached. Cannot add more questions.
+    //                             </span>
+    //                           </div>
+    //                         )}
+
+    //                         <div className="flex justify-between gap-4 mt-6">
+    //                           <button
+    //                             type="button"
+    //                             onClick={() => removeQuestion(currentQuestionIndex)}
+    //                             className="px-4 py-2 text-red-600 border border-red-300 rounded-lg hover:bg-red-50"
+    //                             disabled={quizData.questions.length <= 1}
+    //                           >
+    //                             Delete Question
+    //                           </button>
+    //                           <div className="flex gap-2">
+    //                             <button
+    //                               type="button"
+    //                               onClick={() => setQuestionModal(false)}
+    //                               className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
+    //                             >
+    //                               Close
+    //                             </button>
+    //                             <button
+    //                               type="button"
+    //                               onClick={addQuestion}
+    //                               className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-gray-300"
+    //                               disabled={quizData.questions.length >= maxQuestions}
+    //                             >
+    //                               Add Another Question
+    //                             </button>
+    //                           </div>
+    //                         </div>
+    //                       </div>
+    //                     </div>
+    //                   </div>
+    //                 )}
+
+    //                 <div className="mt-6 flex justify-end gap-4">
+    //                   <button
+    //                     type="button"
+    //                     className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
+    //                     onClick={() => window.history.back()}
+    //                   >
+    //                     Cancel
+    //                   </button>
+    //                   <button
+    //                     type="submit"
+    //                     disabled={isSubmitting}
+    //                     className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-gray-300"
+    //                   >
+    //                     {isSubmitting ? 'Creating...' : 'Create Quiz'}
+    //                   </button>
+    //                 </div>
+    //               </div>
+    //             </Form>
+    //           )}
+    //         </Formik>
+
+    //         <div className="w-64">
+    //           <div className="bg-white rounded-lg shadow p-4 sticky top-4">
+    //             <h2 className="text-lg font-semibold mb-4">Questions ({quizData.questions.length}/{maxQuestions})</h2>
+    //             <div className="grid grid-cols-3 gap-2">
+    //               {quizData.questions.map((question, index) => (
+    //                 <QuestionBox
+    //                   key={question.id}
+    //                   index={index}
+    //                   isActive={currentQuestionIndex === index}
+    //                   isComplete={isQuestionComplete(question)}
+    //                   onClick={() => {
+    //                     setCurrentQuestionIndex(index);
+    //                     setQuestionModal(true);
+    //                   }}
+    //                 />
+    //               ))}
+    //             </div>
+
+    //             {/* <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+    //               <h3 className="text-sm font-medium text-gray-700 mb-2">Quiz Summary</h3>
+    //               <div className="space-y-2 text-sm text-gray-600">
+    //                 <div className="flex justify-between">
+    //                   <span>Status:</span>
+    //                   <span className={`font-medium ${quizData.status === 'published' ? 'text-green-600' : 'text-yellow-600'}`}>
+    //                     {quizData.status.charAt(0).toUpperCase() + quizData.status.slice(1)}
+    //                   </span>
+    //                 </div>
+    //                 <div className="flex justify-between">
+    //                   <span>Duration:</span>
+    //                   <span>{quizData.duration} minutes</span>
+    //                 </div>
+    //                 <div className="flex justify-between">
+    //                   <span>Max Attempts:</span>
+    //                   <span>{quizData.maxAttempts}</span>
+    //                 </div>
+    //                 <div className="flex justify-between">
+    //                   <span>Total Questions:</span>
+    //                   <span>{quizData.questions.length}</span>
+    //                 </div>
+    //                 <div className="flex justify-between">
+    //                   <span>Completed:</span>
+    //                   <span>{quizData.questions.filter(isQuestionComplete).length}</span>
+    //                 </div>
+    //               </div>
+    //             </div> */}
+    //           </div>
+    //         </div>
+    //       </div>
+    //     </div>
+    //   </div>
+    // </div>
+
+    <div className="flex flex-col lg:flex-row">
+  <TutorSidebar />
+  <div className="flex-1 p-4 md:p-6 bg-gray-50 min-h-screen">
+    <div className="max-w-5xl mx-auto">
+      <div className="flex flex-col lg:flex-row gap-4 lg:gap-6">
+        <Formik
+          initialValues={initialQuizData}
+          onSubmit={handleSubmit}
+          validateOnChange={true}
+          validateOnBlur={true}
+        >
+          {({ isSubmitting, touched, errors }) => (
+            <Form className="space-y-6 lg:space-y-8 flex-1 order-2 lg:order-1">
+              <div className="flex-1">
+                <div className="mb-4 md:mb-6">
+                  <h1 className="text-xl md:text-2xl font-bold">Create New Quiz</h1>
+                </div>
+
+                <div className="bg-white rounded-lg shadow p-4 md:p-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <InputWrapper name="title">
+                    <label
                             htmlFor="title"
                             className="block text-sm font-medium text-gray-700 mb-1"
                           >
@@ -303,10 +787,10 @@ const CreateQuiz: React.FC = () => {
                             placeholder="Enter quiz title"
                             className="text-lg font-semibold px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                           />
-                        </InputWrapper>
+                    </InputWrapper>
 
-                        <InputWrapper name="status">
-                          <label
+                    <InputWrapper name="status">
+                    <label
                             htmlFor="status"
                             className="block text-sm font-medium text-gray-700 mb-1"
                           >
@@ -321,12 +805,12 @@ const CreateQuiz: React.FC = () => {
                             <option value="draft">Draft</option>
                             <option value="published">Published</option>
                           </select>
-                        </InputWrapper>
-                      </div>
+                    </InputWrapper>
+                  </div>
 
-                      <div className="grid grid-cols-3 gap-4 mb-4">
-                        <InputWrapper name="duration">
-                          <label
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+                    <InputWrapper name="duration">
+                    <label
                             htmlFor="duration"
                             className="block text-sm font-medium text-gray-700 mb-1"
                           >
@@ -340,10 +824,10 @@ const CreateQuiz: React.FC = () => {
                             min="1"
                             className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                           />
-                        </InputWrapper>
+                    </InputWrapper>
 
-                        <InputWrapper name="maxAttempts">
-                          <label
+                    <InputWrapper name="maxAttempts">
+                    <label
                             htmlFor="maxAttempts"
                             className="block text-sm font-medium text-gray-700 mb-1"
                           >
@@ -357,10 +841,10 @@ const CreateQuiz: React.FC = () => {
                             min="1"
                             className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                           />
-                        </InputWrapper>
+                    </InputWrapper>
 
-                        <InputWrapper name="maxQuestions">
-                          <label
+                    <InputWrapper name="maxQuestions">
+                    <label
                             htmlFor="maxQuestions"
                             className="block text-sm font-medium text-gray-700 mb-1"
                           >
@@ -377,9 +861,9 @@ const CreateQuiz: React.FC = () => {
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setMaxQuestions(parseInt(e.target.value))}
                             className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                           />
-                        </InputWrapper>
+                    </InputWrapper>
 
-                        <InputWrapper name="department">
+                    <InputWrapper name="department">
                           <label
                             htmlFor="department"
                             className="block text-sm font-medium text-gray-700 mb-1"
@@ -398,10 +882,10 @@ const CreateQuiz: React.FC = () => {
                             <option value="business">Business</option>
                             <option value="hotel-management">Hotel Management</option>
                           </Field>
-                        </InputWrapper>
+                    </InputWrapper>
 
-                        <InputWrapper name="stack">
-                          <label
+                    <InputWrapper name="stack">
+                    <label
                             htmlFor="stack"
                             className="block text-sm font-medium text-gray-700 mb-1"
                           >
@@ -414,10 +898,10 @@ const CreateQuiz: React.FC = () => {
                             placeholder="Enter technology stack"
                             className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                           />
-                        </InputWrapper>
+                    </InputWrapper>
 
-                        <InputWrapper name="difficultyLevel">
-                          <label
+                    <InputWrapper name="difficultyLevel">
+                    <label
                             htmlFor="difficultyLevel"
                             className="block text-sm font-medium text-gray-700 mb-1"
                           >
@@ -434,10 +918,10 @@ const CreateQuiz: React.FC = () => {
                             <option value="medium">Medium</option>
                             <option value="hard">Hard</option>
                           </Field>
-                        </InputWrapper>
+                    </InputWrapper>
 
-                        <InputWrapper name="positiveScore">
-                          <label
+                    <InputWrapper name="positiveScore">
+                           <label
                             htmlFor="positiveScore"
                             className="block text-sm font-medium text-gray-700 mb-1"
                           >
@@ -452,10 +936,10 @@ const CreateQuiz: React.FC = () => {
                             max="4"
                             className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                           />
-                        </InputWrapper>
+                    </InputWrapper>
 
-                        <InputWrapper name="negativeScore">
-                          <label
+                    <InputWrapper name="negativeScore">
+                    <label
                             htmlFor="negativeScore"
                             className="block text-sm font-medium text-gray-700 mb-1"
                           >
@@ -470,10 +954,10 @@ const CreateQuiz: React.FC = () => {
                             max="1"
                             className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                           />
-                        </InputWrapper>
+                    </InputWrapper>
 
-                        <InputWrapper name="passingScore">
-                          <label
+                    <InputWrapper name="passingScore">
+                    <label
                             htmlFor="passingScore"
                             className="block text-sm font-medium text-gray-700 mb-1"
                           >
@@ -488,11 +972,11 @@ const CreateQuiz: React.FC = () => {
                             max="100"
                             className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                           />
-                        </InputWrapper>
-                      </div>
+                    </InputWrapper>
+                  </div>
 
-                      <InputWrapper name="description">
-                        <label
+                  <InputWrapper name="description">
+                  <label
                           htmlFor="description"
                           className="block text-sm font-medium text-gray-700 mb-1"
                         >
@@ -506,9 +990,9 @@ const CreateQuiz: React.FC = () => {
                           className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
                           rows={3}
                         />
-                      </InputWrapper>
+                  </InputWrapper>
 
-                      <div className="mb-4">
+                  <div className="mb-4">
                         <label
                           htmlFor="startDate"
                           className="block text-sm font-medium text-gray-700 mb-1"
@@ -525,252 +1009,76 @@ const CreateQuiz: React.FC = () => {
                         </InputWrapper>
                       </div>
 
-                      <div className="flex justify-between items-center gap-4">
-                        <h3 className="text-lg font-medium">Question Type</h3>
-                        <label htmlFor="questionType" className="sr-only">Select Question Type</label>
-                        <Field
-                          as="select"
-                          id="questionType"
-                          name="type"
-                          value={quizData.questions[currentQuestionIndex].type}
-                          onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                            handleQuestionTypeChange(currentQuestionIndex, e.target.value as QuestionType)
-                          }
-                          className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        >
-                          <option value="multiple-choice">Multiple Choice</option>
-                          <option value="true-false">True/False</option>
-                        </Field>
-                        <button
-                          type="button"
-                          onClick={() => setQuestionModal(true)}
-                          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-                        >
-                          Continue to Questions
-                        </button>
-                      </div>
-                    </div>
-
-                    {questionModal && quizData.questions[currentQuestionIndex] && (
-                      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                        <div className="bg-white rounded-lg shadow-lg w-full max-w-3xl mx-4 p-6">
-                          <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-lg font-medium">Question {currentQuestionIndex + 1}</h3>
-                            <button
-                              type="button"
-                              onClick={() => setQuestionModal(false)}
-                              className="text-gray-500 hover:text-gray-700"
-                            >
-                              ×
-                            </button>
-                          </div>
-
-                          <div className="space-y-4">
-                            <textarea
-                              placeholder="Enter your question"
-                              name="question"
-                              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                              value={quizData.questions[currentQuestionIndex].question}
-                              onChange={(e) => updateQuestion(currentQuestionIndex, 'question', e.target.value)}
-                              rows={3}
-                            />
-
-                            {quizData.questions[currentQuestionIndex].type === 'multiple-choice' && (
-                              <div className="space-y-2">
-                                {quizData.questions[currentQuestionIndex].options.map((option, optionIndex) => (
-                                  <div key={optionIndex} className="flex items-center gap-2">
-                                    <input
-                                      type="checkbox"
-                                      checked={option.isCorrect}
-                                      onChange={(e) =>
-                                        updateOption(currentQuestionIndex, optionIndex, 'isCorrect', e.target.checked)
-                                      }
-                                      className="w-4 h-4 rounded border-gray-300 focus:ring-blue-500"
-                                    />
-                                    <input
-                                      type="text"
-                                      placeholder={`Option ${optionIndex + 1}`}
-                                      className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                      value={option.text}
-                                      onChange={(e) =>
-                                        updateOption(currentQuestionIndex, optionIndex, 'text', e.target.value)
-                                      }
-                                    />
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-
-                            {quizData.questions[currentQuestionIndex].type === 'true-false' && (
-                              <div className="space-y-2">
-                                {['True', 'False'].map((value, index) => (
-                                  <div key={index} className="flex items-center gap-2">
-                                    <input
-                                      type="radio"
-                                      name={`correct-${currentQuestionIndex}`}
-                                      checked={quizData.questions[currentQuestionIndex].options[index]?.isCorrect}
-                                      onChange={() => {
-                                        const newOptions = [
-                                          { text: 'True', isCorrect: index === 0 },
-                                          { text: 'False', isCorrect: index === 1 }
-                                        ];
-                                        setQuizData(prev => ({
-                                          ...prev,
-                                          questions: prev.questions.map((q, i) =>
-                                            i === currentQuestionIndex
-                                              ? { ...q, options: newOptions }
-                                              : q
-                                          )
-                                        }));
-                                      }}
-                                      className="w-4 h-4 border-gray-300 focus:ring-blue-500"
-                                    />
-                                    <span className="text-gray-700">{value}</span>
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-
-                            {quizData.questions[currentQuestionIndex].type === 'short-answer' && (
-                              <input
-                                type="text"
-                                placeholder="Correct Answer"
-                                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                value={quizData.questions[currentQuestionIndex].options[0]?.text || ''}
-                                onChange={(e) =>
-                                  updateOption(currentQuestionIndex, 0, 'text', e.target.value)
-                                }
-                              />
-                            )}
-
-                            <textarea
-                              placeholder="Explanation (Optional) - Provide explanation for the correct answer"
-                              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                              value={quizData.questions[currentQuestionIndex].explanation}
-                              onChange={(e) =>
-                                updateQuestion(currentQuestionIndex, 'explanation', e.target.value)
-                              }
-                              rows={3}
-                            />
-                            {/* {touched.questions?.[currentQuestionIndex]?.question &&
-                              errors.questions?.[currentQuestionIndex]?.question && (
-                                <div className="text-red-500 text-sm mt-1">
-                                  {errors.questions[currentQuestionIndex].question}
-                                </div>
-                              )} */}
-
-                            {showMaxAlert && (
-                              <div className="bg-yellow-50 border border-yellow-400 text-yellow-800 px-4 py-3 rounded relative">
-                                <span className="block sm:inline">
-                                  Maximum questions limit reached. Cannot add more questions.
-                                </span>
-                              </div>
-                            )}
-
-                            <div className="flex justify-between gap-4 mt-6">
-                              <button
-                                type="button"
-                                onClick={() => removeQuestion(currentQuestionIndex)}
-                                className="px-4 py-2 text-red-600 border border-red-300 rounded-lg hover:bg-red-50"
-                                disabled={quizData.questions.length <= 1}
-                              >
-                                Delete Question
-                              </button>
-                              <div className="flex gap-2">
-                                <button
-                                  type="button"
-                                  onClick={() => setQuestionModal(false)}
-                                  className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
-                                >
-                                  Close
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={addQuestion}
-                                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-gray-300"
-                                  disabled={quizData.questions.length >= maxQuestions}
-                                >
-                                  Add Another Question
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    <div className="mt-6 flex justify-end gap-4">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <h3 className="text-lg font-medium">Question Type</h3>
+                    <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+                      <Field
+                        as="select"
+                        id="questionType"
+                        name="type"
+                        value={quizData.questions[currentQuestionIndex].type}
+                        onChange={(e:any) => handleQuestionTypeChange(currentQuestionIndex, e.target.value)}
+                        className="w-full sm:w-auto px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="multiple-choice">Multiple Choice</option>
+                        <option value="true-false">True/False</option>
+                      </Field>
                       <button
                         type="button"
-                        className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
-                        onClick={() => window.history.back()}
+                        onClick={() => setQuestionModal(true)}
+                        className="w-full sm:w-auto px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
                       >
-                        Cancel
-                      </button>
-                      <button
-                        type="submit"
-                        disabled={isSubmitting}
-                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-gray-300"
-                      >
-                        {isSubmitting ? 'Creating...' : 'Create Quiz'}
+                        Continue to Questions
                       </button>
                     </div>
                   </div>
-                </Form>
-              )}
-            </Formik>
-
-            <div className="w-64">
-              <div className="bg-white rounded-lg shadow p-4 sticky top-4">
-                <h2 className="text-lg font-semibold mb-4">Questions ({quizData.questions.length}/{maxQuestions})</h2>
-                <div className="grid grid-cols-3 gap-2">
-                  {quizData.questions.map((question, index) => (
-                    <QuestionBox
-                      key={question.id}
-                      index={index}
-                      isActive={currentQuestionIndex === index}
-                      isComplete={isQuestionComplete(question)}
-                      onClick={() => {
-                        setCurrentQuestionIndex(index);
-                        setQuestionModal(true);
-                      }}
-                    />
-                  ))}
                 </div>
 
-                {/* <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-                  <h3 className="text-sm font-medium text-gray-700 mb-2">Quiz Summary</h3>
-                  <div className="space-y-2 text-sm text-gray-600">
-                    <div className="flex justify-between">
-                      <span>Status:</span>
-                      <span className={`font-medium ${quizData.status === 'published' ? 'text-green-600' : 'text-yellow-600'}`}>
-                        {quizData.status.charAt(0).toUpperCase() + quizData.status.slice(1)}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Duration:</span>
-                      <span>{quizData.duration} minutes</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Max Attempts:</span>
-                      <span>{quizData.maxAttempts}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Total Questions:</span>
-                      <span>{quizData.questions.length}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Completed:</span>
-                      <span>{quizData.questions.filter(isQuestionComplete).length}</span>
-                    </div>
-                  </div>
-                </div> */}
+                <div className="mt-6 flex flex-col sm:flex-row justify-end gap-4">
+                  <button
+                    type="button"
+                    className="w-full sm:w-auto px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
+                    onClick={() => window.history.back()}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full sm:w-auto px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-gray-300"
+                  >
+                    {isSubmitting ? 'Creating...' : 'Create Quiz'}
+                  </button>
+                </div>
               </div>
+            </Form>
+          )}
+        </Formik>
+
+        {/* Questions Sidebar */}
+        <div className="w-full lg:w-64 order-1 lg:order-2">
+          <div className="bg-white rounded-lg shadow p-4 lg:sticky lg:top-4">
+            <h2 className="text-lg font-semibold mb-4">Questions ({quizData.questions.length}/{maxQuestions})</h2>
+            <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-3 gap-2">
+              {quizData.questions.map((question, index) => (
+                <QuestionBox
+                  key={question.id}
+                  index={index}
+                  isActive={currentQuestionIndex === index}
+                  isComplete={isQuestionComplete(question)}
+                  onClick={() => {
+                    setCurrentQuestionIndex(index);
+                    setQuestionModal(true);
+                  }}
+                />
+              ))}
             </div>
           </div>
         </div>
       </div>
     </div>
+  </div>
+</div>
   );
 };
 

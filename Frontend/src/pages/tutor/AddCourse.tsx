@@ -12,6 +12,8 @@ import { RootState } from '../../store';
 import InstituteFooter from '../../components/footer/InstituteFooter';
 import { useCreateCourseMutation } from '../../store/slices/tutorSlice';
 import TutorSidebar from '../../components/sidebar/tutorSidebar';
+import { useNotificationSocket } from '../../useNotificationHook';
+import { toast } from 'react-toastify';
 
 interface CourseFormValues {
   title: string;
@@ -82,9 +84,16 @@ const AddCourse: React.FC = () => {
   const [previewUrl, setPreviewUrl] = useState<string>('');
   const [submitError, setSubmitError] = useState<string>('');
   const tutorData = useAppSelector((state) => state.auth.tutorInfo);
-  console.log(tutorData?.institutionId)
+  const token = tutorData?.accessToken;
 
 
+    const { sendNotification, isConnected } = useNotificationSocket({
+      token,
+      senderId: tutorData?._id,
+      onNotification: (notification) => {
+        console.log('Received notification:', notification);
+      }
+    });
 
   const initialValues: CourseFormValues = {
     title: '',
@@ -126,6 +135,25 @@ const AddCourse: React.FC = () => {
       const response = await createCourse({
         body: formData
       }).unwrap();
+
+              if (response?.data) {
+                  if (isConnected) {
+                      try {
+                          await sendNotification({
+                              type: 'COURSE_CREATED',
+                              title: `New Course: ${values.title}`,
+                              department: tutorData?.department,
+                              createdBy: tutorData?._id,
+                          });
+                          toast.success('Course created and notification sent');
+                      } catch (error) {
+                          console.error('Failed to send notification:', error);
+                          toast.warning('Course created but notification failed');
+                      }
+                  } else {
+                      toast.error('Notification service is not connected. Please try again later.');
+                  }
+              }
 
       console.log('Course created successfully:', response.data._id);
       navigate('/tutor/upload-videos', { state: { draftId: response.data._id } });
