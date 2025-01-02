@@ -94,8 +94,8 @@ export class OrderController {
                 payment_method_types: ["card"],
                 line_items: lineItems,
                 mode: "payment",
-                success_url: `http://localhost:5173/success?orderId=${order._id}`,
-                cancel_url: `http://localhost:5173/cancel?orderId=${order._id}`,
+                success_url: `${process.env.FRONT_END_URL}/success?orderId=${order._id}`,
+                cancel_url: `${process.env.FRONT_END_URL}/cancel?orderId=${order._id}`,
             });
             res.json({
                 id: session.id,

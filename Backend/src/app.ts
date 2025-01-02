@@ -22,7 +22,7 @@ const server = http.createServer(app);
 app.use(cors({
 origin: [ 'https://techora.online' , 'http://localhost:5173'],
 methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'role'],
 exposedHeaders: ['Content-Range', 'X-Content-Range'],
 credentials: true,
 maxAge: 86400

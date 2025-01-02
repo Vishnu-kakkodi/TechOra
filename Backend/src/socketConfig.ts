@@ -15,8 +15,8 @@ class SocketConfig {
     this.io = new Server(server, {
       cors: {
         origin: [
-          'http://localhost:5173',  
-          'http://localhost:5000' 
+          'https://techora.online',
+          'https://api.techora.online',
         ],
         methods: ["GET", "POST"],
         credentials: true
