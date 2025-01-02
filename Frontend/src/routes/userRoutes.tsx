@@ -88,9 +88,9 @@ const UserRoutes: React.FC = () => {
       <Route
         path="/quiz"
         element={
-          // <AuthRoute role={'user'}>
+          <AuthRoute role={'user'}>
             <QuizList />
-          // </AuthRoute>
+          </AuthRoute>
         }
       />
 

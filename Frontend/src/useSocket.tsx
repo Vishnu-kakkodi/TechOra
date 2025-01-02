@@ -65,7 +65,7 @@
     useEffect(() => {
       if (!token || !senderId || !receiverId) return;
   
-      const newSocket = io('http://localhost:5000', {
+      const newSocket = io(import.meta.env.VITE_BACKEND_URL, {
         auth: { token },
         transports: ['websocket', 'polling']
       });
