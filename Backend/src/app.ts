@@ -20,9 +20,14 @@ const server = http.createServer(app);
 
 
 app.use(cors({
-  origin: 'http://localhost:5173', 
-  credentials: true,
+origin: [ 'https://techora.online' , 'http://localhost:5173'],
+methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+exposedHeaders: ['Content-Range', 'X-Content-Range'],
+credentials: true,
+maxAge: 86400
 }));
+
 
 app.use(express.json());
 app.use(cookieParser());

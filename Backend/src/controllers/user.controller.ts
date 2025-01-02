@@ -112,6 +112,8 @@ export class UserController {
         next: NextFunction
     ): Promise<void> {
         try {
+            console.log(req.body.email)
+
             const userDetails = await this.userService.getUser(req.body.email, req.body.password);
             if (!userDetails) {
                 throw new HttpException(404, 'User not found');

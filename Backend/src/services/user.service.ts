@@ -60,10 +60,11 @@ export class UserService {
 
     async getUser(email: string, password: string): Promise<IUserDocument | null> {
         try {
+            console.log(email,password)
             const user = await this.userRepository.findByEmail(email)
 
             if (!user) {
-                throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.USER_NOT_FOUND);
+                throw new HttpException(STATUS_CODES.NOT_FOUND, "user");
             }
 
             if (user) {
