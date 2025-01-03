@@ -116,13 +116,13 @@ const TutorSidebar: React.FC = () => {
               <FaUserCircle />
               <span>My Profile</span>
             </button>
-            <button
+            {/* <button
               onClick={() => handleNavigate('/tutor/change-password')}
               className="flex items-center space-x-2 text-gray-300 hover:text-white w-full"
             >
               <FaLock />
               <span>Change Password</span>
-            </button>
+            </button> */}
           </div>
         </div>
 
