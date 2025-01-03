@@ -68,12 +68,13 @@ const ForgotPasswordPage: React.FC = () => {
           <div className="rounded-md shadow-sm space-y-4">
           <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                New Password<span className="text-red-500">*</span>
+                Email<span className="text-red-500">*</span>
               </label>
               <input
                 id="email"
                 name="email"
                 type="email"
+                disabled
                 onChange={formik.handleChange}
                 value={email}
                 className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 sm:text-sm"
