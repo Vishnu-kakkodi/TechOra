@@ -72,31 +72,31 @@ const CreateQuiz: React.FC = () => {
 
 
   const initialQuizData: QuizDatas = {
-    title: 'ghhv',
-    description: 'bnn',
+    title: '',
+    description: '',
     duration: 30,
     maxAttempts: 3,
     questions: [{
       id: 1,
       question: '1',
       options: [
-        { text: ' vbb', isCorrect: false },
-        { text: 'bnvnv', isCorrect: false },
-        { text: 'vnbv', isCorrect: true },
-        { text: 'vbnnn', isCorrect: false }
+        { text: '', isCorrect: false },
+        { text: '', isCorrect: false },
+        { text: '', isCorrect: true },
+        { text: '', isCorrect: false }
       ],
-      explanation: 'vgvvhgm',
+      explanation: '',
       type: 'multiple-choice',
     }],
     status: 'published',
     totalQuestions: 1,
-    department: 'ghhjfh',
-    stack: 'bhbjhj',
+    department: '',
+    stack: '',
     difficultyLevel: 'easy',
     positiveScore: 1,
     negativeScore: 1,
     passingScore: 1,
-    startDate: '11-09-2025'
+    startDate: ''
   };
 
   const [quizData, setQuizData] = useState<QuizDatas>(initialQuizData);
@@ -1033,6 +1033,154 @@ const CreateQuiz: React.FC = () => {
                     </div>
                   </div>
                 </div>
+
+                {questionModal && quizData.questions[currentQuestionIndex] && (
+                      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                        <div className="bg-white rounded-lg shadow-lg w-full max-w-3xl mx-4 p-6">
+                          <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-lg font-medium">Question {currentQuestionIndex + 1}</h3>
+                            <button
+                              type="button"
+                              onClick={() => setQuestionModal(false)}
+                              className="text-gray-500 hover:text-gray-700"
+                            >
+                              ×
+                            </button>
+                          </div>
+
+                          <div className="space-y-4">
+                            <textarea
+                              placeholder="Enter your question"
+                              name="question"
+                              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              value={quizData.questions[currentQuestionIndex].question}
+                              onChange={(e) => updateQuestion(currentQuestionIndex, 'question', e.target.value)}
+                              rows={3}
+                            />
+
+                            {quizData.questions[currentQuestionIndex].type === 'multiple-choice' && (
+                              <div className="space-y-2">
+                                {quizData.questions[currentQuestionIndex].options.map((option, optionIndex) => (
+                                  <div key={optionIndex} className="flex items-center gap-2">
+                                    <input
+                                      type="checkbox"
+                                      checked={option.isCorrect}
+                                      onChange={(e) =>
+                                        updateOption(currentQuestionIndex, optionIndex, 'isCorrect', e.target.checked)
+                                      }
+                                      className="w-4 h-4 rounded border-gray-300 focus:ring-blue-500"
+                                    />
+                                    <input
+                                      type="text"
+                                      placeholder={`Option ${optionIndex + 1}`}
+                                      className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                      value={option.text}
+                                      onChange={(e) =>
+                                        updateOption(currentQuestionIndex, optionIndex, 'text', e.target.value)
+                                      }
+                                    />
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+
+                            {quizData.questions[currentQuestionIndex].type === 'true-false' && (
+                              <div className="space-y-2">
+                                {['True', 'False'].map((value, index) => (
+                                  <div key={index} className="flex items-center gap-2">
+                                    <input
+                                      type="radio"
+                                      name={`correct-${currentQuestionIndex}`}
+                                      checked={quizData.questions[currentQuestionIndex].options[index]?.isCorrect}
+                                      onChange={() => {
+                                        const newOptions = [
+                                          { text: 'True', isCorrect: index === 0 },
+                                          { text: 'False', isCorrect: index === 1 }
+                                        ];
+                                        setQuizData(prev => ({
+                                          ...prev,
+                                          questions: prev.questions.map((q, i) =>
+                                            i === currentQuestionIndex
+                                              ? { ...q, options: newOptions }
+                                              : q
+                                          )
+                                        }));
+                                      }}
+                                      className="w-4 h-4 border-gray-300 focus:ring-blue-500"
+                                    />
+                                    <span className="text-gray-700">{value}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+
+                            {quizData.questions[currentQuestionIndex].type === 'short-answer' && (
+                              <input
+                                type="text"
+                                placeholder="Correct Answer"
+                                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                value={quizData.questions[currentQuestionIndex].options[0]?.text || ''}
+                                onChange={(e) =>
+                                  updateOption(currentQuestionIndex, 0, 'text', e.target.value)
+                                }
+                              />
+                            )}
+
+                            <textarea
+                              placeholder="Explanation (Optional) - Provide explanation for the correct answer"
+                              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              value={quizData.questions[currentQuestionIndex].explanation}
+                              onChange={(e) =>
+                                updateQuestion(currentQuestionIndex, 'explanation', e.target.value)
+                              }
+                              rows={3}
+                            />
+                            {/* {touched.questions?.[currentQuestionIndex]?.question &&
+                              errors.questions?.[currentQuestionIndex]?.question && (
+                                <div className="text-red-500 text-sm mt-1">
+                                  {errors.questions[currentQuestionIndex].question}
+                                </div>
+                              )} */}
+
+                            {showMaxAlert && (
+                              <div className="bg-yellow-50 border border-yellow-400 text-yellow-800 px-4 py-3 rounded relative">
+                                <span className="block sm:inline">
+                                  Maximum questions limit reached. Cannot add more questions.
+                                </span>
+                              </div>
+                            )}
+
+                            <div className="flex justify-between gap-4 mt-6">
+                              <button
+                                type="button"
+                                onClick={() => removeQuestion(currentQuestionIndex)}
+                                className="px-4 py-2 text-red-600 border border-red-300 rounded-lg hover:bg-red-50"
+                                disabled={quizData.questions.length <= 1}
+                              >
+                                Delete Question
+                              </button>
+                              <div className="flex gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => setQuestionModal(false)}
+                                  className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
+                                >
+                                  Close
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={addQuestion}
+                                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-gray-300"
+                                  disabled={quizData.questions.length >= maxQuestions}
+                                >
+                                  Add Another Question
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
 
                 <div className="mt-6 flex flex-col sm:flex-row justify-end gap-4">
                   <button
