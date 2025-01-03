@@ -90,7 +90,7 @@ const CreateQuiz: React.FC = () => {
     }],
     status: 'published',
     totalQuestions: 1,
-    department: '',
+    department: tutordata?.department,
     stack: '',
     difficultyLevel: 'easy',
     positiveScore: 1,
@@ -212,40 +212,40 @@ const CreateQuiz: React.FC = () => {
 
   const handleSubmit = async (values: QuizDatas): Promise<void> => {
     try {
-        const quizPayload = {
-            ...values,
-            questions: quizData.questions,
-            totalQuestions: quizData.questions.length,
-            positiveScore: Number(values.positiveScore),
-            negativeScore: Number(values.negativeScore),
-            passingScore: Number(values.passingScore),
-        };
+      const quizPayload = {
+        ...values,
+        questions: quizData.questions,
+        totalQuestions: quizData.questions.length,
+        positiveScore: Number(values.positiveScore),
+        negativeScore: Number(values.negativeScore),
+        passingScore: Number(values.passingScore),
+      };
 
-        const response = await addQuiz(quizPayload).unwrap();
+      const response = await addQuiz(quizPayload).unwrap();
 
-        if (response?.data) {
-            if (isConnected) {
-                try {
-                    await sendNotification({
-                        type: 'QUIZ_CREATED',
-                        title: `New Quiz: ${values.title}`,
-                        department: values.department,
-                        createdBy: tutordata?._id,
-                    });
-                    toast.success('Quiz created and notification sent');
-                } catch (error) {
-                    console.error('Failed to send notification:', error);
-                    toast.warning('Quiz created but notification failed');
-                }
-            } else {
-                toast.error('Notification service is not connected. Please try again later.');
-            }
+      if (response?.data) {
+        if (isConnected) {
+          try {
+            await sendNotification({
+              type: 'QUIZ_CREATED',
+              title: `New Quiz: ${values.title}`,
+              department: values.department,
+              createdBy: tutordata?._id,
+            });
+            toast.success('Quiz created and notification sent');
+          } catch (error) {
+            console.error('Failed to send notification:', error);
+            toast.warning('Quiz created but notification failed');
+          }
+        } else {
+          toast.error('Notification service is not connected. Please try again later.');
         }
+      }
     } catch (error) {
-        console.error('Failed to create quiz:', error);
-        toast.error('Failed to create quiz');
+      console.error('Failed to create quiz:', error);
+      toast.error('Failed to create quiz');
     }
-};
+  };
 
 
   return (
@@ -754,27 +754,27 @@ const CreateQuiz: React.FC = () => {
     // </div>
 
     <div className="flex flex-col lg:flex-row">
-  <TutorSidebar />
-  <div className="flex-1 p-4 md:p-6 bg-gray-50 min-h-screen">
-    <div className="max-w-5xl mx-auto">
-      <div className="flex flex-col lg:flex-row gap-4 lg:gap-6">
-        <Formik
-          initialValues={initialQuizData}
-          onSubmit={handleSubmit}
-          validateOnChange={true}
-          validateOnBlur={true}
-        >
-          {({ isSubmitting, touched, errors }) => (
-            <Form className="space-y-6 lg:space-y-8 flex-1 order-2 lg:order-1">
-              <div className="flex-1">
-                <div className="mb-4 md:mb-6">
-                  <h1 className="text-xl md:text-2xl font-bold">Create New Quiz</h1>
-                </div>
+      <TutorSidebar />
+      <div className="flex-1 p-4 md:p-6 bg-gray-50 min-h-screen">
+        <div className="max-w-5xl mx-auto">
+          <div className="flex flex-col lg:flex-row gap-4 lg:gap-6">
+            <Formik
+              initialValues={initialQuizData}
+              onSubmit={handleSubmit}
+              validateOnChange={true}
+              validateOnBlur={true}
+            >
+              {({ isSubmitting, touched, errors }) => (
+                <Form className="space-y-6 lg:space-y-8 flex-1 order-2 lg:order-1">
+                  <div className="flex-1">
+                    <div className="mb-4 md:mb-6">
+                      <h1 className="text-xl md:text-2xl font-bold">Create New Quiz</h1>
+                    </div>
 
-                <div className="bg-white rounded-lg shadow p-4 md:p-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <InputWrapper name="title">
-                    <label
+                    <div className="bg-white rounded-lg shadow p-4 md:p-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <InputWrapper name="title">
+                          <label
                             htmlFor="title"
                             className="block text-sm font-medium text-gray-700 mb-1"
                           >
@@ -787,10 +787,10 @@ const CreateQuiz: React.FC = () => {
                             placeholder="Enter quiz title"
                             className="text-lg font-semibold px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                           />
-                    </InputWrapper>
+                        </InputWrapper>
 
-                    <InputWrapper name="status">
-                    <label
+                        <InputWrapper name="status">
+                          <label
                             htmlFor="status"
                             className="block text-sm font-medium text-gray-700 mb-1"
                           >
@@ -805,12 +805,12 @@ const CreateQuiz: React.FC = () => {
                             <option value="draft">Draft</option>
                             <option value="published">Published</option>
                           </select>
-                    </InputWrapper>
-                  </div>
+                        </InputWrapper>
+                      </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
-                    <InputWrapper name="duration">
-                    <label
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+                        <InputWrapper name="duration">
+                          <label
                             htmlFor="duration"
                             className="block text-sm font-medium text-gray-700 mb-1"
                           >
@@ -824,10 +824,10 @@ const CreateQuiz: React.FC = () => {
                             min="1"
                             className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                           />
-                    </InputWrapper>
+                        </InputWrapper>
 
-                    <InputWrapper name="maxAttempts">
-                    <label
+                        <InputWrapper name="maxAttempts">
+                          <label
                             htmlFor="maxAttempts"
                             className="block text-sm font-medium text-gray-700 mb-1"
                           >
@@ -841,10 +841,10 @@ const CreateQuiz: React.FC = () => {
                             min="1"
                             className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                           />
-                    </InputWrapper>
+                        </InputWrapper>
 
-                    <InputWrapper name="maxQuestions">
-                    <label
+                        <InputWrapper name="maxQuestions">
+                          <label
                             htmlFor="maxQuestions"
                             className="block text-sm font-medium text-gray-700 mb-1"
                           >
@@ -861,31 +861,27 @@ const CreateQuiz: React.FC = () => {
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setMaxQuestions(parseInt(e.target.value))}
                             className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                           />
-                    </InputWrapper>
+                        </InputWrapper>
 
-                    <InputWrapper name="department">
+                        <InputWrapper name="department">
                           <label
                             htmlFor="department"
                             className="block text-sm font-medium text-gray-700 mb-1"
                           >
-                            Academic Department
+                            Department
                           </label>
                           <Field
-                            as="select"
+                            type="text"
+                            disabled
                             id="department"
                             name="department"
-                            className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          >
-                            <option value="">Select Department</option>
-                            <option value="computer-science">Computer Science</option>
-                            <option value="mathematics">Mathematics</option>
-                            <option value="business">Business</option>
-                            <option value="hotel-management">Hotel Management</option>
-                          </Field>
-                    </InputWrapper>
+                            readOnly
+                            className="px-4 py-2 border rounded-lg bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          />
+                        </InputWrapper>
 
-                    <InputWrapper name="stack">
-                    <label
+                        <InputWrapper name="stack">
+                          <label
                             htmlFor="stack"
                             className="block text-sm font-medium text-gray-700 mb-1"
                           >
@@ -898,10 +894,10 @@ const CreateQuiz: React.FC = () => {
                             placeholder="Enter technology stack"
                             className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                           />
-                    </InputWrapper>
+                        </InputWrapper>
 
-                    <InputWrapper name="difficultyLevel">
-                    <label
+                        <InputWrapper name="difficultyLevel">
+                          <label
                             htmlFor="difficultyLevel"
                             className="block text-sm font-medium text-gray-700 mb-1"
                           >
@@ -918,10 +914,10 @@ const CreateQuiz: React.FC = () => {
                             <option value="medium">Medium</option>
                             <option value="hard">Hard</option>
                           </Field>
-                    </InputWrapper>
+                        </InputWrapper>
 
-                    <InputWrapper name="positiveScore">
-                           <label
+                        <InputWrapper name="positiveScore">
+                          <label
                             htmlFor="positiveScore"
                             className="block text-sm font-medium text-gray-700 mb-1"
                           >
@@ -936,10 +932,10 @@ const CreateQuiz: React.FC = () => {
                             max="4"
                             className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                           />
-                    </InputWrapper>
+                        </InputWrapper>
 
-                    <InputWrapper name="negativeScore">
-                    <label
+                        <InputWrapper name="negativeScore">
+                          <label
                             htmlFor="negativeScore"
                             className="block text-sm font-medium text-gray-700 mb-1"
                           >
@@ -954,10 +950,10 @@ const CreateQuiz: React.FC = () => {
                             max="1"
                             className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                           />
-                    </InputWrapper>
+                        </InputWrapper>
 
-                    <InputWrapper name="passingScore">
-                    <label
+                        <InputWrapper name="passingScore">
+                          <label
                             htmlFor="passingScore"
                             className="block text-sm font-medium text-gray-700 mb-1"
                           >
@@ -972,11 +968,11 @@ const CreateQuiz: React.FC = () => {
                             max="100"
                             className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                           />
-                    </InputWrapper>
-                  </div>
+                        </InputWrapper>
+                      </div>
 
-                  <InputWrapper name="description">
-                  <label
+                      <InputWrapper name="description">
+                        <label
                           htmlFor="description"
                           className="block text-sm font-medium text-gray-700 mb-1"
                         >
@@ -990,9 +986,9 @@ const CreateQuiz: React.FC = () => {
                           className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
                           rows={3}
                         />
-                  </InputWrapper>
+                      </InputWrapper>
 
-                  <div className="mb-4">
+                      <div className="mb-4">
                         <label
                           htmlFor="startDate"
                           className="block text-sm font-medium text-gray-700 mb-1"
@@ -1009,32 +1005,32 @@ const CreateQuiz: React.FC = () => {
                         </InputWrapper>
                       </div>
 
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                    <h3 className="text-lg font-medium">Question Type</h3>
-                    <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-                      <Field
-                        as="select"
-                        id="questionType"
-                        name="type"
-                        value={quizData.questions[currentQuestionIndex].type}
-                        onChange={(e:any) => handleQuestionTypeChange(currentQuestionIndex, e.target.value)}
-                        className="w-full sm:w-auto px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      >
-                        <option value="multiple-choice">Multiple Choice</option>
-                        <option value="true-false">True/False</option>
-                      </Field>
-                      <button
-                        type="button"
-                        onClick={() => setQuestionModal(true)}
-                        className="w-full sm:w-auto px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-                      >
-                        Continue to Questions
-                      </button>
+                      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <h3 className="text-lg font-medium">Question Type</h3>
+                        <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+                          <Field
+                            as="select"
+                            id="questionType"
+                            name="type"
+                            value={quizData.questions[currentQuestionIndex].type}
+                            onChange={(e: any) => handleQuestionTypeChange(currentQuestionIndex, e.target.value)}
+                            className="w-full sm:w-auto px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          >
+                            <option value="multiple-choice">Multiple Choice</option>
+                            <option value="true-false">True/False</option>
+                          </Field>
+                          <button
+                            type="button"
+                            onClick={() => setQuestionModal(true)}
+                            className="w-full sm:w-auto px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                          >
+                            Continue to Questions
+                          </button>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
 
-                {questionModal && quizData.questions[currentQuestionIndex] && (
+                    {questionModal && quizData.questions[currentQuestionIndex] && (
                       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                         <div className="bg-white rounded-lg shadow-lg w-full max-w-3xl mx-4 p-6">
                           <div className="flex items-center justify-between mb-4">
@@ -1182,51 +1178,51 @@ const CreateQuiz: React.FC = () => {
                       </div>
                     )}
 
-                <div className="mt-6 flex flex-col sm:flex-row justify-end gap-4">
-                  <button
-                    type="button"
-                    className="w-full sm:w-auto px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
-                    onClick={() => window.history.back()}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full sm:w-auto px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-gray-300"
-                  >
-                    {isSubmitting ? 'Creating...' : 'Create Quiz'}
-                  </button>
+                    <div className="mt-6 flex flex-col sm:flex-row justify-end gap-4">
+                      <button
+                        type="button"
+                        className="w-full sm:w-auto px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
+                        onClick={() => window.history.back()}
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="w-full sm:w-auto px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-gray-300"
+                      >
+                        {isSubmitting ? 'Creating...' : 'Create Quiz'}
+                      </button>
+                    </div>
+                  </div>
+                </Form>
+              )}
+            </Formik>
+
+            {/* Questions Sidebar */}
+            <div className="w-full lg:w-64 order-1 lg:order-2">
+              <div className="bg-white rounded-lg shadow p-4 lg:sticky lg:top-4">
+                <h2 className="text-lg font-semibold mb-4">Questions ({quizData.questions.length}/{maxQuestions})</h2>
+                <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-3 gap-2">
+                  {quizData.questions.map((question, index) => (
+                    <QuestionBox
+                      key={question.id}
+                      index={index}
+                      isActive={currentQuestionIndex === index}
+                      isComplete={isQuestionComplete(question)}
+                      onClick={() => {
+                        setCurrentQuestionIndex(index);
+                        setQuestionModal(true);
+                      }}
+                    />
+                  ))}
                 </div>
               </div>
-            </Form>
-          )}
-        </Formik>
-
-        {/* Questions Sidebar */}
-        <div className="w-full lg:w-64 order-1 lg:order-2">
-          <div className="bg-white rounded-lg shadow p-4 lg:sticky lg:top-4">
-            <h2 className="text-lg font-semibold mb-4">Questions ({quizData.questions.length}/{maxQuestions})</h2>
-            <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-3 gap-2">
-              {quizData.questions.map((question, index) => (
-                <QuestionBox
-                  key={question.id}
-                  index={index}
-                  isActive={currentQuestionIndex === index}
-                  isComplete={isQuestionComplete(question)}
-                  onClick={() => {
-                    setCurrentQuestionIndex(index);
-                    setQuestionModal(true);
-                  }}
-                />
-              ))}
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-</div>
   );
 };
 

@@ -18,6 +18,7 @@ interface TutorInfo {
   tutorEmail?: string;
   tutorname?: string;
   education?: string;
+  department?: string;
   experiance?: string;
   institutionId?: {
     _id:string;
