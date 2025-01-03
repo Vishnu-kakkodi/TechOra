@@ -3,11 +3,11 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recha
 
 const InstitutionPieChart = () => {
     const data = [
-        { name: 'Total Institutions', value: 151, color: '#0D47A1' }, 
-        { name: 'Pending Approvals', value: 234, color: '#FFA000' },
-        { name: 'Active Institutions', value: 124, color: '#2E7D32' }, 
-        { name: 'Under Verification', value: 325, color: '#6A1B9A' }, 
-        { name: 'Rejected', value: 124, color: '#D32F2F' } 
+        { name: 'Total Institutions', value: 1, color: '#0D47A1' }, 
+        { name: 'Pending Approvals', value: 0, color: '#FFA000' },
+        { name: 'Active Institutions', value: 1, color: '#2E7D32' }, 
+        { name: 'Under Verification', value: 0, color: '#6A1B9A' }, 
+        { name: 'Rejected', value: 0, color: '#D32F2F' } 
     ];
 
   return (

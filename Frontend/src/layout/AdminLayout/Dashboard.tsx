@@ -44,11 +44,11 @@ const Dashboard: React.FC = () => {
   }, [debouncedSearchTerm]);
 
   const stats = {
-    totalInstitutions: 24,
-    pendingApprovals: 23,
-    activeInstitutions: 124,
-    totalTutors: 892,
-    totalStudents: 12435
+    totalInstitutions: 1,
+    pendingApprovals: 0,
+    activeInstitutions: 1,
+    totalTutors: 4,
+    totalStudents: 2
   };
 
 

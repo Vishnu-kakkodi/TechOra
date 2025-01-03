@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import CardDisplay from '../../components/card/institutionDashboard/CustomCard';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
@@ -16,6 +16,21 @@ const InstitutionDashboard: React.FC = () => {
   const quizzes = data.quiz || [];
 
   const instituteData = useSelector((state: RootState) => state.auth.institutionInfo);
+
+  const months = [
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun", 
+    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+  ];
+
+  const monthWiseData = useMemo(() => {
+    const counts = Array(12).fill(0); 
+    courses.forEach((course:any) => {
+      const date = new Date(course.createdAt); 
+      const month = date.getMonth();
+      counts[month] += 1;
+    });
+    return counts;
+  }, [courses]);
 
   const handleTutor = () => {
     setTutorAdd(true)
@@ -55,11 +70,11 @@ const InstitutionDashboard: React.FC = () => {
           </div>
         </header>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
-            <CardDisplay />
+          <CardDisplay course={courses.length} quizze={quizzes.length} department={instituteData?.department?.length.toString()} />
           </div>
-          <div className="bg-white shadow-lg rounded-xl p-6">
+          <div className="bg-white shadow-lg rounded-xl p-3">
             <h3 className="text-xl font-semibold text-gray-800 mb-4">Course Status</h3>
             <PieChart
               series={[
@@ -72,7 +87,7 @@ const InstitutionDashboard: React.FC = () => {
                   ],
                 },
               ]}
-              width={400}
+              width={350}
               height={200}
             />
             <div className="mt-4">

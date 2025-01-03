@@ -39,6 +39,7 @@ interface InstituteInfo {
   id?: string;
   collegeName?: string;
   instituteEmail?: string;
+  department?: string[];
   totalStudents?:number;
   [key: string]: any;
 }

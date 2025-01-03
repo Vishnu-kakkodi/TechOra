@@ -1,15 +1,16 @@
 
 import React from 'react';
-import { Users, TrendingUp, School, BookOpen, LucideIcon, HelpCircle, ClipboardList } from 'lucide-react';
+import { Users, TrendingUp, School, BookOpen, LucideIcon, HelpCircle, ClipboardList, Building } from 'lucide-react';
 import { useCourseListQuery } from '../../../store/slices/institutionSlice';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../store';
+
 
 type CardType = 'students' | 'performance' | 'courses' | 'quizzes';
 
 interface CustomCardProps {
   title?: string;
-  value?: number;
+  value?: string;
   type?: CardType;
   trend?: string;
 }
@@ -20,10 +21,16 @@ interface CardConfig {
   iconColor: string;
 }
 
+interface CardDisplayProps {
+  course: string;
+  quizze: string; 
+  department?: string;
+}
+
 const cardConfigs: Record<CardType, CardConfig> = {
   
   students: {
-    icon: Users,
+    icon: Building,
     gradient: 'from-blue-50 to-blue-100',
     iconColor: 'text-blue-500'
   },
@@ -46,7 +53,7 @@ const cardConfigs: Record<CardType, CardConfig> = {
 
 const CustomCard: React.FC<CustomCardProps> = ({ 
   title = "Total Students",
-  value = 8,
+  value = 4,
   type = "students",
 }) => {
   const config = cardConfigs[type];
@@ -71,28 +78,27 @@ const CustomCard: React.FC<CustomCardProps> = ({
   );
 };
 
-const CardDisplay: React.FC = () => {
-  const instituteData = useSelector((state: RootState) => state.auth.institutionInfo);
+const CardDisplay: React.FC<CardDisplayProps> = ({ course, quizze, department }) => {
   const { data = {} } = useCourseListQuery(null);
   const courses = data.data || [] as any;
   const cardData: CustomCardProps[] = [
     {
-      title: "New Students",
-      value: 2,
+      title: "Total Departments",
+      value: department,
       type: "students",
     },
     {
-      title: "Total Students",
+      title: "Total Tutors",
       type: "students",
     },
     {
       title: "Active Courses",
-      value: 24,
+      value: course,
       type: "courses",
     },
     {
       title: "Active Quizzes",
-      value: 8,
+      value: quizze,
       type: "quizzes",
     }
   ];
