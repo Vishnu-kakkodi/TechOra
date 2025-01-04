@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from "express";
-import { CourseService } from "../../services/course.service";
 import { Course, CourseDocument, Module } from "../../type/course.type";
 import { CreateCourseDto, UpdateCourseDto } from "../../dtos/course.dtos";
 import { IUserDocument } from "../../type/user.type";
