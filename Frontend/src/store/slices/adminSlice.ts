@@ -1,8 +1,8 @@
 import { createApi, BaseQueryFn, FetchArgs, fetchBaseQuery, FetchBaseQueryError } from '@reduxjs/toolkit/query/react';
-import { IUserDocument } from '../../../../Backend/src/interfaces/user.interface';
 import { UserRole } from './userSlice';
 import { InstituteViewQueryResponse } from '../../types/userTypes';
 import { InstituteDocument } from '../../types/Institute/InstituteDocument';
+import { IUserDocument } from 'src/types/userSide/leaderBoard';
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 

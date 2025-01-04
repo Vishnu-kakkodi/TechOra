@@ -42,6 +42,9 @@ export interface Course {
   price?: number; 
   status: 'draft' | 'published';
   thumbnail?: string;
+  totalReviews?: number;
+  averageRating?: number;
+  enrolledStudents?: number
   institutionId?: Types.ObjectId | string;
   modules: Module[];
   totalModules?: number;

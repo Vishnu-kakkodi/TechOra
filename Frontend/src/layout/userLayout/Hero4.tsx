@@ -101,7 +101,6 @@ const Hero4: React.FC<HeroProps> = ({ courses }) => {
                       </div>
                       <div className="flex items-center">
                         <BookOpen size={12} className="mr-1 text-green-500" />
-                        <span>{course?.level}</span>
                       </div>
                       <div className="flex items-center">
                         <User size={12} className="mr-1 text-purple-500" />
@@ -111,7 +110,7 @@ const Hero4: React.FC<HeroProps> = ({ courses }) => {
 
                     <div className="flex justify-between items-center">
                       <div className="text-sm font-bold text-blue-700">
-                        ₹{course?.price.toFixed(2)}
+                        ₹{course?.price?.toFixed(2)}
                       </div>
                     </div>
                   </div>
