@@ -1,15 +1,19 @@
 import { Request, Response, NextFunction } from "express";
-import { UserService } from "../services/user.service";
 import { CreateUserDto } from "../dtos/user.dtos";
 import { HttpException } from "../middleware/error.middleware";
 import { setCookie } from "../helperFunction/cookieUtils";
 import STATUS_CODES from "../constants/statusCode";
 import MESSAGES from "../constants/message";
 import { decodedToken } from "../helperFunction/authHelper";
+import { IUserService } from "../interfaces/IServiceInterface/IUserService";
 
 
 export class UserController {
-    constructor(private readonly userService: UserService) { }
+    private userService: IUserService;
+
+    constructor(userService: IUserService) {
+        this.userService = userService;
+    }
 
     async initiateUser(
         req: Request<{}, {}, CreateUserDto>,
@@ -136,8 +140,8 @@ export class UserController {
         next: NextFunction
     ): Promise<void> {
         try {
-            const {email,userName,phoneNumber} = req.body
-            const userDetails = await this.userService.googleSign(email,userName,phoneNumber);
+            const { email, userName, phoneNumber } = req.body
+            const userDetails = await this.userService.googleSign(email, userName, phoneNumber);
             if (!userDetails) {
                 throw new HttpException(404, 'User not found');
             }
@@ -226,12 +230,8 @@ export class UserController {
     ): Promise<void> {
         try {
             const credential = req.body;
-            const Token = req.cookies.user
-            const token = Token.accessToken
-            if (!token) {
-                throw new HttpException(STATUS_CODES.UNAUTHORIZED, MESSAGES.ERROR.UNAUTHORIZED)
-            }
-            await this.userService.changePassword(credential, token);
+            const userId: string | null = req.user?._id;
+            await this.userService.changePassword(credential, userId);
             res.status(STATUS_CODES.SUCCESS).json({ message: MESSAGES.SUCCESS.PASSWORD_CHANGED });
         } catch (error) {
             next(error)
@@ -248,17 +248,13 @@ export class UserController {
             const page = parseInt(req.query.page as string) || 1;
             const limit = parseInt(req.query.limit as string) || 4;
             const search = (req.query.search as string);
-            const Token = req.cookies.user
-            const token = Token.accessToken;
-            if (!token) {
-                throw new HttpException(STATUS_CODES.UNAUTHORIZED, MESSAGES.ERROR.UNAUTHORIZED)
-            }
-            const { course, total } = await this.userService.myCourses(token, page, limit, search);
+            const userId: string | null = req.user?._id;
+            const { course, total } = await this.userService.myCourses(userId, page, limit, search);
             if (!course) {
                 throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
             }
             res.status(201).json({
-                data:course,
+                data: course,
                 total,
                 page,
                 limit,
@@ -297,15 +293,8 @@ export class UserController {
         next: NextFunction
     ): Promise<void> {
         try {
-
             let fileLocation = (req.file as any).location;
-            const Token = req.cookies.user
-            const token = Token.accessToken;
-            if (!token) {
-                throw new HttpException(STATUS_CODES.UNAUTHORIZED, MESSAGES.ERROR.UNAUTHORIZED)
-            }
-            const requiredRole = "user";
-            const userId: string | null = decodedToken(token, requiredRole);
+            const userId: string | null = req.user?._id;
             const user = await this.userService.profilePhoto(userId, fileLocation);
             if (!user) {
                 throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
@@ -329,13 +318,7 @@ export class UserController {
     ): Promise<void> {
         try {
             const { userName, phoneNumber } = req.body;
-            const Token = req.cookies.user
-            const token = Token.accessToken;
-            if (!token) {
-                throw new HttpException(STATUS_CODES.UNAUTHORIZED, MESSAGES.ERROR.UNAUTHORIZED)
-            }
-            const requiredRole = "user";
-            const userId: string | null = decodedToken(token, requiredRole);
+            const userId: string | null = req.user?._id;
             const updatedUser = await this.userService.updateProfile(userId, {
                 userName,
                 phoneNumber,
@@ -363,8 +346,12 @@ export class UserController {
             if (!courses) {
                 throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
             }
+            const  quizWinners = await this.userService.quizWinners();
             res.status(201).json(
-                courses
+                {
+                courses,
+                winners:quizWinners
+                }
             );
         } catch (error) {
             next(error)
@@ -372,24 +359,18 @@ export class UserController {
     }
 
     async leaderBoard
-    (
-        req: Request<{}, {}>,
-        res: Response,
-        next: NextFunction
-    ): Promise<void> {
+        (
+            req: Request<{}, {}>,
+            res: Response,
+            next: NextFunction
+        ): Promise<void> {
         try {
-            const Token = req.cookies.user
-            const token = Token.accessToken;
-            if (!token) {
-                throw new HttpException(STATUS_CODES.UNAUTHORIZED, MESSAGES.ERROR.UNAUTHORIZED)
-            }
-            const requiredRole = "user";
-            const userId: string | null = decodedToken(token, requiredRole);
+            const userId: string | null = req.user?._id;
             const page = parseInt(req.query.page as string) || 1;
             const limit = parseInt(req.query.limit as string) || 4;
             const search = (req.query.search as string);
             console.log(search)
-            const {users,total, currentUser }= await this.userService.leaderBoard(page, limit, search,userId);
+            const { users, total, currentUser } = await this.userService.leaderBoard(page, limit, search, userId);
             if (!users) {
                 throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
             }

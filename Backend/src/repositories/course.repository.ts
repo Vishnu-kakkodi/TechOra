@@ -1,6 +1,6 @@
 import { BaseRepository } from "./base.repository";
 import { CourseModel } from "../models/course.model";
-import { CourseDocument, Module } from "../interfaces/course.interface";
+import { CourseDocument, Module } from "../type/course.type";
 import mongoose, { FilterQuery, Types } from 'mongoose'
 import { UpdateCourseDto } from "../dtos/course.dtos";
 

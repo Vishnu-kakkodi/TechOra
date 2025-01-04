@@ -1,5 +1,5 @@
 import {Schema, model} from 'mongoose'
-import { ReviewDocument } from '../interfaces/review.interface';
+import { ReviewDocument } from '../type/review.type';
 
 const reviewSchema = new Schema<ReviewDocument>(
     {

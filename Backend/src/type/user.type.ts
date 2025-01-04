@@ -1,5 +1,5 @@
 import { Document, Types } from "mongoose";
-import { BaseInterface } from "./base.interface";
+import { BaseInterface } from "./base.type";
 
 export enum UserStatus {
     Active = 'active',

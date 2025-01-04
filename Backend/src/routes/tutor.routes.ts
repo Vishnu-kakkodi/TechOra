@@ -1,21 +1,21 @@
 import { Router } from "express";
 import { InstitutionController } from "../controllers/institute.controller";
-import { InstituteService } from "../services/institute.service";
 import upload from "../bucketConfig";
 import { CourseController } from "../controllers/course.controller";
-import { CourseService } from "../services/course.service";
 import { CourseRepository } from "../repositories/course.repository";
 import { CartRepository } from "../repositories/cart.repository";
 import { QuizController } from "../controllers/quiz.controller";
 import { QuizRepository } from "../repositories/quiz.repository";
-import { QuizService } from "../services/quiz.service";
 import { UserRepository } from "../repositories/user.repository";
 import { TutorRepository } from "../repositories/tutor.repository";
-import { TutorService } from "../services/tutor.service";
 import { TutorController } from "../controllers/tutor.controller";
 import { WishlistRepository } from "../repositories/wishlist.repository";
 import { authMiddleware } from "../middleware/auth.middleware";
 import { NotificationRepository } from "../repositories/notification.repository";
+import InstituteService from "../services/institute.service";
+import CourseService from "../services/course.service";
+import QuizService from "../services/quiz.service";
+import TutorService from "../services/tutor.service";
 
 const router = Router();
 const instituteService = new InstituteService();

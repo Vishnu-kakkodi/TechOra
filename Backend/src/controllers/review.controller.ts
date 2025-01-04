@@ -1,15 +1,15 @@
 import { Request, Response, NextFunction } from "express";
-import { ReviewService } from "../services/review.service"; 
 import { decodedToken } from "../helperFunction/authHelper";
 import { HttpException } from "../middleware/error.middleware";
 import STATUS_CODES from "../constants/statusCode";
 import MESSAGES from "../constants/message";
+import { IReviewService } from "../interfaces/IServiceInterface/IReviewService";
 
 
 export class ReviewController {
-    private reviewService: ReviewService;
+    private reviewService: IReviewService;
 
-    constructor(reviewService: ReviewService) {
+    constructor(reviewService: IReviewService) {
         this.reviewService = reviewService
     }
 
@@ -19,13 +19,7 @@ export class ReviewController {
         next: NextFunction
     ): Promise<void> => {
         try {            
-            const Token = req.cookies.user
-            const token = Token.accessToken;
-            if(!token){
-                throw new HttpException(STATUS_CODES.UNAUTHORIZED,MESSAGES.ERROR.UNAUTHORIZED)
-            }
-            const requiredRole = "user";
-            const userId: string | null = decodedToken(token, requiredRole);
+            const userId: string | null = req.user?._id;
             const { courseId,currentValue,reviewText } = req.body;
             const response = await this.reviewService.createReview(currentValue,reviewText,userId,courseId);
             res.status(201).json({

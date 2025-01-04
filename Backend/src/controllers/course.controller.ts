@@ -1,18 +1,18 @@
 import { Request, Response, NextFunction } from "express";
-import { CourseService } from "../services/course.service";
 import { HttpException } from "../middleware/error.middleware";
 import { CreateCourseDto, UpdateCourseDto } from "../dtos/course.dtos";
-import { CourseDetailResponse, CourseDetailResponseInstitute, Module } from "../interfaces/course.interface";
+import { CourseDetailResponse, CourseDetailResponseInstitute, Module } from "../type/course.type";
 import { decodedToken } from "../helperFunction/authHelper";
 import STATUS_CODES from "../constants/statusCode";
 import MESSAGES from "../constants/message";
-import { QuizService } from "../services/quiz.service";
+import { ICourseService } from "../interfaces/IServiceInterface/ICourseService";
+import { IQuizService } from "../interfaces/IServiceInterface/IQuizService";
 
 export class CourseController {
-    private courseService: CourseService;
-    private quizService: QuizService;
+    private courseService: ICourseService;
+    private quizService: IQuizService;
 
-    constructor(courseService: CourseService, quizService: QuizService) {
+    constructor(courseService: ICourseService, quizService: IQuizService) {
         this.courseService = courseService;
         this.quizService = quizService;
     }
@@ -23,12 +23,7 @@ export class CourseController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const token = req.cookies.tutor.accessToken
-            if(!token){
-                throw new HttpException(STATUS_CODES.UNAUTHORIZED,MESSAGES.ERROR.UNAUTHORIZED)
-            }
-            const requiredRole = "tutor";
-            const tutorId: string | null = decodedToken(token, requiredRole);
+            const tutorId: string | null = req.user?._id;
             const courseData: CreateCourseDto = req.body;
 
             if (!courseData) {
@@ -63,12 +58,7 @@ export class CourseController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const token = req.cookies.institute.accessToken
-            if(!token){
-                throw new HttpException(STATUS_CODES.UNAUTHORIZED,MESSAGES.ERROR.UNAUTHORIZED)
-            }
-            const requiredRole = "institute";
-            const institutionId: string | null = decodedToken(token, requiredRole);
+            const institutionId: string | null = req.user?._id;
             const page = parseInt(req.query.page as string) || 1;
             const limit = parseInt(req.query.limit as string) || 4;
             const search = (req.query.search as string);
@@ -88,12 +78,7 @@ export class CourseController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const token = req.cookies.tutor.accessToken
-            if(!token){
-                throw new HttpException(STATUS_CODES.UNAUTHORIZED,MESSAGES.ERROR.UNAUTHORIZED)
-            }
-            const requiredRole = "tutor";
-            const tutorId: string | null = decodedToken(token, requiredRole);
+            const tutorId: string | null = req.user?._id
             const page = parseInt(req.query.page as string) || 1;
             const limit = parseInt(req.query.limit as string) || 4;
             const search = (req.query.search as string);
@@ -139,12 +124,7 @@ export class CourseController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const token = req.cookies.institute.accessToken;
-            if(!token){
-                throw new HttpException(STATUS_CODES.UNAUTHORIZED,MESSAGES.ERROR.UNAUTHORIZED)
-            }
-            const requiredRole = "institute";
-            const instituteId: string | null = decodedToken(token, requiredRole);
+            const instituteId: string | null = req.user?._id;
             const page = parseInt(req.query.page as string) || 1;
             const limit = parseInt(req.query.limit as string) || 4;
             const search = (req.query.search as string);
@@ -169,12 +149,7 @@ export class CourseController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const token = req.cookies.tutor.accessToken;
-            if(!token){
-                throw new HttpException(STATUS_CODES.UNAUTHORIZED,MESSAGES.ERROR.UNAUTHORIZED)
-            }
-            const requiredRole = "tutor";
-            const tutorId: string | null = decodedToken(token, requiredRole);
+            const tutorId: string | null = req.user?._id;
             const page = parseInt(req.query.page as string) || 1;
             const limit = parseInt(req.query.limit as string) || 4;
             const search = (req.query.search as string);
@@ -199,12 +174,7 @@ export class CourseController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const token = req.cookies.user.accessToken;
-            if(!token){
-                throw new HttpException(STATUS_CODES.UNAUTHORIZED,MESSAGES.ERROR.UNAUTHORIZED)
-            }
-            const requiredRole = "user";
-            const userId: string | null = decodedToken(token, requiredRole);
+            const userId: string | null = req.user?._id;
             const data = await this.courseService.PurchasedCourse(userId);
             const purchased: string | undefined = (data?.purchasedCourses)?.toString();
             const purchasedCourses = purchased?.split(",");
@@ -216,8 +186,6 @@ export class CourseController {
                 Data: course,
                 purchased: purchasedCourses,
             };
-
-
             res.status(201).json(response)
         } catch (error) {
             next(error)
@@ -344,12 +312,7 @@ export class CourseController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const token = req.cookies.institute.accessToken;
-            if(!token){
-                throw new HttpException(STATUS_CODES.UNAUTHORIZED,MESSAGES.ERROR.UNAUTHORIZED)
-            }
-            const requiredRole = "institute";
-            const instituteId: string | null = decodedToken(token, requiredRole);
+            const instituteId: string | null = req.user?._id;
             const {published,draft,listed,unlisted,course} = await this.courseService.chartData(instituteId);
             const quiz = await this.quizService.findQuiz(instituteId);
             res.status(201).json({published,draft,listed,unlisted,course,quiz});

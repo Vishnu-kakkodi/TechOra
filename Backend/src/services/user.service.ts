@@ -1,4 +1,4 @@
-import { IUserDocument } from "../interfaces/user.interface";
+import { IUserDocument } from "../type/user.type";
 import { UserRepository } from "../repositories/user.repository";
 import { CreateUserDto } from "../dtos/user.dtos";
 import { HttpException } from "../middleware/error.middleware";
@@ -9,19 +9,20 @@ import MESSAGES from '../constants/message';
 import { generateNumericOTP } from "../utils/gererateNumericOTP";
 import { emailSend } from "../utils/emailSend";
 import { PasswordUtils } from "../utils/passwordUtils";
-import { UpdatePassword, UserCookieData } from "../types/user.types";
+import { UpdatePassword, UserCookieData } from "../type/types/user.types";
 import { CourseRepository } from "../repositories/course.repository";
-import { CourseDocument } from "../interfaces/course.interface";
+import { CourseDocument } from "../type/course.type";
+import { IUserService } from "../interfaces/IServiceInterface/IUserService";
 
-interface userDetail extends CreateUserDto {
+export interface userDetail extends CreateUserDto {
     OTP: string;
 }
 
 
-export class UserService {
+class UserService implements IUserService {
     constructor(private readonly userRepository: UserRepository,
         private readonly courseRepository: CourseRepository
-        ) { }
+    ) { }
 
     async initiateUser(userDetail: CreateUserDto): Promise<userDetail> {
         try {
@@ -29,11 +30,12 @@ export class UserService {
             userDetail.password = hashPassword;
             const OTP = generateNumericOTP(4);
             console.log(OTP);
-            const subject:string = "Authentication OTP"
+            const subject: string = "Authentication OTP"
             await emailSend(userDetail.email, subject, OTP);
             return { ...userDetail, OTP }
         } catch (error) {
-            throw error        }
+            throw error
+        }
     }
 
     async createUser(cookieData: UserCookieData, OTP: string): Promise<IUserDocument> {
@@ -44,9 +46,9 @@ export class UserService {
             const currentTime = new Date().getTime();
             const timeDifference = (currentTime - cookieData.timestamp) / 1000 / 60;
             if (timeDifference > 10) {
-                throw new HttpException(STATUS_CODES.GONE,MESSAGES.ERROR.OTP_EXPIRED );
+                throw new HttpException(STATUS_CODES.GONE, MESSAGES.ERROR.OTP_EXPIRED);
             }
-            if(OTP!==CookieOTP){
+            if (OTP !== CookieOTP) {
                 throw new HttpException(STATUS_CODES.UNAUTHORIZED, MESSAGES.ERROR.INVALID_OTP);
             }
 
@@ -55,12 +57,13 @@ export class UserService {
 
 
         } catch (error) {
-            throw error        }
+            throw error
+        }
     }
 
     async getUser(email: string, password: string): Promise<IUserDocument | null> {
         try {
-            console.log(email,password)
+            console.log(email, password)
             const user = await this.userRepository.findByEmail(email)
 
             if (!user) {
@@ -84,7 +87,8 @@ export class UserService {
             return { ...user.toObject(), accessToken, refreshToken };
 
         } catch (error) {
-            throw error        }
+            throw error
+        }
     }
 
     async googleSign(email: string, userName: string, phoneNumber: string): Promise<any | null> {
@@ -95,17 +99,17 @@ export class UserService {
                 let userDetail = {
                     email,
                     userName,
-                    password: userName+"@123",
+                    password: userName + "@123",
                     phoneNumber,
                 }
                 const user = await this.userRepository.create(userDetail);
-                let id : any = user._id
+                let id: any = user._id
                 const accessToken = helperFunction.accesstoken(id, "user");
                 const refreshToken = helperFunction.refreshtoken(id, "user");
-    
-                return { ...user, accessToken, refreshToken };  
 
-             }
+                return { ...user, accessToken, refreshToken };
+
+            }
 
             if (user) {
                 if (user.status === 'inactive') {
@@ -119,7 +123,8 @@ export class UserService {
             return { ...user.toObject(), accessToken, refreshToken };
 
         } catch (error) {
-            throw error        }
+            throw error
+        }
     }
 
     async verifyEmail(email: string): Promise<string> {
@@ -171,11 +176,12 @@ export class UserService {
             return OTP;
 
         } catch (error) {
-            throw error        }
+            throw error
+        }
     }
 
 
-    async verifyOtp(otp: string, CookieData: string) {
+    async verifyOtp(otp: string, CookieData: string): Promise<string | undefined> {
         try {
             console.log(otp, CookieData)
             if (otp !== CookieData) {
@@ -184,7 +190,8 @@ export class UserService {
                 return "Otp Verified"
             }
         } catch (error) {
-            throw error        }
+            throw error
+        }
     }
 
 
@@ -198,7 +205,8 @@ export class UserService {
             await user?.save();
             return user
         } catch (error) {
-            throw error        }
+            throw error
+        }
     }
 
 
@@ -248,30 +256,28 @@ export class UserService {
             return OTP;
 
         } catch (error) {
-            throw error        }
+            throw error
+        }
     }
 
-    async changePassword(credential:UpdatePassword, token:string): Promise<any>{
-        try{
+    async changePassword(credential: UpdatePassword, userId: string): Promise<any> {
+        try {
             const currentPassword = credential.currentPassword;
             const newPassword = credential.newPassword;
-            const confirmPassword = credential.confirmPassword;
-            const requiredRole = "user";
-            const userId = decodedToken(token, requiredRole);
             const user = await this.userRepository.findById(userId);
-            if(!user){
-                throw new HttpException(STATUS_CODES.NOT_FOUND,MESSAGES.ERROR.USER_NOT_FOUND);
+            if (!user) {
+                throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.USER_NOT_FOUND);
             }
-            if(user){
+            if (user) {
                 const validPassword = await PasswordUtils.comparePassword(currentPassword, user.password);
-                if(!validPassword){
+                if (!validPassword) {
                     console.log("Error")
                     throw new HttpException(STATUS_CODES.UNAUTHORIZED, MESSAGES.ERROR.INVALID_CURRENT_PASSWORD)
                 }
-                if(currentPassword===confirmPassword){
-                    throw new HttpException(STATUS_CODES.BAD_REQUEST,MESSAGES.ERROR.SAME_PASSWORD)
+                if (currentPassword === newPassword) {
+                    throw new HttpException(STATUS_CODES.BAD_REQUEST, MESSAGES.ERROR.SAME_PASSWORD)
                 }
-                const hashPassword = await PasswordUtils.hashPassword(confirmPassword);
+                const hashPassword = await PasswordUtils.hashPassword(newPassword);
 
                 user.password = hashPassword;
 
@@ -281,34 +287,33 @@ export class UserService {
 
 
             }
-        }catch(error){
+        } catch (error) {
             throw error
         }
     }
 
-    async myCourses(token:string,page:number,limit:number,search:string): Promise<{ course: CourseDocument[] | null; total: number;}> {
-        try{
+    async myCourses(userId: string, page: number, limit: number, search: string): Promise<{ course: CourseDocument[] | null; total: number; }> {
+        try {
             const skip = (page - 1) * limit;
-            let query:any = {};
-            const requiredRole = "user";
-            const userId = decodedToken(token, requiredRole);
+            let query: any = {};
             if (search && search.trim() !== '') {
                 query.$or = [
                     { title: { $regex: search, $options: 'i' } }
                 ];
             }
             const user = await this.userRepository.findById(userId);
-            if(!user){
-                throw new HttpException(STATUS_CODES.NOT_FOUND,MESSAGES.ERROR.USER_NOT_FOUND);
+            if (!user) {
+                throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.USER_NOT_FOUND);
             }
             const MyCourses = user?.purchasedCourses
-            return await this.courseRepository.findMyCourse(MyCourses,query,skip,limit)
-        }catch(error){
-            throw error        }
+            return await this.courseRepository.findMyCourse(MyCourses, query, skip, limit)
+        } catch (error) {
+            throw error
+        }
     }
 
 
-    async profilePhoto(userId:string, fileLocation:string): Promise<IUserDocument | null> {
+    async profilePhoto(userId: string, fileLocation: string): Promise<IUserDocument | null> {
         try {
             const user = await this.userRepository.findById(userId)
             if (!user) {
@@ -324,10 +329,11 @@ export class UserService {
             }
 
 
-            return { ...user.toObject()};
+            return { ...user.toObject() };
 
         } catch (error) {
-            throw error        }
+            throw error
+        }
     }
 
     async updateProfile(userId: string, updateData: {
@@ -336,37 +342,50 @@ export class UserService {
         address?: string;
     }): Promise<IUserDocument | null> {
         try {
-            const updatedUser = await this.userRepository.UpdateProfile(userId,updateData );
-            return updatedUser;        
+            const updatedUser = await this.userRepository.UpdateProfile(userId, updateData);
+            return updatedUser;
         } catch (error) {
-            throw error        }
+            throw error
+        }
     }
 
-        async homeData(): Promise<{course:CourseDocument[] | null}> {
+    async homeData(): Promise<{ course: CourseDocument[] | null }> {
         try {
             const course = await this.courseRepository.homeData();
-            return course;         
+            return course;
         } catch (error) {
-            throw error 
-               }
+            throw error
+        }
+    }
+
+    async quizWinners(): Promise<{ quizWinners: IUserDocument[] | null }> {
+        try {
+            const quizWinners =  await this.userRepository.quizWinners();
+            return quizWinners;
+        } catch (error) {
+            throw error
+        }
     }
 
 
-    async leaderBoard(page:number,limit:number,search:string,userId:string): Promise<{ users: IUserDocument[] | null; total: number; currentUser: IUserDocument|null}> {
-        try{
+    async leaderBoard(page: number, limit: number, search: string, userId: string): Promise<{ users: IUserDocument[] | null; total: number; currentUser: IUserDocument | null }> {
+        try {
             const skip = (page - 1) * limit;
-            let query:any = {};
+            let query: any = {};
             if (search && search.trim() !== '') {
                 query.$or = [
                     { userName: { $regex: search, $options: 'i' } },
                     { 'quizProgress.rank': { $regex: search, $options: 'i' } }
                 ];
             }
-            const {users,total} =  await this.userRepository.findUsers(query,skip,limit);
-            const currentUser =  await this.userRepository.findById(userId);
+            const { users, total } = await this.userRepository.findUsers(query, skip, limit);
+            const currentUser = await this.userRepository.findById(userId);
 
-            return {users,total,currentUser}
-        }catch(error){
-            throw error        }
+            return { users, total, currentUser }
+        } catch (error) {
+            throw error
+        }
     }
 }
+
+export default UserService;

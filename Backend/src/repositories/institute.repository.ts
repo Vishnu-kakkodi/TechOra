@@ -1,6 +1,6 @@
 import { BaseRepository } from "./base.repository";
 import { InstituteModel } from "../models/institute.model";
-import { InstituteDocument } from "../interfaces/institute.interface";
+import { InstituteDocument } from "../type/institute.type";
 import mongoose, { FilterQuery } from "mongoose";
 
 export type SearchQueryTypeInstitute = FilterQuery<{

@@ -1,16 +1,17 @@
 import { helperFunction } from "../helperFunction/authHelper";
 import { HttpException } from "../middleware/error.middleware";
 import { TutorRepository } from "../repositories/tutor.repository";
-import { TutorDocument } from "../interfaces/tutor.interface";
+import { TutorDocument } from "../type/tutor.type";
 import STATUS_CODES from "../constants/statusCode";
 import MESSAGES from "../constants/message";
-import { IUserDocument } from "../interfaces/user.interface";
+import { IUserDocument } from "../type/user.type";
 import { UserRepository } from "../repositories/user.repository";
 import mongoose from "mongoose";
 import { NotificationRepository } from "../repositories/notification.repository";
-import { INotification } from "../interfaces/notification.interface";
+import { INotification } from "../type/notification.type";
+import { ITutorService } from "../interfaces/IServiceInterface/ITutorService";
 
-export class TutorService {
+class TutorService implements ITutorService {
     private tutorRepository: TutorRepository;
     private userRepository: UserRepository;
     private notificationRepository: NotificationRepository;
@@ -148,3 +149,5 @@ export class TutorService {
     }
       
 }
+
+export default TutorService;

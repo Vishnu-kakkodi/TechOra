@@ -1,6 +1,6 @@
 import { BaseRepository } from "./base.repository";
 import { UserModel } from "../models/user.model";
-import { IUserDocument } from "../interfaces/user.interface";
+import { IUserDocument } from "../type/user.type";
 import { HttpException } from "../middleware/error.middleware";
 import mongoose, { FilterQuery } from 'mongoose';
 
@@ -123,12 +123,22 @@ export class UserRepository extends BaseRepository<IUserDocument> {
             .limit(limit)
 
             const total:number = await this.model.countDocuments(searchQuery);
-            console.log(users);
             return { users, total };
 
         } catch (error) {
             throw error;
         }
+    }
+
+    async quizWinners(): Promise<{ quizWinners: IUserDocument[] | null; }> { 
+        try {  
+            const quizWinners =  await this.model.find()
+            .sort({ 'quizProgress.rank': 1 })
+            .limit(3)
+            return { quizWinners: quizWinners.length > 0 ? quizWinners : null };
+        } catch (error) {
+            throw error;
+        }                                   
     }
 
     async updateRank():Promise<void>{

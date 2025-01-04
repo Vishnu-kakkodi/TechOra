@@ -1,4 +1,4 @@
-import { CourseDocument } from "../interfaces/course.interface";
+import { CourseDocument } from "../course.type";
 
 interface User {
     userName: string;
@@ -22,4 +22,10 @@ export interface UpdatePassword{
 
 export interface MyCourses {
     course: CourseDocument[];
+  }
+
+
+  export interface winnerType{
+    userName: string;
+    profilePhoto: string;
   }

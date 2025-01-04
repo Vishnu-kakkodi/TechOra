@@ -1,5 +1,5 @@
 import { Document } from "mongoose";
-import { BaseInterface } from "./base.interface";
+import { BaseInterface } from "./base.type";
 
 export interface Institute extends BaseInterface{
     id:string;

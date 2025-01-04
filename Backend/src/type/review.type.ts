@@ -1,5 +1,5 @@
 import { Document, Types } from "mongoose";
-import { BaseInterface } from "./base.interface";
+import { BaseInterface } from "./base.type";
 
 export interface Review extends BaseInterface {
   id:string;

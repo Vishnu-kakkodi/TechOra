@@ -1,6 +1,6 @@
 import { BaseRepository } from "./base.repository";
 import { CartModel } from "../models/cart.model";
-import { CartDocument } from "../interfaces/cart.interface";
+import { CartDocument } from "../type/cart.type";
 import mongoose from 'mongoose';
 
 

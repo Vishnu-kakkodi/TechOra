@@ -1,16 +1,15 @@
 import { Request, Response, NextFunction } from "express";
-import { CourseService } from "../services/course.service";
 import { decodedToken } from "../helperFunction/authHelper";
 import { HttpException } from "../middleware/error.middleware";
 import STATUS_CODES from "../constants/statusCode";
 import MESSAGES from "../constants/message";
-import { NotificationService } from "../services/notification.service";
+import { INotificationService } from "../interfaces/IServiceInterface/INotificationService";
 
 
 export class NotificationController {
-    private notificationService: NotificationService;
+    private notificationService: INotificationService;
 
-    constructor(notificationService: NotificationService) {
+    constructor(notificationService: INotificationService) {
         this.notificationService = notificationService
     }
 
@@ -20,13 +19,7 @@ export class NotificationController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const Token = req.cookies.user
-            const token = Token.accessToken;
-            if(!token){
-                throw new HttpException(STATUS_CODES.UNAUTHORIZED,MESSAGES.ERROR.UNAUTHORIZED)
-            }
-            const requiredRole = "user";
-            const userId: string | null = decodedToken(token, requiredRole);
+            const userId: string | null = req.user?._id;
             if(!userId){
                 res.json({message:"Authentication failed"});
             }
@@ -46,13 +39,7 @@ export class NotificationController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const Token = req.cookies.user
-            const token = Token.accessToken;
-            if(!token){
-                throw new HttpException(STATUS_CODES.UNAUTHORIZED,MESSAGES.ERROR.UNAUTHORIZED)
-            }
-            const requiredRole = "user";
-            const userId: string | null = decodedToken(token, requiredRole);
+            const userId: string | null = req.user?._id;
             const notificationId = req.params.notificationId;
             if(!userId){
                 res.json({message:"Authentication failed"});

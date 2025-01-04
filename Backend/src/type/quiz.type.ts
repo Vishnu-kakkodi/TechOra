@@ -1,5 +1,5 @@
 import { Document, Types } from "mongoose";
-import { BaseInterface } from "./base.interface";
+import { BaseInterface } from "./base.type";
 
 export type QuestionType = 'multiple-choice' | 'true-false' | 'short-answer';
 export type QuizStatus = 'draft' | 'published';

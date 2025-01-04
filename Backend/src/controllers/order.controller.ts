@@ -1,11 +1,11 @@
 import { Request, Response, NextFunction } from "express";
-import { OrderService } from "../services/order.service";
 import dotenv from 'dotenv';
 import { decodedToken } from "../helperFunction/authHelper";
 import { HttpException } from "../middleware/error.middleware";
 import STATUS_CODES from "../constants/statusCode";
 import MESSAGES from "../constants/message";
 import generator from "../utils/orderIdGenerate";
+import { IOrderService } from "../interfaces/IServiceInterface/IOrderService";
 
 dotenv.config();
 const stripe = require('stripe')(process.env.STRIPE_SECRET, {
@@ -36,9 +36,9 @@ function isExistingOrder(order: OrderBody): order is ExistingOrderBody {
 
 
 export class OrderController {
-    private orderService: OrderService;
+    private orderService: IOrderService;
 
-    constructor(orderService: OrderService) {
+    constructor(orderService: IOrderService) {
         this.orderService = orderService;
         this.createOrder = this.createOrder.bind(this);
     }
@@ -53,13 +53,7 @@ export class OrderController {
             if (!Array.isArray(orderItems) || typeof total !== 'number') {
                 throw new Error('Invalid order details');
             }
-            const Token = req.cookies.user;
-            const token = Token.accessToken;
-            if(!token){
-                throw new HttpException(STATUS_CODES.UNAUTHORIZED,MESSAGES.ERROR.UNAUTHORIZED)
-            }
-            const requiredRole = "user";
-            const userId = decodedToken(token, requiredRole);
+            const userId: string | null = req.user?._id;
             let order;
             const orderId = generator.generateID()
             if (isExistingOrder(req.body)) {
@@ -100,8 +94,6 @@ export class OrderController {
             res.json({
                 id: session.id,
             });
-
-
         } catch (error) {
             next(error)
         }
@@ -114,21 +106,12 @@ export class OrderController {
         next: NextFunction
     ): Promise<void> {
         try {
-
             const orderId= req.body.orderId;
-            const Token = req.cookies.user;
-            const token = Token.accessToken;
-            if(!token){
-                throw new HttpException(STATUS_CODES.UNAUTHORIZED,MESSAGES.ERROR.UNAUTHORIZED);
-            }
-            const requiredRole = "user";
-            const userId = decodedToken(token, requiredRole);
-
+            const userId: string | null = req.user?._id;
             const order = await this.orderService.updatePayment(orderId,userId);
             res.json({
                 order
             });
-
         } catch (error) {
             next(error)
         }
@@ -145,21 +128,12 @@ export class OrderController {
             const search = (req.query.search as string);
             const filter = (req.query.filter as string);
             const sort = (req.query.sort as string);
-            const orderId= req.body.orderId;
-            const Token = req.cookies.user
-            const token = Token.accessToken;
-            if(!token){
-                throw new HttpException(STATUS_CODES.UNAUTHORIZED,MESSAGES.ERROR.UNAUTHORIZED)
-            }
-            const requiredRole = "user";
-            const userId = decodedToken(token, requiredRole);            
-            
+            const userId: string | null = req.user?._id;           
             const {orders,total} = await this.orderService.orderList(userId,page,limit,search,filter,sort);
             res.json({
                 orders,
                 total
             });
-
         } catch (error) {
             next(error)
         }

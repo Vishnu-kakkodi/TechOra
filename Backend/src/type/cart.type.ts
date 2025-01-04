@@ -1,6 +1,6 @@
 import { Document, Types } from "mongoose";
-import { BaseInterface } from "./base.interface";
-import { CourseDocument } from "./course.interface";
+import { BaseInterface } from "./base.type";
+import { CourseDocument } from "./course.type";
 
 
 

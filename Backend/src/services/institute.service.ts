@@ -1,4 +1,4 @@
-import { Institute, InstituteDocument, InstituteStatus } from "../interfaces/institute.interface";
+import { Institute, InstituteDocument, InstituteStatus } from "../type/institute.type";
 import { InstituteRepository } from "../repositories/institute.repository";
 import { CreateUserDto } from "../dtos/institute.dtos";
 import nodemailer from 'nodemailer';
@@ -6,11 +6,11 @@ import { helperFunction } from "../helperFunction/authHelper";
 import { HttpException } from "../middleware/error.middleware";
 import generator from "../utils/generateApplicationID";
 import { TutorRepository } from "../repositories/tutor.repository";
-import { TutorDocument } from "../interfaces/tutor.interface";
+import { TutorDocument } from "../type/tutor.type";
 import STATUS_CODES from "../constants/statusCode";
 import MESSAGES from "../constants/message";
 
-export class InstituteService {
+class InstituteService implements InstituteService {
     private instituteRepository: InstituteRepository;
     private tutorRepository: TutorRepository
     constructor() {
@@ -76,7 +76,7 @@ export class InstituteService {
         }
     }
 
-    async verifyOtp(otp: string, CookieData: string) {
+    async verifyOtp(otp: string, CookieData: string):Promise<string | undefined> {
         try {
             if (otp !== CookieData) {
                 throw new Error('Invalid OTP');
@@ -219,3 +219,5 @@ export class InstituteService {
         }
       }
 }
+
+export default InstituteService

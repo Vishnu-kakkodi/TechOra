@@ -1,7 +1,7 @@
 import { BaseRepository } from "./base.repository";
-import { CartDocument } from "../interfaces/cart.interface";
+import { CartDocument } from "../type/cart.type";
 import mongoose from 'mongoose';
-import {INotification}  from "../interfaces/notification.interface";
+import {INotification}  from "../type/notification.type";
 import notificationModel from "../models/notification.model";
 
 

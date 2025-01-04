@@ -1,10 +1,11 @@
 import { CourseRepository } from "../repositories/course.repository";
 import mongoose from "mongoose";
 import { ReviewRepository } from "../repositories/review.repository";
-import { ReviewDocument } from "../interfaces/review.interface";
+import { ReviewDocument } from "../type/review.type";
+import { IReviewService } from "../interfaces/IServiceInterface/IReviewService";
 
 
-export class ReviewService {
+class ReviewService implements IReviewService {
     private reviewRepository: ReviewRepository;
     private courseRepository: CourseRepository;
 
@@ -77,8 +78,8 @@ export class ReviewService {
         }
     }
     
-
-
 }
+
+export default ReviewService;
 
 

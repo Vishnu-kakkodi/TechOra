@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import { HttpException } from "../middleware/error.middleware";
-import { AdminService } from "../services/admin.service";
 import { setCookie } from "../helperFunction/cookieUtils";
 import { GetObjectOutput } from 'aws-sdk/clients/s3';
+import { IAdminService } from "../interfaces/IServiceInterface/IAdminService";
 
 
 
@@ -13,9 +13,12 @@ export interface DownloadDocResponse extends GetObjectOutput {
 }
 
 export class AdminController {
+    private adminService: IAdminService;
     constructor(
-        private readonly adminService: AdminService,
-    ) { }
+        adminService: IAdminService,
+    ) { 
+        this.adminService = adminService;
+    }
 
     async verifyAdmin(
         req: Request,

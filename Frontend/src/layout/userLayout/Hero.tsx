@@ -1,15 +1,23 @@
 
-
+import { useState, useEffect } from 'react';
+import { ArrowBigLeft, ArrowBigRight } from 'lucide-react';
 import HOMEPIC1 from '../../assets/frontEnd/HOMEPIC.png';
 import HOMEPIC2 from '../../assets/frontEnd/Carosal2.jpg';
 import HOMEPIC3 from '../../assets/frontEnd/Carosal3.jpg';
-import { useState, useEffect } from 'react';
-import { ArrowBigLeft, ArrowBigRight } from 'lucide-react';
 
 export default function Hero() {
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const slides = [
+    {
+      image: HOMEPIC3,
+      title: "Future-Proof Your Career",
+      subtitle: "Invest in yourself",
+      description: [
+        "Affordable and flexible courses,",
+        "starting at just ₹299."
+      ],
+    },
     {
       image: HOMEPIC1,
       title: "Learn, practice, succeed",
@@ -28,15 +36,6 @@ export default function Hero() {
         "business, and more."
       ],
     },
-    {
-      image: HOMEPIC3,
-      title: "Future-Proof Your Career",
-      subtitle: "Invest in yourself",
-      description: [
-        "Affordable and flexible courses,",
-        "starting at just ₹299."
-      ],
-    },
   ];
 
   const handleNext = () => {
@@ -50,34 +49,39 @@ export default function Hero() {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length);
-    }, 8000); 
+    }, 8000);
 
-    return () => clearInterval(interval); 
+    return () => clearInterval(interval);
   }, []);
 
   return (
-    <div className="relative w-full min-h-[60vh] flex items-center overflow-hidden">
+    <div className="relative w-full min-h-[40vh] md:min-h-[60vh] flex items-center overflow-hidden">
       {/* Image Section */}
       {slides.map((slide, index) => (
         <div
           key={index}
-          className={`absolute w-full transition-transform duration-700 ${
+          className={`absolute w-full h-full transition-transform duration-700 ${
             index === currentSlide ? "translate-x-0" : "translate-x-full"
           }`}
         >
           <img
             src={slide.image}
             alt={`Slide ${index + 1}`}
-            className="w-full h-[60vh] object-cover"
+            className="w-full h-full object-cover"
           />
-          <div className="absolute top-1/2 left-[10%] md:left-[200px] bg-white bg-opacity-90 transform -translate-y-1/2 text-black p-6 md:p-10 border-2 rounded-lg shadow-lg">
-            <div className="text-xl md:text-3xl font-bold mb-2 text-center md:text-left">
+          
+          {/* Text Content - Only visible on md and larger screens */}
+          <div className="hidden md:block absolute top-1/2 left-[200px] 
+                        bg-white bg-opacity-90 
+                        transform -translate-y-1/2 
+                        p-10 rounded-lg shadow-lg">
+            <div className="text-3xl font-bold mb-2 text-left">
               {slide.title}
             </div>
-            <div className="text-lg md:text-2xl font-semibold mb-4 text-center md:text-left">
+            <div className="text-2xl font-semibold mb-4 text-left">
               {slide.subtitle}
             </div>
-            <div className="text-sm md:text-base font-normal text-gray-700 text-center md:text-left">
+            <div className="text-base font-normal text-gray-700 text-left">
               {slide.description.map((line, i) => (
                 <p key={i}>{line}</p>
               ))}
@@ -87,18 +91,24 @@ export default function Hero() {
       ))}
 
       {/* Navigation Controls */}
-      <button
+      {/* <button
         onClick={handlePrev}
-        className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full"
+        className="absolute left-4 top-1/2 transform -translate-y-1/2 
+                   bg-black bg-opacity-50 hover:bg-opacity-70 
+                   text-white p-2 rounded-full 
+                   transition-all duration-200"
       >
-        <ArrowBigLeft />
+        <ArrowBigLeft className="w-6 h-6" />
       </button>
       <button
         onClick={handleNext}
-        className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full"
+        className="absolute right-4 top-1/2 transform -translate-y-1/2 
+                   bg-black bg-opacity-50 hover:bg-opacity-70 
+                   text-white p-2 rounded-full 
+                   transition-all duration-200"
       >
-        <ArrowBigRight />
-      </button>
+        <ArrowBigRight className="w-6 h-6" />
+      </button> */}
 
       {/* Indicators */}
       <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
@@ -106,10 +116,12 @@ export default function Hero() {
           <button
             key={index}
             onClick={() => setCurrentSlide(index)}
-            className={`w-3 h-3 rounded-full ${
-              index === currentSlide ? "bg-black" : "bg-gray-400"
-            }`}
-          ></button>
+            className={`w-3 h-3 rounded-full transition-all duration-200 
+                       ${index === currentSlide 
+                         ? "bg-white md:bg-black" 
+                         : "bg-gray-400"
+                       }`}
+          />
         ))}
       </div>
     </div>

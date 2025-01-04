@@ -1,11 +1,24 @@
-import { Response, NextFunction } from "express";
+import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import { AuthenticatedRequest } from "../types/auth.types";
+// import { AuthenticatedRequest } from "../types/auth.types";
 import { DecodedToken, helperFunction } from "../helperFunction/authHelper";
 import { UserModel } from "../models/user.model";
 
+interface JwtPayload {
+  _id : string;
+  role: string;
+}
+
+declare global {
+  namespace Express {
+    interface Request {
+      user: JwtPayload
+    }
+  }
+}
+
 export const authMiddleware = async (
-  req: AuthenticatedRequest,
+  req: Request,
   res: Response,
   next: NextFunction
 ): Promise<any> => {
@@ -49,7 +62,7 @@ export const authMiddleware = async (
     const secretKey = process.env.ACCESS_SECRET_KEY as string;
 
     try {
-      const decoded = jwt.verify(accessToken, secretKey) as DecodedToken;      
+      const decoded = jwt.verify(accessToken, secretKey) as DecodedToken; 
       if (role === "user") {
         const user = await UserModel.findById(decoded._id);
         if (!user || user.status !== "active") {
@@ -67,8 +80,8 @@ export const authMiddleware = async (
           code: "ACCESS_TOKEN_EXPIRED"
         });
       }
-      
-      req.user = decoded as AuthenticatedRequest["user"];
+
+      req.user = decoded
       next();
     } catch (tokenError) {
       if (tokenError instanceof jwt.TokenExpiredError) {
@@ -85,7 +98,7 @@ export const authMiddleware = async (
           const refreshDecoded = jwt.verify(
             refreshToken,
             process.env.REFRESH_SECRET_KEY as string
-          ) as jwt.JwtPayload;
+          ) as JwtPayload;
 
           const { _id, role: decodedRole } = refreshDecoded;
 
@@ -110,7 +123,7 @@ export const authMiddleware = async (
             }
           }
 
-          req.user = { _id, role: decodedRole };
+          req.user = refreshDecoded;
           next();
         } catch (refreshError) {
           console.log("Refresh token verification failed:", refreshError);

@@ -1,6 +1,6 @@
 import { BaseRepository } from "./base.repository";
 import { QuizModel } from "../models/qiiz.model";
-import { QuizDocument } from "../interfaces/quiz.interface";
+import { QuizDocument } from "../type/quiz.type";
 import mongoose, { FilterQuery } from "mongoose";
 import { HttpException } from "../middleware/error.middleware";
 import STATUS_CODES from "../constants/statusCode";

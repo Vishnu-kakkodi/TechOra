@@ -1,10 +1,10 @@
-import { IUserDocument, UserStatus } from "../interfaces/user.interface";
-import { InstituteDocument, InstituteStatus } from "../interfaces/institute.interface";
+import { IUserDocument, UserStatus } from "../type/user.type";
+import { InstituteDocument, InstituteStatus } from "../type/institute.type";
 import { UserRepository } from "../repositories/user.repository";
 import { InstituteRepository } from "../repositories/institute.repository";
 import { helperFunction } from "../helperFunction/authHelper";
 import { HttpException } from "../middleware/error.middleware";
-import { AdminResponse } from "../interfaces/admin.interface";
+import { AdminResponse } from "../type/admin.type";
 import AWS from 'aws-sdk';
 import { DownloadDocResponse } from "../controllers/admin.controller";
 import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
@@ -12,6 +12,7 @@ import { Readable } from 'stream';
 import dotenv from 'dotenv';
 import { emailSend } from "../utils/emailSend";
 import { FilterQuery } from 'mongoose';
+import { IAdminService } from "../interfaces/IServiceInterface/IAdminService";
 dotenv.config();
 
 export type SearchQueryType = FilterQuery<{
@@ -27,7 +28,7 @@ AWS.config.update({
     region: process.env.AWS_REGION
 });
 
-export class AdminService {
+class AdminService implements IAdminService {
     private s3Client: S3Client;
 
     private userRepository: UserRepository;
@@ -45,7 +46,7 @@ export class AdminService {
         });
     }
 
-    verifyAdminCredentials(adminEmail: string, adminPassword: string): Promise<AdminResponse> {
+    async verifyAdminCredentials(adminEmail: string, adminPassword: string): Promise<AdminResponse> {
         let admin = null;
         if (adminEmail === process.env.ADMIN_EMAIL && adminPassword === process.env.ADMIN_PASSWORD) {
             const accessToken = helperFunction.accesstoken("admin#@$123", "admin");
@@ -255,3 +256,5 @@ export class AdminService {
     }
 
 }
+
+export default AdminService

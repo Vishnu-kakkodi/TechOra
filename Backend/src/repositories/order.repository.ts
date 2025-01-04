@@ -1,5 +1,5 @@
 import { BaseRepository } from "./base.repository";
-import { OrderDocument } from "../interfaces/order.interface";
+import { OrderDocument } from "../type/order.type";
 import { OrderModel } from "../models/order.model";
 import mongoose, { FilterQuery } from 'mongoose';
 
@@ -73,5 +73,4 @@ export class OrderRepository extends BaseRepository<OrderDocument> {
             throw error;
         }
     }
-
 }

@@ -1,5 +1,5 @@
 import { Schema, model, Document } from "mongoose";
-import { CourseDocument, Module } from "../interfaces/course.interface";
+import { CourseDocument, Module } from "../type/course.type";
 
 
 const moduleSchema = new Schema<Module>({

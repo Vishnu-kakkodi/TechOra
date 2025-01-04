@@ -1,15 +1,11 @@
 import {Request, Response, NextFunction} from 'express'
-import { decodedToken } from '../helperFunction/authHelper'
-import { HttpException } from '../middleware/error.middleware'
-import STATUS_CODES from '../constants/statusCode'
-import MESSAGES from '../constants/message'
-import { CourseService } from '../services/course.service'
+import { IWishlistService } from '../interfaces/IServiceInterface/IWishlistService';
 
 export class WishlistController {
-    private courseService: CourseService;
+    private wishlistService: IWishlistService;
 
-    constructor(courseService: CourseService){
-        this.courseService = courseService
+    constructor(wishlistService: IWishlistService){
+        this.wishlistService = wishlistService
     }
 
     public addToWishlist = async (
@@ -18,15 +14,9 @@ export class WishlistController {
         next: NextFunction
     ): Promise<void> => {
         try{
-            const Token = req.cookies.user;
-            const token = Token.accessToken;
-            if(!token){
-                throw new HttpException(STATUS_CODES.UNAUTHORIZED,MESSAGES.ERROR.UNAUTHORIZED);
-            }
-            const requiredRole = 'user';
-            const userId: string | null = decodedToken(token,requiredRole);
+            const userId: string | null = req.user?._id;
             const {courseId} = req.body;
-            const response = await this.courseService.addToWishlist(userId,courseId);
+            const response = await this.wishlistService.addToWishlist(userId,courseId);
             res.status(201).json({
                 message: response,
             });
@@ -45,15 +35,8 @@ export class WishlistController {
             const page = parseInt(req.query.page as string) || 1;
             const limit = parseInt(req.query.limit as string) || 4;
             const search = (req.query.search as string) || '';
-            const Token = req.cookies.user;
-            const token = Token.accessToken;
-            if(!token){
-                throw new HttpException(STATUS_CODES.UNAUTHORIZED,MESSAGES.ERROR.UNAUTHORIZED);
-            }
-            const requiredRole = 'user';
-            const userId: string | null = decodedToken(token,requiredRole);
-            const { favourates, total }  = await this.courseService.wishlistPage(userId, page, limit, search);
-
+            const userId: string | null = req.user?._id;
+            const { favourates, total }  = await this.wishlistService.wishlistPage(userId, page, limit, search);
             res.status(201).json({
                 favourates,
                 total,
@@ -72,15 +55,9 @@ export class WishlistController {
         next: NextFunction
     ): Promise<any> => {
         try{
-            const Token = req.cookies.user;
-            const token = Token.accessToken;
-            if(!token){
-                throw new HttpException(STATUS_CODES.UNAUTHORIZED,MESSAGES.ERROR.UNAUTHORIZED);
-            }
-            const requiredRole = 'user';
-            const userId: string | null = decodedToken(token,requiredRole);
+            const userId: string | null = req.user?._id;
             const courseId = req.params.courseId;
-            const response = await this.courseService.removeWishlist(userId,courseId);
+            const response = await this.wishlistService.removeWishlist(userId,courseId);
             res.status(201).json({
                 message:response
             });

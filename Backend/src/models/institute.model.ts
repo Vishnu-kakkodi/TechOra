@@ -1,5 +1,5 @@
 import { Schema, model, Document } from 'mongoose';
-import { InstituteDocument, InstituteStatus } from '../interfaces/institute.interface';
+import { InstituteDocument, InstituteStatus } from '../type/institute.type';
 
 const instituteSchema = new Schema<InstituteDocument>(
   {

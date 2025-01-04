@@ -1,7 +1,7 @@
 import { BaseRepository } from "./base.repository";
 import  {TutorModel}  from "../models/tutor.model";
-import { InstituteDocument } from "../interfaces/institute.interface";
-import { TutorDocument } from "../interfaces/tutor.interface";
+import { InstituteDocument } from "../type/institute.type";
+import { TutorDocument } from "../type/tutor.type";
 import mongoose from "mongoose";
 
 interface UpdateProfileData {

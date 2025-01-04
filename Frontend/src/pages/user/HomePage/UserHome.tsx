@@ -13,6 +13,11 @@ import ReactStars from 'react-stars';
 import LanguageSelectModal from '../../../components/modals/LanguageSelectModal';
 import Footer from '../../../components/footer/Footer';
 import Navbar from '../../../components/header/Navbar';
+import Hero from '../../../layout/userLayout/Hero';
+import Hero1 from '../../../layout/userLayout/Hero1';
+import Hero4 from '../../../layout/userLayout/Hero4';
+import Hero3 from '../../../layout/userLayout/Hero3';
+import Hero2 from '../../../layout/userLayout/Hero2';
 
 const UserHome = () => {
 
@@ -36,8 +41,8 @@ const UserHome = () => {
 
 
   const { data = {} } = useHomeDataQuery(null);
-  const courses = data.course || [] as any;
-
+  const courses = data.courses?.course || [] as any;
+  const winners = data.winners?.quizWinners || [] as any;
 
 
 
@@ -89,36 +94,16 @@ const UserHome = () => {
           <Navbar/>
 
           {/* Hero Section */}
-          <div className="relative flex justify-center items-center w-full min-h-[60vh] px-4 sm:px-0 md:px-8 lg:px-10">
-            {/* Image */}
-            <img
-              src={HOMEPIC}
-              alt="Description of the image"
-              className="w-full object-cover"
-            />
+          <Hero/>
 
-            {/* Text Overlay */}
-            <div className="absolute top-1/2 left-[10%] md:left-[200px] bg-white bg-opacity-90 transform -translate-y-1/2 text-black p-6 md:p-10 border-2 rounded-lg shadow-lg">
-              {/* Headline */}
-              <div className="text-xl md:text-3xl font-bold mb-2 text-center md:text-left">
-                Learn, practice, succeed
-              </div>
+          <Hero1/>
 
-              {/* Sub-Headline */}
-              <div className="text-lg md:text-2xl font-semibold mb-4 text-center md:text-left">
-                (and save)
-              </div>
-
-              {/* Description */}
-              <div className="text-sm md:text-base font-normal text-gray-700 text-center md:text-left">
-                <p>Courses for every step of your learning journey,</p>
-                <p>starting at ₹499. Sale ends December 31.</p>
-              </div>
-            </div>
-          </div>
+          
         </div>
 
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <Hero3 winners={winners} />
+
+        <div className="container mt-10 px-4 sm:px-6 lg:px-8">
           <div className="bg-black rounded-lg shadow-xl p-8 md:p-12 flex flex-col md:flex-row items-center justify-between">
             <div className="mb-6 md:mb-0 md:mr-8">
               <h2 className="text-3xl text-white md:text-4xl font-bold text-gray-800 mb-4">
@@ -239,6 +224,9 @@ const UserHome = () => {
             </div>
           </div>
         </div>
+
+        <Hero2/>
+
 
       </div>
 

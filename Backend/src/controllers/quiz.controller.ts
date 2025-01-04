@@ -1,16 +1,16 @@
 import { Request, Response, NextFunction } from "express";
-import { QuizService } from "../services/quiz.service";
-import {QuizDocument} from "../interfaces/quiz.interface";
+import {QuizDocument} from "../type/quiz.type";
 import { decodedToken } from "../helperFunction/authHelper";
 import STATUS_CODES from "../constants/statusCode";
 import MESSAGES from "../constants/message";
 import { HttpException } from "../middleware/error.middleware";
+import { IQuizService } from "../interfaces/IServiceInterface/IQuizService";
 
 
 export class QuizController {
-    private quizService: QuizService;
+    private quizService: IQuizService;
 
-    constructor(quizService: QuizService) {
+    constructor(quizService: IQuizService) {
         this.quizService = quizService;
     }
 
@@ -20,12 +20,7 @@ export class QuizController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const token = req.cookies.tutor.accessToken;
-            if(!token){
-                throw new HttpException(STATUS_CODES.UNAUTHORIZED,MESSAGES.ERROR.UNAUTHORIZED)
-            }
-            const requiredRole = "tutor";
-            const tutorId: string | null = decodedToken(token, requiredRole);
+            const tutorId: string | null = req.user?._id;
             const quizData: QuizDocument = req.body;
             if (!quizData) {
                 throw new HttpException(STATUS_CODES.BAD_REQUEST, MESSAGES.ERROR.BAD_REQUEST)
@@ -75,12 +70,7 @@ export class QuizController {
         next: NextFunction
     ): Promise<void> =>{
         try{
-            const token = req.cookies.institute.accessToken;
-            if(!token){
-                throw new HttpException(STATUS_CODES.UNAUTHORIZED,MESSAGES.ERROR.UNAUTHORIZED)
-            }
-            const requiredRole = "institute";
-            const institutionId: string | null = decodedToken(token, requiredRole);
+            const institutionId: string | null = req.user?._id;
             const page = parseInt(req.query.page as string) || 1;
             const limit = parseInt(req.query.limit as string) || 4;
             const search = (req.query.search as string);
@@ -110,12 +100,7 @@ export class QuizController {
         next: NextFunction
     ): Promise<void> =>{
         try{
-            const token = req.cookies.tutor.accessToken;
-            if(!token){
-                throw new HttpException(STATUS_CODES.UNAUTHORIZED,MESSAGES.ERROR.UNAUTHORIZED)
-            }
-            const requiredRole = "tutor";
-            const tutorId: string | null = decodedToken(token, requiredRole);
+            const tutorId: string | null = req.user?._id;
             const page = parseInt(req.query.page as string) || 1;
             const limit = parseInt(req.query.limit as string) || 4;
             const search = (req.query.search as string);
@@ -184,13 +169,7 @@ export class QuizController {
         next: NextFunction
     ): Promise<void>=>{
         try{
-            const Token = req.cookies.user
-            const token = Token.accessToken;
-            if(!token){
-                throw new HttpException(STATUS_CODES.UNAUTHORIZED, MESSAGES.ERROR.UNAUTHORIZED)
-            }
-            const requiredRole = "user";
-            const userId: string | null = decodedToken(token,requiredRole);
+            const userId: string | null = req.user?._id;
             const mark: string = req.body.mark;
             const quizId: string = req.body.quizId;
             await this.quizService.quizResult(userId,mark,quizId);

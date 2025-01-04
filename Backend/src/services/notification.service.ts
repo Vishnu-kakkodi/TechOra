@@ -1,16 +1,17 @@
 import { helperFunction } from "../helperFunction/authHelper";
 import { HttpException } from "../middleware/error.middleware";
 import { TutorRepository } from "../repositories/tutor.repository";
-import { TutorDocument } from "../interfaces/tutor.interface";
+import { TutorDocument } from "../type/tutor.type";
 import STATUS_CODES from "../constants/statusCode";
 import MESSAGES from "../constants/message";
-import { IUserDocument } from "../interfaces/user.interface";
+import { IUserDocument } from "../type/user.type";
 import { UserRepository } from "../repositories/user.repository";
 import mongoose from "mongoose";
 import { NotificationRepository } from "../repositories/notification.repository";
-import { INotification } from "../interfaces/notification.interface";
+import { INotification } from "../type/notification.type";
+import { INotificationService } from "../interfaces/IServiceInterface/INotificationService";
 
-export class NotificationService {
+class NotificationService implements INotificationService {
     private notificationRepository: NotificationRepository;
 
     constructor(notificationRepository: NotificationRepository) {
@@ -25,7 +26,7 @@ export class NotificationService {
         }
     }
 
-    async notificationRead(userId:string,notificationId:string) {
+    async notificationRead(userId:string,notificationId:string): Promise<void> {
         try {
             const id = new mongoose.Types.ObjectId(userId);
             const notification = await this.notificationRepository.findOne(notificationId);
@@ -37,3 +38,5 @@ export class NotificationService {
     }
       
 }
+
+export default NotificationService

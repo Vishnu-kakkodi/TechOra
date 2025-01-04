@@ -1,15 +1,16 @@
 import { HttpException } from "../middleware/error.middleware";
 import mongoose from "mongoose";
 import { QuizRepository } from "../repositories/quiz.repository";
-import { QuizDocument } from "../interfaces/quiz.interface";
+import { QuizDocument } from "../type/quiz.type";
 import STATUS_CODES from "../constants/statusCode";
 import MESSAGES from "../constants/message";
 import { UserRepository } from "../repositories/user.repository";
 import { TutorRepository } from "../repositories/tutor.repository";
+import { IQuizService } from "../interfaces/IServiceInterface/IQuizService";
 
 
 
-export class QuizService {
+class QuizService implements IQuizService {
     private quizRepository: QuizRepository;
     private userRepository: UserRepository;
     private tutorRepository: TutorRepository;
@@ -23,7 +24,7 @@ export class QuizService {
     }
 
 
-    async createQuiz(quizData: QuizDocument,tutorId: string): Promise<any> {
+    async createQuiz(quizData: QuizDocument,tutorId: string): Promise<unknown> {
         try {
             if(!tutorId){
                 throw new HttpException(STATUS_CODES.BAD_REQUEST, MESSAGES.ERROR.BAD_REQUEST)
@@ -239,3 +240,5 @@ export class QuizService {
 
 
 }
+
+export default QuizService;

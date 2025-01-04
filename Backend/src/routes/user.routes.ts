@@ -1,29 +1,31 @@
 import { Router } from "express";
 import { UserController } from "../controllers/user.controller";
-import { UserService } from "../services/user.service";
 import { UserRepository } from "../repositories/user.repository";
 import { authMiddleware } from '../middleware/auth.middleware';
 import { CartController } from "../controllers/cart.controller";
-import { CourseService } from "../services/course.service";
 import { CourseRepository } from "../repositories/course.repository";
 import { CartRepository } from "../repositories/cart.repository";
 import { CourseController } from "../controllers/course.controller";
-import { OrderService } from "../services/order.service";
 import { OrderRepository } from "../repositories/order.repository";
 import { OrderController } from "../controllers/order.controller";
 import { QuizController } from "../controllers/quiz.controller";
-import { QuizService } from "../services/quiz.service";
 import { QuizRepository } from "../repositories/quiz.repository";
 import upload from "../bucketConfig";
 import { ReviewRepository } from "../repositories/review.repository";
-import { ReviewService } from "../services/review.service";
 import { ReviewController } from "../controllers/review.controller";
 import { TutorRepository } from "../repositories/tutor.repository";
 import { WishlistController } from "../controllers/wishlist.controller";
 import { WishlistRepository } from "../repositories/wishlist.repository";
 import { NotificationRepository } from "../repositories/notification.repository";
-import { NotificationService } from "../services/notification.service";
 import { NotificationController } from "../controllers/notification.controller";
+import UserService from "../services/user.service";
+import CartService from "../services/cart.service";
+import WishlistService from "../services/wishlist.service";
+import CourseService from "../services/course.service";
+import NotificationService from "../services/notification.service";
+import QuizService from "../services/quiz.service";
+import OrderService from "../services/order.service";
+import ReviewService from "../services/review.service";
 
 
 
@@ -34,16 +36,18 @@ const cartRepository = new CartRepository();
 const tutorRepository = new TutorRepository();
 const wishlistRepository = new WishlistRepository();
 const notificationRepository = new NotificationRepository();
+const userService = new UserService(userRepository,courseRepository);
+const cartService = new CartService(courseRepository, cartRepository);
+const wishlistService = new WishlistService(courseRepository, wishlistRepository);
+const courseService = new CourseService(courseRepository, cartRepository, userRepository,tutorRepository,wishlistRepository)
 const notificationService = new NotificationService(notificationRepository);
 const notificationController = new NotificationController(notificationService);
-const userService = new UserService(userRepository,courseRepository);
 const userController = new UserController(userService);
 const quizRepository = new QuizRepository()
 const quizService = new QuizService(quizRepository,userRepository,tutorRepository)
 const quizController = new QuizController(quizService)
-const courseService = new CourseService(courseRepository, cartRepository, userRepository,tutorRepository,wishlistRepository)
-const cartController = new CartController(courseService)
-const wishlistController = new WishlistController(courseService)
+const cartController = new CartController(cartService)
+const wishlistController = new WishlistController(wishlistService)
 const courseController = new CourseController(courseService,quizService)
 const orderRepository = new OrderRepository()
 const orderService = new OrderService(orderRepository,cartRepository,userRepository,courseRepository)

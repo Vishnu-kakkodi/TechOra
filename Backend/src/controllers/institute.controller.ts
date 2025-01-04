@@ -1,14 +1,17 @@
 import { Request, Response, NextFunction } from "express";
-import { InstituteService } from "../services/institute.service";
 import { CreateUserDto, CreateTutorDto } from "../dtos/institute.dtos";
 import { HttpException } from "../middleware/error.middleware";
 import { setCookie } from "../helperFunction/cookieUtils";
 import { decodedToken } from "../helperFunction/authHelper";
 import STATUS_CODES from "../constants/statusCode";
 import MESSAGES from "../constants/message";
+import { IInstituteService } from "../interfaces/IServiceInterface/IInsrituteService";
 
 export class InstitutionController{
-    constructor(private readonly instituteService: InstituteService){}
+    private instituteService: IInstituteService
+    constructor(instituteService: IInstituteService){
+        this.instituteService = instituteService
+    }
     async trackStatus(
         req: Request<{}, {}>,
         res: Response,
@@ -146,12 +149,7 @@ export class InstitutionController{
         next: NextFunction
     ): Promise<void>{
         try{
-            const token = req.cookies.institute.accessToken;
-            if(!token){
-                throw new HttpException(STATUS_CODES.UNAUTHORIZED,MESSAGES.ERROR.UNAUTHORIZED)
-            }
-            const requiredRole = "institute";
-            const institutionId: string | null = decodedToken(token, requiredRole);
+            const institutionId: string | null = req.user?._id;
             const tutorDetail = req.body;
             const tutorData = {
                 ...tutorDetail,
@@ -174,12 +172,7 @@ export class InstitutionController{
         next: NextFunction
     ): Promise<void>{
         try{
-            const token = req.cookies.institute.accessToken;
-            if(!token){
-                throw new HttpException(STATUS_CODES.UNAUTHORIZED,MESSAGES.ERROR.UNAUTHORIZED)
-            }
-            const requiredRole = "institute";
-            const institutionId: string | null = decodedToken(token, requiredRole);
+            const institutionId: string | null = req.user?._id;
             const institutes = await this.instituteService.tutorList(institutionId);
             if (!institutes) {
                 throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
@@ -192,43 +185,13 @@ export class InstitutionController{
         }
     }
 
-    async createCourse(
-        req: Request,
-        res: Response,
-        next: NextFunction
-    ): Promise<void> {
-        try {
-            const courseData = req.body;
-            if (!courseData) {
-                throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
-              }
-            if (req.file) {
-                courseData.thumbnailUrl = (req.file as any).location;
-            } else {
-                throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
-            }            
-            res.status(201).json({
-                status: 'success',
-                message: 'Course created successfully', 
-                data: courseData
-            });
-        } catch (error) {
-            next(error)
-        }
-    }
-
     async addDepartment(
         req: Request,
         res: Response,
         next: NextFunction
     ): Promise<void> {
         try{
-            const token = req.cookies.institute.accessToken;
-            if(!token){
-                throw new HttpException(STATUS_CODES.UNAUTHORIZED,MESSAGES.ERROR.UNAUTHORIZED)
-            }
-            const requiredRole = "institute";
-            const institutionId: string | null = decodedToken(token, requiredRole);
+            const institutionId: string | null = req.user?._id;
             const institutes = await this.instituteService.tutorList(institutionId);
             if (!institutes) {
                 throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
@@ -249,12 +212,7 @@ export class InstitutionController{
     ): Promise<void>
 {
     try{
-        const token = req.cookies.institute.accessToken;
-        if(!token){
-            throw new HttpException(STATUS_CODES.UNAUTHORIZED,MESSAGES.ERROR.UNAUTHORIZED)
-        }
-        const requiredRole = "institute";
-        const institutionId: string | null = decodedToken(token, requiredRole);
+        const institutionId: string | null = req.user?._id;
         const institutes = await this.instituteService.tutorList(institutionId);
         if (!institutes) {
             throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)

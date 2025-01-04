@@ -1,16 +1,16 @@
 import { Request, Response, NextFunction } from "express";
-import { CourseService } from "../services/course.service";
 import { decodedToken } from "../helperFunction/authHelper";
 import { HttpException } from "../middleware/error.middleware";
 import STATUS_CODES from "../constants/statusCode";
 import MESSAGES from "../constants/message";
+import { ICartService } from "../interfaces/IServiceInterface/ICartService";
 
 
 export class CartController {
-    private courseService: CourseService;
+    private cartService: ICartService ;
 
-    constructor(courseService: CourseService) {
-        this.courseService = courseService
+    constructor(cartService: ICartService) {
+        this.cartService = cartService
     }
 
     public addToCart = async (
@@ -19,19 +19,12 @@ export class CartController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const Token = req.cookies.user
-            const token = Token.accessToken;
-            if(!token){
-                throw new HttpException(STATUS_CODES.UNAUTHORIZED,MESSAGES.ERROR.UNAUTHORIZED)
-            }
-            const requiredRole = "user";
-            const userId: string | null = decodedToken(token, requiredRole);
+            const userId: string = req.user?._id
             const { courseId } = req.body;
-            const response = await this.courseService.addToCart(userId, courseId);
+            const response = await this.cartService.addToCart(userId, courseId);
             res.status(201).json({
                 message: response,
             });
-
         } catch (error) {
             next(error)
         }
@@ -43,14 +36,8 @@ export class CartController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const Token = req.cookies.user
-            const token = Token.accessToken;
-            const requiredRole = "user";
-            if(!token){
-                throw new HttpException(STATUS_CODES.UNAUTHORIZED,MESSAGES.ERROR.UNAUTHORIZED)
-            }
-            const userId: string | null = decodedToken(token, requiredRole);
-            const items = await this.courseService.getCartItems(userId);
+            const userId: string = req.user?._id
+            const items = await this.cartService.getCartItems(userId);
             if (!items) {
                 throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
               }
@@ -70,15 +57,9 @@ export class CartController {
         next: NextFunction
     ): Promise<void> => {
         try {            
-            const Token = req.cookies.user
-            const token = Token.accessToken;
-            if(!token){
-                throw new HttpException(STATUS_CODES.UNAUTHORIZED,MESSAGES.ERROR.UNAUTHORIZED)
-            }
-            const requiredRole = "user";
-            const userId: string | null = decodedToken(token, requiredRole);
+            const userId: string = req.user?._id
             const { courseId } = req.body;
-            await this.courseService.removeCart(userId, courseId);
+            await this.cartService.removeCart(userId, courseId);
             res.status(201).json({
                 message: "Cart item removed successfully",
             });

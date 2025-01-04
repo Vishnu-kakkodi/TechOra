@@ -15,6 +15,11 @@ import OtpModal from '../../../components/modals/OtpModal';
 import LanguageSelectModal from '../../../components/modals/LanguageSelectModal';
 import Footer from '../../../components/footer/Footer';
 import { useHomeDataQuery } from '../../../store/slices/userSlice';
+import Hero1 from '../../../layout/userLayout/Hero1';
+import Hero2 from '../../../layout/userLayout/Hero2';
+import Hero3 from '../../../layout/userLayout/Hero3';
+import Hero4 from '../../../layout/userLayout/Hero4';
+
 
 
 interface LoginButtonProps{
@@ -61,7 +66,8 @@ const LandingPage = () => {
 
 
   const { data = {} } = useHomeDataQuery(null);
-  const courses = data.course || [] as any;
+  const courses = data.courses?.course || [] as any;
+  const winners = data.winners?.quizWinners || [] as any;
 
   const handleForgotPassword = () => {
     setLoginModalOpen(false);
@@ -88,7 +94,6 @@ const LandingPage = () => {
   return (
     <>
       <div>
-        {/* Hero Section with Background Image */}
         <div className="bg-cover bg-center bg-no-repeat min-h-screen flex flex-col">
           <header className="w-full top-0 shadow-lg bg-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -138,114 +143,20 @@ const LandingPage = () => {
           </header>
 
           <Hero/>
+
+          <Hero1/>
         </div>
-
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-black rounded-lg shadow-xl p-8 md:p-12 flex flex-col md:flex-row items-center justify-between">
-            <div className="mb-6 md:mb-0 md:mr-8">
-              <h2 className="text-3xl text-white md:text-4xl font-bold text-gray-800 mb-4">
-                Test Your Knowledge!
-              </h2>
-              <p className="text-lg text-white mb-6">
-                Challenge yourself with our interactive quizzes and climb the leaderboard.
-              </p>
-            </div>
-            <div className="w-full md:w-1/3">
-              <img
-                src={QuizPic}
-                alt="Quiz Illustration"
-                className="w-full h-auto"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Courses Section */}
-        <div className="bg-gray-50 py-12 md:py-20">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-2xl md:text-4xl font-bold text-center mb-8 md:mb-16 text-gray-800">
-              Popular Courses
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-8">
-              {courses.map((course:any) => (
-                <div
-                  key={course.id}
-                  className="bg-white border border-gray-200 overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2"
-                >
-                  <div className="relative">
-                    <img
-                      src={course.thumbnail}
-                      alt={course.title}
-                      className="w-full h-44 md:h-52 object-cover"
-                    />
-                  </div>
-
-                  <div className="p-4 md:p-6">
-                    <div className="mb-3">
-                      <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-1 truncate">
-                        {course.title}
-                      </h3>
-                      <div className="flex items-center text-gray-600 text-xs md:text-sm">
-                        <User size={14} className="mr-2 text-gray-500" />
-                        <span>{course.tutorId.tutorname}</span>
-                      </div>
-                    </div>
-
-                    <p className="text-gray-600 text-sm mb-3 md:mb-4 line-clamp-3">
-                      {course.description}
-                    </p>
-
-                    <div className="flex items-center space-x-2 mb-3 md:mb-4">
-                      <ReactStars
-                        count={5}
-                        value={course.averageRating}
-                        size={18}
-                        edit={false}
-                        color1={"#d1d5db"}
-                        color2={"#facc15"}
-                      />
-                      <span className="text-yellow-700 font-semibold text-sm">
-                        {course.averageRating} ({course.totalReviews} reviews)
-                      </span>
-                    </div>
-
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs md:text-sm text-gray-700 mb-3">
-                      <div className="flex items-center">
-                        <Clock size={14} className="mr-1 text-blue-500" />
-                        <span>{course.duration} Weeks</span>
-                      </div>
-                      <div className="flex items-center">
-                        <BookOpen size={14} className="mr-1 text-green-500" />
-                        <span>{course.level}</span>
-                      </div>
-                      <div className="flex items-center">
-                        <User size={14} className="mr-1 text-purple-500" />
-                        <span>{course.enrolledStudents} Enrolled</span>
-                      </div>
-                    </div>
-
-                    <div className="flex justify-between items-center">
-                      <div className="text-base md:text-lg font-bold text-blue-700">
-                        ₹{course.price.toFixed(2)}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+        <Hero3 winners={winners} />
+        <Hero4 courses={courses}/>
+        <Hero2/>
       </div>
-
       <Footer/>
-
       {isSignUpModalOpen && (
         <SignUpModal
           setSignUpModalOpen={setSignUpModalOpen}
           setOtpModalOpen={() => handleOtpModalOpen('signup')}
         />
       )}
-
       {isLoginModalOpen && (
         <LoginModal
           setLoginModalOpen={setLoginModalOpen}
@@ -253,7 +164,6 @@ const LandingPage = () => {
           onForgotPassword={handleForgotPassword}
         />
       )}
-
       {isEmailVerifyOpen && (
         <EmailVerify
           setEmailVerify={setEmailVerifyOpen}
@@ -261,21 +171,18 @@ const LandingPage = () => {
           mode="user"
         />
       )}
-
       {isOtpModalOpen && (
         <OtpModal
           setOtpModalOpen={setOtpModalOpen}
           mode={otpMode}
         />
       )}
-
       {isLanguageModalOpen && (
         <LanguageSelectModal
           setLanguageModalOpen={setLanguageModalOpen}
         />
       )}
     </>
-
   );
 };
 

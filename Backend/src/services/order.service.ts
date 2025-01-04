@@ -1,4 +1,4 @@
-import { OrderDocument } from "../interfaces/order.interface";
+import { OrderDocument } from "../type/order.type";
 import { CartRepository } from "../repositories/cart.repository";
 import { OrderRepository } from "../repositories/order.repository";
 import mongoose from 'mongoose';
@@ -7,9 +7,10 @@ import { HttpException } from "../middleware/error.middleware";
 import STATUS_CODES from "../constants/statusCode";
 import MESSAGES from "../constants/message";
 import { CourseRepository } from "../repositories/course.repository";
+import { IOrderService } from "../interfaces/IServiceInterface/IOrderService";
 
 
-export class OrderService {
+class OrderService implements IOrderService {
     constructor(
         private readonly orderRepository: OrderRepository,
         private readonly cartRepository: CartRepository,
@@ -29,7 +30,7 @@ export class OrderService {
         }
     }
 
-    async createOrder(orderId: string, userId: string, orderItems: Array<{ courseId: string, price: number }>, total: number) {
+    async createOrder(orderId: string, userId: string, orderItems: Array<{ courseId: string, price: number }>, total: number): Promise<OrderDocument> {
         try {
             return this.orderRepository.create({
                 orderId,
@@ -117,4 +118,7 @@ export class OrderService {
             throw new HttpException(STATUS_CODES.SERVER_ERROR, MESSAGES.ERROR.SERVER_ERROR)
         }
     }
+
 }
+
+export default OrderService;

@@ -1,5 +1,5 @@
 import mongoose, { Schema, Document, Types } from 'mongoose';
-import { INotification } from '../interfaces/notification.interface';
+import { INotification } from '../type/notification.type';
 
 
 

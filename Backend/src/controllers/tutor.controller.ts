@@ -4,10 +4,13 @@ import { setCookie } from "../helperFunction/cookieUtils";
 import { decodedToken } from "../helperFunction/authHelper";
 import STATUS_CODES from "../constants/statusCode";
 import MESSAGES from "../constants/message";
-import { TutorService } from "../services/tutor.service";
+import { ITutorService } from "../interfaces/IServiceInterface/ITutorService";
 
 export class TutorController{
-    constructor(private readonly tutorService: TutorService){}
+    private tutorService: ITutorService
+    constructor(tutorService: ITutorService){
+        this.tutorService = tutorService
+    }
     async tutorLogin(
         req: Request<{ tutorEmail: string, password: string }>,
         res: Response,
@@ -36,12 +39,7 @@ export class TutorController{
         next: NextFunction
     ): Promise<void>{
         try{
-            const token = req.cookies.tutor.accessToken;
-            if(!token){
-                throw new HttpException(STATUS_CODES.UNAUTHORIZED,MESSAGES.ERROR.UNAUTHORIZED)
-            }
-            const requiredRole = "tutor";
-            const tutorId: string | null = decodedToken(token, requiredRole);
+            const tutorId: string | null = req.user?._id;
             let fileLocation = (req.file as any).location; 
             const tutor = await this.tutorService.uploadPhoto(tutorId,fileLocation);
             res.status(201).json({
@@ -60,12 +58,7 @@ export class TutorController{
         next: NextFunction
     ): Promise<void>{
         try{
-            const token = req.cookies.tutor.accessToken;
-            if(!token){
-                throw new HttpException(STATUS_CODES.UNAUTHORIZED,MESSAGES.ERROR.UNAUTHORIZED)
-            }
-            const requiredRole = "tutor";
-            const tutorId: string | null = decodedToken(token, requiredRole);
+            const tutorId: string | null = req.user?._id;
             const { tutorname, experiance, education } = req.body;
             const updatedTutor = await this.tutorService.updateProfile(tutorId, {
                 tutorname,
@@ -87,12 +80,7 @@ export class TutorController{
         next: NextFunction
     ): Promise<void>{
         try{
-            const token = req.cookies.tutor.accessToken;
-            if(!token){
-                throw new HttpException(STATUS_CODES.UNAUTHORIZED,MESSAGES.ERROR.UNAUTHORIZED)
-            }
-            const requiredRole = "tutor";
-            const tutorId: string | null = decodedToken(token, requiredRole);
+            const tutorId: string | null = req.user?._id;
             const page = parseInt(req.query.page as string) || 1;
             const limit = parseInt(req.query.limit as string) || 4;
             const search = (req.query.search as string);
@@ -118,12 +106,7 @@ export class TutorController{
         next: NextFunction
     ): Promise<void>{
         try{
-            const token = req.cookies.tutor.accessToken;
-            if(!token){
-                throw new HttpException(STATUS_CODES.UNAUTHORIZED,MESSAGES.ERROR.UNAUTHORIZED)
-            }
-            const requiredRole = "tutor";
-            const tutorId: string | null = decodedToken(token, requiredRole);
+            const tutorId: string | null = req.user?._id;
             const data = await this.tutorService.recentActivity(tutorId);
             if (!data) {
                 throw new HttpException(STATUS_CODES.BAD_REQUEST, MESSAGES.ERROR.BAD_REQUEST)

@@ -1,8 +1,8 @@
 import { BaseRepository } from "./base.repository";
 import { ReviewModel } from "../models/review.model";
-import { CartDocument } from "../interfaces/cart.interface";
+import { CartDocument } from "../type/cart.type";
 import mongoose from 'mongoose';
-import { ReviewDocument } from "../interfaces/review.interface";
+import { ReviewDocument } from "../type/review.type";
 import { Types } from 'mongoose';
 
 
