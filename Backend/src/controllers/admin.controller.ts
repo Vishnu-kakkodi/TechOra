@@ -3,6 +3,8 @@ import { HttpException } from "../middleware/error.middleware";
 import { setCookie } from "../helperFunction/cookieUtils";
 import { GetObjectOutput } from 'aws-sdk/clients/s3';
 import { IAdminService } from "../interfaces/IServiceInterface/IAdminService";
+import STATUS_CODES from "../constants/statusCode";
+import MESSAGES from "../constants/message";
 
 
 
@@ -29,7 +31,7 @@ export class AdminController {
             const { adminEmail, adminPassword } = req.body;
             const admin = await this.adminService.verifyAdminCredentials(adminEmail, adminPassword);
             if (!admin) {
-                throw new HttpException(401, "Unauthorized: Invalid admin credentials");
+                res.json({STATUS:STATUS_CODES.UNAUTHORIZED,MESSAGE:MESSAGES.ERROR.UNAUTHORIZED});
             }
             const { accessToken, refreshToken, ...adminMail } = admin;
             const Token = {
@@ -37,7 +39,7 @@ export class AdminController {
                 refreshToken: refreshToken
             }
             setCookie(res,'admin',Token);
-            res.status(200).json({ admin, message: "Admin verified successfully" });
+            res.status(200).json({ status:STATUS_CODES.SUCCESS,message:MESSAGES.SUCCESS.LOGIN_SUCCESS,data:admin });
         } catch (error) {
             next(error);
         }
@@ -53,10 +55,9 @@ export class AdminController {
             const limit = parseInt(req.query.limit as string) || 4;
             const search = (req.query.search as string);
             const filter = (req.query.filter as string);
-            console.log(page,limit,search,"Field")
             const {users,total} = await this.adminService.getUser(page,limit,search,filter);
             if (!users) {
-                throw new HttpException(404, "No users found");
+                throw new HttpException(STATUS_CODES.NOT_FOUND,MESSAGES.ERROR.USER_NOT_FOUND);
             }
             res.json({
                 users,
@@ -83,7 +84,7 @@ export class AdminController {
             const filter = (req.query.filter as string);
             const {institutes,total} = await this.adminService.getInstitutes(page,limit,search,filter);
             if (!institutes || institutes.length === 0) {
-                throw new HttpException(404, "No users found");
+                throw new HttpException(STATUS_CODES.NOT_FOUND,MESSAGES.ERROR.INSTITUTE_NOT_FOUND);
             }
             console.log(institutes)
             res.json({
@@ -107,8 +108,9 @@ export class AdminController {
             const userId: string = req.params.userId;
             const updatedUser = await this.adminService.userAction(userId);
             res.status(200).json({
-                message: "User status updated successfully",
-                user: updatedUser,
+                status: STATUS_CODES.SUCCESS,
+                message: MESSAGES.SUCCESS.USER_UPDATED,
+                data: updatedUser,
             });
         } catch (error) {
             next(error);
@@ -124,8 +126,9 @@ export class AdminController {
             const instituteId = req.query.id as string;
             const updatedInstitute = await this.adminService.InstituteAction(instituteId);
             res.status(200).json({
-                message: "Institute approved successfully",
-                institute: updatedInstitute,
+                status: STATUS_CODES.SUCCESS,
+                message: MESSAGES.SUCCESS.INSTITUTE_APPROVED,
+                data: updatedInstitute,
             });
         } catch (error) {
             next(error)
@@ -143,8 +146,9 @@ export class AdminController {
             const { rejectReason } = req.body
             const updatedInstitute = await this.adminService.InstituteReject(instituteId, rejectReason);
             res.status(200).json({
-                message: "Application rejected",
-                institute: updatedInstitute,
+                status: STATUS_CODES.SUCCESS,
+                message: MESSAGES.ERROR.APPLICATION_REJECTED,
+                data: updatedInstitute,
             });
         } catch (error) {
             next(error)
@@ -160,8 +164,9 @@ export class AdminController {
             const instituteId = req.query.id as string;
             const updatedInstitute = await this.adminService.InstituteBlock(instituteId);
             res.status(200).json({
-                message: "Institute Blocked",
-                institute: updatedInstitute,
+                status: STATUS_CODES.SUCCESS,
+                message: MESSAGES.SUCCESS.BLOCKED,
+                data: updatedInstitute,
             });
         } catch (error) {
             next(error)
@@ -177,8 +182,9 @@ export class AdminController {
             const instituteId = req.query.id as string;
             const updatedInstitute = await this.adminService.InstituteUnBlock(instituteId);
             res.status(200).json({
-                message: "Institute Unblocked",
-                institute: updatedInstitute,
+                status: STATUS_CODES.SUCCESS,
+                message: MESSAGES.SUCCESS.BLOCKED,
+                data: updatedInstitute,
             });
         } catch (error) {
             next(error)
@@ -193,17 +199,17 @@ export class AdminController {
         try {
             const url = req.query.url as string;
             if (!url) {
-                res.status(400).json({ error: 'URL is required' });
+                res.status(STATUS_CODES.BAD_REQUEST).json({ MESSAGE:MESSAGES.ERROR.DATA_NOTFOUND });
                 return;
             }
             const key = this.getKeyFromUrl(url);
             if (!key) {
-                res.status(400).json({ error: 'Invalid URL format' });
+                res.status(STATUS_CODES.BAD_REQUEST).json({ MESSAGE: MESSAGES.ERROR.INVALID_FORMAT});
                 return;
             }
             const data = await this.adminService.downloadDoc(url);
             if (!data.Body) {
-                res.status(404).json({ error: 'Document not found' });
+                res.status(STATUS_CODES.NOT_FOUND).json({ MESSAGE:MESSAGES.ERROR.DATA_NOTFOUND });
                 return;
             }
             res.setHeader('Content-Type', data.ContentType || 'application/pdf');
@@ -222,10 +228,8 @@ export class AdminController {
             const pathname = urlObj.pathname.startsWith('/')
                 ? urlObj.pathname.slice(1)
                 : urlObj.pathname;
-            console.log(pathname)
             return pathname
         } catch (error) {
-            console.error('Error parsing URL:', error);
             return null;
         }
     }
@@ -239,7 +243,8 @@ export class AdminController {
             const instituteId = req.query.id as string;
             const institute = await this.adminService.InstituteView(instituteId);
             res.status(200).json({
-                message: "Data fetched successfully",
+                status: STATUS_CODES.SUCCESS,
+                message: MESSAGES.SUCCESS.DATA_RETRIEVED,
                 data: institute,
             });
         } catch (error) {
@@ -261,8 +266,8 @@ export class AdminController {
             });
 
             res.status(200).json({
-                success: true,
-                message: 'Logged out successfully'
+                status:STATUS_CODES.SUCCESS,
+                message: MESSAGES.SUCCESS.LOGOUT_SUCCESS
             });
         } catch (error) {
             next(error)

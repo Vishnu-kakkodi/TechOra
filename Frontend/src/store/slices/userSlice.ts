@@ -6,6 +6,7 @@ import { cartResponse } from '../../types/cartType';
 import { OrderResponse } from '../../types/userSide/orderType';
 import { CourseDetailResponse, CourseListResponse } from '../../types/courseType';
 import { RootState } from '..';
+import { ApiResponse } from 'src/types/responseType';
 
 
 export type UserRole = 'user' | 'admin' | 'institute' | 'tutor';
@@ -214,7 +215,7 @@ export const userSlice = createApi({
     }),
 
 
-    removeCart: builder.mutation<string, { courseId: string }>({
+    removeCart: builder.mutation<ApiResponse<null>, { courseId: string }>({
       query: ({courseId}) =>({
         url: '/users/remove-cart',
         method: 'PATCH',
@@ -283,7 +284,7 @@ export const userSlice = createApi({
       providesTags: ['User'],
      }),
 
-     coursedetail: builder.query<CourseDetailResponse, string>({
+     coursedetail: builder.query<ApiResponse<null>, string>({
       query: (courseId) =>({
         url: `/users/course-detail/${courseId}`,
         method:'GET',

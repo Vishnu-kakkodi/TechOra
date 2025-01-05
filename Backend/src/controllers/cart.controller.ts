@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from "express";
-import { decodedToken } from "../helperFunction/authHelper";
 import { HttpException } from "../middleware/error.middleware";
 import STATUS_CODES from "../constants/statusCode";
 import MESSAGES from "../constants/message";
@@ -19,11 +18,13 @@ export class CartController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const userId: string = req.user?._id
+            const userId: string = req.user?._id;
             const { courseId } = req.body;
             const response = await this.cartService.addToCart(userId, courseId);
             res.status(201).json({
-                message: response,
+                status: STATUS_CODES.SUCCESS,
+                message: MESSAGES.SUCCESS.ADD_TO_CART,
+                data: response,
             });
         } catch (error) {
             next(error)
@@ -42,8 +43,9 @@ export class CartController {
                 throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
               }
             res.status(201).json({
-                message: "Cart item fetched successfully",
-                Data: items
+                status: STATUS_CODES.SUCCESS,
+                message: MESSAGES.SUCCESS.DATA_RETRIEVED,
+                data: items
             });
 
         } catch (error) {
@@ -61,7 +63,8 @@ export class CartController {
             const { courseId } = req.body;
             await this.cartService.removeCart(userId, courseId);
             res.status(201).json({
-                message: "Cart item removed successfully",
+                status: STATUS_CODES.NOT_FOUND,
+                message: MESSAGES.SUCCESS.REMOVE_CART
             });
 
         } catch (error) {

@@ -12,6 +12,7 @@ import {
 import profile from '../../assets/frontEnd/ProfilePic.png'
 import TutorSidebar from '../../components/sidebar/tutorSidebar';
 import { useCoursedetailQuery } from '../../store/slices/tutorSlice';
+import { CourseDocument, Module } from 'src/types/courseType';
 
 const CourseDetail = () => {
   const { courseId } = useParams<{ courseId: string }>();
@@ -30,11 +31,11 @@ const CourseDetail = () => {
     return <div>Error fetching course data.</div>;
   }
 
-  if (!courseData || !courseData.Data) {
+  if (!courseData || !courseData.data) {
     return <div>No course data available.</div>;
   }
 
-  const course = courseData.Data;
+  const course: CourseDocument = courseData?.data  
 
   const toggleModule = (moduleId: number) => {
     setActiveModule(activeModule === moduleId ? null : moduleId);
@@ -100,11 +101,11 @@ const CourseDetail = () => {
 
           <div className="space-y-4">
             <h2 className="text-xl font-bold mb-4">Course Modules</h2>
-            {course.modules.map((module: any) => (
-              <div key={module.id} className="bg-white rounded-lg shadow-md overflow-hidden">
+            {course.modules.map((module: Module) => (
+              <div key={module._id} className="bg-white rounded-lg shadow-md overflow-hidden">
                 <div 
                   className="p-4 cursor-pointer hover:bg-gray-50"
-                  onClick={() => toggleModule(module.id)}
+                  onClick={() => toggleModule(Number(module._id))}
                 >
                   <div className="flex justify-between items-center">
                     <div className="flex items-center space-x-4">

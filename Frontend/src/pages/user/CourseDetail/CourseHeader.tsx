@@ -1,9 +1,10 @@
 import React from 'react';
 import { ArrowLeft, BookOpen, Clock, MessageCircle, Users } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { CourseDocument } from 'src/types/courseType';
 
 interface CourseHeaderProps {
-  course: any;
+  course: CourseDocument;
   courseIDs: string[];
   courseId: string | undefined;
   setIsChatOpen: (isOpen: boolean) => void;
@@ -21,7 +22,7 @@ const CourseHeader: React.FC<CourseHeaderProps> = ({ course, courseIDs, courseId
           Back to Course List
         </button>
 
-        {courseIDs.includes(courseId as string) && (
+        {courseIDs?.includes(courseId as string) && (
           <motion.button
             className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-full font-semibold shadow-lg overflow-hidden transition-colors"
             whileHover={{ scale: 1.05 }}
@@ -38,7 +39,7 @@ const CourseHeader: React.FC<CourseHeaderProps> = ({ course, courseIDs, courseId
       <div className="flex flex-wrap gap-4 text-sm text-gray-600">
         <span className="flex items-center"><Clock className="w-4 h-4 mr-1" /> {course?.duration} weeks</span>
         <span className="flex items-center"><Users className="w-4 h-4 mr-1" /> {course?.enrolledStudents} students</span>
-        <span className="flex items-center"><BookOpen className="w-4 h-4 mr-1" /> {course?.level}</span>
+        <span className="flex items-center"><BookOpen className="w-4 h-4 mr-1" /> Medium</span>
       </div>
     </div>
   );

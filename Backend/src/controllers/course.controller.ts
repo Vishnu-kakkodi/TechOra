@@ -10,6 +10,7 @@ import { IQuizService } from "../interfaces/IServiceInterface/IQuizService";
 
 export class CourseController {
     private courseService: ICourseService;
+
     private quizService: IQuizService;
 
     constructor(courseService: ICourseService, quizService: IQuizService) {
@@ -37,12 +38,12 @@ export class CourseController {
             }
 
             if (!courseData.institutionId) {
-                throw new HttpException(400, 'Institute ID is required');
+                throw new HttpException(STATUS_CODES.BAD_REQUEST, MESSAGES.ERROR.INSTITUTION_ID_REQUIRED);
             }
 
             const course = await this.courseService.createCourse(courseData,tutorId);
 
-            res.status(201).json({
+            res.json({
                 status: STATUS_CODES.SUCCESS,
                 message: MESSAGES.SUCCESS.COURSE_CREATED,
                 data: course
@@ -59,12 +60,16 @@ export class CourseController {
     ): Promise<void> => {
         try {
             const institutionId: string | null = req.user?._id;
+            if (!institutionId) {
+                throw new HttpException(STATUS_CODES.BAD_REQUEST, MESSAGES.ERROR.INSTITUTION_ID_REQUIRED);
+            }
             const page = parseInt(req.query.page as string) || 1;
             const limit = parseInt(req.query.limit as string) || 4;
             const search = (req.query.search as string);
             const course = await this.courseService.draftCourse({institutionId},page,limit,search)
-            res.status(201).json({
-                message: "Approved",
+            res.json({
+                status: STATUS_CODES.SUCCESS,
+                message: MESSAGES.SUCCESS.COURSE_APPROVED,
                 data: course
             })
         } catch (error) {
@@ -78,13 +83,17 @@ export class CourseController {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const tutorId: string | null = req.user?._id
+            const tutorId: string | null = req.user?._id;
+            if (!tutorId) {
+                throw new HttpException(STATUS_CODES.BAD_REQUEST, MESSAGES.ERROR.TUTOR_ID_REQUIRED);
+            }
             const page = parseInt(req.query.page as string) || 1;
             const limit = parseInt(req.query.limit as string) || 4;
             const search = (req.query.search as string);
             const course = await this.courseService.draftCourse({tutorId},page,limit,search)
-            res.status(201).json({
-                message: "Approved",
+            res.json({
+                status:STATUS_CODES.SUCCESS,
+                message: MESSAGES.SUCCESS.COURSE_APPROVED,
                 data: course
             })
         } catch (error) {
@@ -110,7 +119,8 @@ export class CourseController {
             }
             const course = await this.courseService.createModule(courseData.draftId, courseData)
             res.status(201).json({
-                message: "Approved",
+                status: STATUS_CODES.SUCCESS,
+                message: MESSAGES.SUCCESS.COURSE_APPROVED,
                 data: course
             })
         } catch (error) {
@@ -125,6 +135,9 @@ export class CourseController {
     ): Promise<void> => {
         try {
             const instituteId: string | null = req.user?._id;
+            if (!instituteId) {
+                throw new HttpException(STATUS_CODES.BAD_REQUEST, MESSAGES.ERROR.INSTITUTION_ID_REQUIRED);
+            }
             const page = parseInt(req.query.page as string) || 1;
             const limit = parseInt(req.query.limit as string) || 4;
             const search = (req.query.search as string);
@@ -150,6 +163,9 @@ export class CourseController {
     ): Promise<void> => {
         try {
             const tutorId: string | null = req.user?._id;
+            if (!tutorId) {
+                throw new HttpException(STATUS_CODES.BAD_REQUEST, MESSAGES.ERROR.TUTOR_ID_REQUIRED);
+            }
             const page = parseInt(req.query.page as string) || 1;
             const limit = parseInt(req.query.limit as string) || 4;
             const search = (req.query.search as string);
@@ -175,18 +191,20 @@ export class CourseController {
     ): Promise<void> => {
         try {
             const userId: string | null = req.user?._id;
+            if (!userId) {
+                throw new HttpException(STATUS_CODES.BAD_REQUEST, MESSAGES.ERROR.USER_ID_REQUIRED);
+            }
             const data = await this.courseService.PurchasedCourse(userId);
             const purchased: string | undefined = (data?.purchasedCourses)?.toString();
             const purchasedCourses = purchased?.split(",");
             const { courseId } = req.params
             const course = await this.courseService.courseDetail(courseId);
 
-            const response: CourseDetailResponse = {
-                message: "Success",
-                Data: course,
-                purchased: purchasedCourses,
-            };
-            res.status(201).json(response)
+            res.json({
+                status: STATUS_CODES.SUCCESS,
+                message: MESSAGES.SUCCESS.DATA_RETRIEVED,
+                data: {course,purchasedCourses}
+            })
         } catch (error) {
             next(error)
         }
@@ -201,11 +219,7 @@ export class CourseController {
         try {
             const { courseId } = req.params
             const course = await this.courseService.courseDetail(courseId);
-            const response: CourseDetailResponseInstitute = {
-                message: "Success",
-                Data: course,
-            };
-            res.status(201).json(response)
+            res.json({status:STATUS_CODES.SUCCESS,message:MESSAGES.SUCCESS.DATA_RETRIEVED,data:course})
         } catch (error) {
             next(error)
         }
@@ -256,6 +270,7 @@ export class CourseController {
                 throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
             }
             res.status(201).json({
+                status:STATUS_CODES.SUCCESS,
                 message: information
             });
         } catch (error) {
@@ -278,7 +293,7 @@ export class CourseController {
             await this.courseService.updateCourse(courseData,courseId);
             res.status(201).json({
                 status: STATUS_CODES.SUCCESS,
-                message: "Course Updated",
+                message: MESSAGES.SUCCESS.COURSE_UPDATED
             });
         } catch (error) {
             next(error);
@@ -298,8 +313,9 @@ export class CourseController {
                 throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
             }
             await this.courseService.moduleDelete(courseId,moduleId);
-            res.status(201).json({
-                message: "Module Deleted"
+            res.json({
+                status:STATUS_CODES.SUCCESS,
+                message:MESSAGES.SUCCESS.COURSE_DELETED
             });
         } catch (error) {
             next(error);
@@ -313,6 +329,9 @@ export class CourseController {
     ): Promise<void> => {
         try {
             const instituteId: string | null = req.user?._id;
+            if (!instituteId) {
+                throw new HttpException(STATUS_CODES.BAD_REQUEST, MESSAGES.ERROR.INSTITUTION_ID_REQUIRED);
+            }
             const {published,draft,listed,unlisted,course} = await this.courseService.chartData(instituteId);
             const quiz = await this.quizService.findQuiz(instituteId);
             res.status(201).json({published,draft,listed,unlisted,course,quiz});

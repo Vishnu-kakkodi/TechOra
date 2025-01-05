@@ -11,11 +11,17 @@ import { useAppSelector } from '../../../store/hook';
 import Navbar from '../../../components/header/Navbar';
 import ChatModal from '../../../components/modals/User/ChatModal';
 import Footer from '../../../components/footer/Footer';
+import { CourseDocument } from 'src/types/courseType';
 
 interface LastMessage {
   message: string;
   timestamp: number;
   userId: string;
+}
+
+interface courseDetail{
+  purchasedCourses: string[];
+  course: CourseDocument;
 }
 
 
@@ -39,8 +45,12 @@ const CourseDetail = () => {
   
 
   const { data: courseData, isLoading, isError } = useCoursedetailQuery(courseId as string);
-  const courseIDs: string[] = courseData?.purchased || [];
-  let course = courseData?.Data;
+  const Data: courseDetail = courseData?.data ?? { purchasedCourses: [] as string[], course: {} as CourseDocument };
+
+  const courseIDs = Data.purchasedCourses
+  const course = Data.course;
+
+  
 
   const { data: Review } = useReviewQuery(courseId as string);
 
@@ -79,7 +89,7 @@ const CourseDetail = () => {
     return <div className="flex justify-center items-center h-screen">Error fetching course data.</div>;
   }
 
-  if (!courseData || !courseData.Data) {
+  if (!courseData || !courseData.data) {
     return <div className="flex justify-center items-center h-screen">No course data available.</div>;
   }
 
@@ -88,7 +98,7 @@ const CourseDetail = () => {
   };
 
   const handleVideoSelect = (video: string, courseId: string) => {
-    if (courseIDs.includes(courseId)) {
+    if (courseIDs?.includes(courseId)) {
       setCurrentVideo(video);
       setIsVideoPlaying(true);
     } else {

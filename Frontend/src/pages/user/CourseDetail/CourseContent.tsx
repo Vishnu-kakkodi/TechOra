@@ -1,8 +1,9 @@
 import React from 'react';
 import { PlayCircle, ChevronDown, ChevronUp } from 'lucide-react';
+import { CourseDocument, Module } from 'src/types/courseType';
 
 interface CourseContentProps {
-  course: any;
+  course: CourseDocument;
   isVideoPlaying: boolean;
   currentVideo: string | null;
   handleVideoEnd: () => void;
@@ -48,14 +49,14 @@ const CourseContent: React.FC<CourseContentProps> = ({
         <div className="lg:col-span-1 p-4">
           <h2 className="text-xl font-bold mb-4">Course Content</h2>
           <div className="space-y-4 max-h-[600px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
-            {course?.modules.map((module: any) => (
+            {course?.modules.map((module: Module) => (
               <div
-                key={module.id}
+                key={module._id}
                 className="bg-gray-50 rounded-lg overflow-hidden"
               >
                 <div
                   className="p-4 cursor-pointer hover:bg-gray-100 transition-colors"
-                  onClick={() => toggleModule(module.id)}
+                  onClick={() => toggleModule(Number(module._id))}
                 >
                   <div className="flex justify-between items-center">
                     <div className="flex items-center space-x-4">
@@ -71,10 +72,10 @@ const CourseContent: React.FC<CourseContentProps> = ({
                         <p className="text-sm text-gray-500">{module.duration}</p>
                       </div>
                     </div>
-                    {activeModule === module.id ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                    {activeModule === Number(module._id) ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
                   </div>
                 </div>
-                {activeModule === module.id && (
+                {activeModule === Number(module._id) && (
                   <div className="p-4 bg-gray-100">
                     <p className="text-sm text-gray-600">{module.description}</p>
                   </div>

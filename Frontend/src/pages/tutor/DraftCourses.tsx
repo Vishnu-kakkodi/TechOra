@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Trash2, ChevronDown, Search, Edit, Eye } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-import { Course } from '../../types/courseType';
+import { Course, CourseDocument } from '../../types/courseType';
 import { useDraftCourseListQuery } from '../../store/slices/tutorSlice';
 import TutorSidebar from '../../components/sidebar/tutorSidebar';
 import InstituteFooter from '../../components/footer/InstituteFooter';
@@ -49,7 +49,7 @@ const DraftCourses = () => {
     setSearch(value);
   };
 
-  const handleEdit = (courseId: number) => {
+  const handleEdit = (courseId: string) => {
     navigate(`/tutor/courses/edit/${courseId}`);
   };
 
@@ -58,7 +58,7 @@ const DraftCourses = () => {
   };
 
   const handleView = (courseId: string) => {
-      navigate(`/tutor/course-view/${courseId}`, { state: { courseId: courseId } });
+    navigate(`/tutor/course-view/${courseId}`, { state: { courseId: courseId } });
   };
 
   const handleDelete = (courseId: number) => {
@@ -121,7 +121,7 @@ const DraftCourses = () => {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {courses.map((course: any) => (
+                  {courses.map((course: CourseDocument) => (
                     <tr key={course._id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
@@ -138,40 +138,47 @@ const DraftCourses = () => {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {course.tutorId.tutorname}
+                        {course?.tutorId?.tutorname}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {course.department}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {new Date(course.updatedAt).toLocaleDateString('en-GB', {
-                          day: '2-digit',
-                          month: '2-digit',
-                          year: 'numeric',
-                        })}{' '}
-                        {new Date(course.updatedAt).toLocaleTimeString('en-GB', {
-                          hour: '2-digit',
-                          minute: '2-digit',
-                          hour12: true,
-                        })}
+                        {course.updatedAt ? (
+                          <>
+                            {new Date(course.updatedAt).toLocaleDateString('en-GB', {
+                              day: '2-digit',
+                              month: '2-digit',
+                              year: 'numeric',
+                            })}{' '}
+                            {new Date(course.updatedAt).toLocaleTimeString('en-GB', {
+                              hour: '2-digit',
+                              minute: '2-digit',
+                              hour12: true,
+                            })}
+                          </>
+                        ) : (
+                          'N/A'
+                        )}
+
                       </td>
 
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                          <button 
-                            onClick={() => handleView(course._id)}
-                            className="text-blue-600 hover:text-blue-900 flex items-center"
-                          >
-                            <Eye className="h-4 w-4 mr-1" /> View
-                          </button>
+                        <button
+                          onClick={() => handleView(course._id)}
+                          className="text-blue-600 hover:text-blue-900 flex items-center"
+                        >
+                          <Eye className="h-4 w-4 mr-1" /> View
+                        </button>
                       </td>
 
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                          <button
-                            onClick={() => handleEdit(course._id)}
-                            className="text-blue-600 hover:text-blue-900 flex items-center"
-                          >
-                            <Edit className="h-4 w-4 mr-1" /> Edit
-                          </button>
+                        <button
+                          onClick={() => handleEdit(course._id)}
+                          className="text-blue-600 hover:text-blue-900 flex items-center"
+                        >
+                          <Edit className="h-4 w-4 mr-1" /> Edit
+                        </button>
                       </td>
                     </tr>
                   ))}

@@ -24,6 +24,7 @@ import { useAppSelector } from '../../store/hook';
 import { toast } from 'react-toastify';
 import { useCoursedetailQuery, useModuleDeleteMutation, useUpdateCourseMutation } from '../../store/slices/tutorSlice';
 import TutorSidebar from '../../components/sidebar/tutorSidebar';
+import { CourseDocument, Module } from 'src/types/courseType';
 
 
 interface CourseFormValues {
@@ -42,7 +43,7 @@ const EditCourseDetail = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [activeModule, setActiveModule] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>('');
-  const [selectedModule, setSelectedModule] = useState(null);
+  const [selectedModule, setSelectedModule] = useState<Module|null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [submitError, setSubmitError] = useState<string>('');
 
@@ -65,99 +66,27 @@ const EditCourseDetail = () => {
 
   const { data: courseData, isLoading, isError } = useCoursedetailQuery(courseId as string);
 
-  console.log(courseData, "Datasasa")
-  const course = courseData?.Data;
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
-  useEffect(() => {
-    if (course?.thumbnail) {
-      setPreviewUrl(course.thumbnail);
-    }
-  }, [course]);
+  if (isError) {
+    return <div>Error fetching course data.</div>;
+  }
 
-  const [coursedata, setCourseData] = useState(() => {
-    course
-  });
+  if (!courseData || !courseData?.data) {
+    return <div>No course data available.</div>;
+  }
 
-  const [newModule, setNewModule] = useState({
-    title: '',
-    description: '',
-    duration: '',
-    video: null
-  });
-
-  const handleInputChange = (e: any, field: any) => {
-    setCourseData((prev: any) => ({
-      ...prev,
-      [field]: e.target.value
-    }));
-  };
-
-  // const handleModuleChange = (index: any, field: any, value: any) => {
-  //   const updatedModules = [...course?.modules];
-  //   updatedModules[index][field] = value;
-  //   setCourseData((prev: any) => ({
-  //     ...prev,
-  //     modules: updatedModules
-  //   }));
-  // };
-
-  const handleAddModule = () => {
-    if (newModule.title && newModule.description) {
-      setCourseData((prev: any) => ({
-        ...prev,
-        modules: [...prev.modules, {
-          id: prev.modules.length + 1,
-          ...newModule
-        }]
-      }));
-      setNewModule({
-        title: '',
-        description: '',
-        duration: '',
-        video: null
-      });
-    }
-  };
-
-  const handleRemoveModule = (index: any) => {
-    setCourseData((prev: any) => ({
-      ...prev,
-      modules: prev.modules.filter((_: any, i: any) => i !== index)
-    }));
-  };
-
-  const toggleModule = (moduleId: any) => {
-    setActiveModule(activeModule === moduleId ? null : moduleId);
-  };
+  const course: CourseDocument = courseData.data;
 
 
-  const handleImageChange = (
-    setFieldValue: (field: string, value: any) => void,
-    event: ChangeEvent<HTMLInputElement>
-  ): void => {
-    const file = event.currentTarget.files?.[0];
-    if (file) {
-      setFieldValue('thumbnail', file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewUrl(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const removeImage = (setFieldValue: (field: string, value: any) => void): void => {
-    setFieldValue('thumbnail', null);
-    setPreviewUrl('');
-  };
-
-
-  const handleEditClick = (module:any) => {
+  const handleEditClick = (module:Module) => {
     setSelectedModule(module);
     setIsModalOpen(true);
   };
 
-  const handleDelete = async (moduleId:any) => {
+  const handleDelete = async (moduleId:string) => {
     try{
       if(course?._id){
         let courseId = course?._id
@@ -170,8 +99,7 @@ const EditCourseDetail = () => {
     }
   };
 
-  const handleSaveModule = (updatedModule:any) => {
-    // Implement module update logic
+  const handleSaveModule = (updatedModule:Module) => {
   };
 
   const handleSubmit = async (values: CourseFormValues): Promise<void> => {
