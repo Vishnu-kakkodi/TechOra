@@ -7,6 +7,7 @@ import { PieChart } from '@mui/x-charts/PieChart';
 import { LineChart } from '@mui/x-charts/LineChart'
 import { useChartDataQuery } from '../../store/slices/institutionSlice';
 import { Book, Clock, Plus, Eye } from 'lucide-react';
+import { CourseDocument } from 'src/types/courseType';
 
 const InstitutionDashboard: React.FC = () => {
   const [tutorAdd, setTutorAdd] = useState(false);
@@ -108,7 +109,7 @@ const InstitutionDashboard: React.FC = () => {
         <section className="mb-8">
           <h2 className="text-2xl font-bold text-gray-800 mb-4">Latest Courses</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {courses.map((course: any) => (
+            {courses.map((course: CourseDocument) => (
               <div 
                 key={course._id} 
                 className="bg-white rounded-xl shadow-md overflow-hidden transform transition-all hover:scale-105 hover:shadow-lg"
@@ -125,7 +126,7 @@ const InstitutionDashboard: React.FC = () => {
                   <div className="space-y-2 text-sm text-gray-600">
                     <div className="flex justify-between">
                       <span>Instructor</span>
-                      <span className="font-medium">{course.instructor}</span>
+                      <span className="font-medium">{course.tutorId?.tutorname}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Duration</span>
@@ -133,7 +134,7 @@ const InstitutionDashboard: React.FC = () => {
                     </div>
                     <div className="flex justify-between">
                       <span>Enrolled</span>
-                      <span>{course.enrolled} Students</span>
+                      <span>{course.enrolledStudents} Students</span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span>Status</span>

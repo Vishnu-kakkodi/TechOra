@@ -19,6 +19,7 @@ import Hero1 from '../../../layout/userLayout/Hero1';
 import Hero2 from '../../../layout/userLayout/Hero2';
 import Hero3 from '../../../layout/userLayout/Hero3';
 import Hero4 from '../../../layout/userLayout/Hero4';
+import { CourseDocument } from 'src/types/courseType';
 
 
 
@@ -66,7 +67,7 @@ const LandingPage = () => {
 
 
   const { data = {} } = useHomeDataQuery(null);
-  const courses = data.courses?.course || [] as any;
+  const courses: CourseDocument[] = data.courses?.course || [];
   const winners = data.winners?.quizWinners || [] as any;
 
   const handleForgotPassword = () => {

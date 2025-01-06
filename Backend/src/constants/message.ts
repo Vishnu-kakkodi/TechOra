@@ -8,11 +8,13 @@ const MESSAGES = {
       LOGOUT_SUCCESS: "Logout successful.",
       PASSWORD_CHANGED: "Password has been successfully changed.",
       OTP_SEND: "Otp send successfully.",
+      OTP_VERIFIED: "Otp verified successfully.",
       QUIZ_CREATED: "Quiz created.",
       QUIZ_UPDATED: "Quiz updated.",
       QUIZ_FETCHED: "Quiz fetched successfully.",
       COURSE_CREATED: "Course created successfully.",
       INSTITUTE_APPROVED: "Institute approved successfully",
+      INSTITUTE_REGISTER: "Institute registerd successfully",
       BLOCKED: "Successfully blocked.",
       UNBLOCKKED: "Successfully Unblocked.",
       ADD_TO_CART: "Successfully added to cart",
@@ -21,8 +23,13 @@ const MESSAGES = {
       ADDED_TO_WISHLIST: "Successfully added to wishlist",
       COURSE_APPROVED: "Course Approved",
       COURSE_UPDATED: "Course Updated",
-      COURSE_DELETED: "Course Deleted"
-
+      COURSE_DELETED: "Course Deleted",
+      EMAIL_VERIFIED: "Email Verified",
+      TUTOR_CREATED: 'Tutor created successfully',
+      DEPARTMENT_CREATED: 'Department created successfully',
+      QUIZ_RESULT_ADDED: "Result Added",
+      PROFILE_PHOTO_UPDATED: "Profile photo updated",
+      PROFILE_UPDATED: "Profile updated"
     },
   
     ERROR: {
@@ -48,6 +55,12 @@ const MESSAGES = {
       INSTITUTION_ID_REQUIRED: "Institution ID is required.",
       TUTOR_ID_REQUIRED: "Tutor ID is required.",
       USER_ID_REQUIRED: "User ID is required.",
+      APPLICATION_ACTIVE: "Application is active",
+      VERIFICATION_FAILED: "Verification Failed",
+      FILE_UPLOAD_FAILED: "File uploading failed",
+      INVALID_ORDER_DETAIL: 'Invalid order details',
+      ORDER_NOT_FOUND: 'Order not found',
+      EMAIL_VERIFICATION_FAILED: 'Verification failed'
     },
   
     VALIDATION: {

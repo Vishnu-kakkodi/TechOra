@@ -1,5 +1,7 @@
 import {Request, Response, NextFunction} from 'express'
 import { IWishlistService } from '../interfaces/IServiceInterface/IWishlistService';
+import STATUS_CODES from '../constants/statusCode';
+import MESSAGES from '../constants/message';
 
 export class WishlistController {
     private wishlistService: IWishlistService;
@@ -18,7 +20,9 @@ export class WishlistController {
             const {courseId} = req.body;
             const response = await this.wishlistService.addToWishlist(userId,courseId);
             res.status(201).json({
-                message: response,
+                status:STATUS_CODES.SUCCESS,
+                message:MESSAGES.SUCCESS.DATA_RETRIEVED,
+                data: response,
             });
         }catch(error){
             next(error);
@@ -59,7 +63,9 @@ export class WishlistController {
             const courseId = req.params.courseId;
             const response = await this.wishlistService.removeWishlist(userId,courseId);
             res.status(201).json({
-                message:response
+                status:STATUS_CODES.SUCCESS,
+                message:MESSAGES.SUCCESS.DATA_RETRIEVED,
+                data: response,
             });
         }catch(error){
             next(error);

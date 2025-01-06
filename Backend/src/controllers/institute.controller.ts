@@ -24,12 +24,14 @@ export class InstitutionController{
               }
             const response = await this.instituteService.trackStatus(trackID);
             if(!response){
-                res.status(401).json({
-                    message: "Application is active"
+                res.json({
+                    status: STATUS_CODES.UNAUTHORIZED,
+                    message: MESSAGES.ERROR.APPLICATION_ACTIVE
                 })
             }
             res.status(201).json({
-                message:"Success",
+                status: STATUS_CODES.SUCCESS,
+                message:MESSAGES.SUCCESS.DATA_RETRIEVED,
                 data: response
             })
         }catch(error){
@@ -52,9 +54,9 @@ export class InstitutionController{
                     sameSite: 'strict',
                     maxAge: 2 * 60 * 1000,
                 });
-                res.status(201).json({ message: 'Successful' });
+                res.json({ status: STATUS_CODES.CREATED, message: MESSAGES.SUCCESS.EMAIL_VERIFIED });
             } else {
-                res.status(400).json({ message: 'Verification failed' });
+                res.json({ status:STATUS_CODES.BAD_REQUEST, message: MESSAGES.ERROR.VERIFICATION_FAILED });
             }
         } catch (error) {
             next(error)
@@ -82,7 +84,7 @@ export class InstitutionController{
             const email = CookieData[1]
             if(response){
                 res.clearCookie('institutionOTP');
-                res.status(201).json({email,message:'Successfull'});
+                res.json({status:STATUS_CODES.CREATED,message:MESSAGES.SUCCESS.OTP_VERIFIED,data:email});
             }
         }catch(error){
             next(error)
@@ -97,7 +99,7 @@ export class InstitutionController{
         try{
               const fileLocation = (req.file as Express.Multer.File & { location?: string })?.location;
               if (!fileLocation) {
-                 res.status(400).json({ message: "File upload failed." });
+                 res.json({ status:STATUS_CODES.BAD_REQUEST,message: MESSAGES.ERROR.FILE_UPLOAD_FAILED });
               }
             const instituteData = {
                 ...req.body,
@@ -115,7 +117,7 @@ export class InstitutionController{
 
             setCookie(res,'institute',Token);
 
-            res.status(201).json({instituteDetails, message:'Successfull'});
+            res.json({status: STATUS_CODES.SUCCESS, message: MESSAGES.SUCCESS.INSTITUTE_REGISTER, data:instituteDetails});
         }catch(error){
             next(error)
         }
@@ -137,7 +139,7 @@ export class InstitutionController{
                 refreshToken: refreshToken
             }
             setCookie(res,'institute',Token);
-            res.json({ institute,message:"Login successfully" });
+            res.json({ status: STATUS_CODES.SUCCESS,message:MESSAGES.SUCCESS.LOGIN_SUCCESS, data: institute });
         } catch (error) {
             next(error)
         }
@@ -156,9 +158,9 @@ export class InstitutionController{
                 institutionId
             }
             await this.instituteService.createTutor(tutorData)
-            res.status(201).json({
-                status: 'success',
-                message: 'Tutor created successfully'
+            res.json({
+                status: STATUS_CODES.CREATED,
+                message: MESSAGES.SUCCESS.TUTOR_CREATED
             });
         }catch(error){
             next(error)
@@ -177,8 +179,10 @@ export class InstitutionController{
             if (!institutes) {
                 throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
               }
-            res.status(201).json({
-                institutes
+            res.json({
+                status:STATUS_CODES.SUCCESS,
+                message:MESSAGES.SUCCESS.DATA_RETRIEVED,
+                data:institutes
             });
         }catch(error){
             next(error)
@@ -198,7 +202,7 @@ export class InstitutionController{
             }
             const {department} = req.body;
             await this.instituteService.addDepartment(institutionId,department)
-            res.status(201).json({status:'success',message:"Department added"});
+            res.json({status:STATUS_CODES.SUCCESS,message:MESSAGES.SUCCESS.DEPARTMENT_CREATED});
 
         }catch(error){
             next(error)
@@ -221,7 +225,7 @@ export class InstitutionController{
         const limit = parseInt(req.query.limit as string) || 4;
         const search = (req.query.search as string) || '';
         const {departments,total} = await this.instituteService.getDepartment(institutionId,page,limit,search);
-        res.status(201).json({status:'success',message:"Department added", data: {departments,total}});
+        res.status(201).json({status:STATUS_CODES.SUCCESS,message:MESSAGES.SUCCESS.DATA_RETRIEVED, data: {departments,total}});
 
     }catch(error){
         next(error)
@@ -242,8 +246,8 @@ export class InstitutionController{
             });
 
             res.status(200).json({
-                success: true,
-                message: 'Logged out successfully'
+                status: STATUS_CODES.SUCCESS,
+                message: MESSAGES.SUCCESS.LOGOUT_SUCCESS
             });
         } catch (error) {
             next(error)

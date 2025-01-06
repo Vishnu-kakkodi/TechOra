@@ -7,6 +7,7 @@ import { useDispatch } from 'react-redux';
 import ProfileCard from './ProfileCard';
 import EditableField from './EditableField';
 import { useProfilePhotoMutation, useUpdateProfileMutation } from '../../../store/slices/userSlice';
+import { toast } from 'react-toastify';
 
 const Profile = () => {
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -28,7 +29,7 @@ const Profile = () => {
                 const formData = new FormData();
                 formData.append('profilePhoto', file);
                 const response = await profilePhoto({body: formData}).unwrap();
-                
+                toast.success(response.message)           
                 dispatch(updateUserField({
                     field: 'profilePhoto',
                     value: response.data.profilePhoto
@@ -51,9 +52,11 @@ const Profile = () => {
         };
 
         try {
-            await updateProfile({
+            const response = await updateProfile({
                 [fieldToApiKeyMap[field]]: value
             }).unwrap();
+
+            toast.success(response.message)
 
             dispatch(updateUserField({
                 field: fieldToApiKeyMap[field],

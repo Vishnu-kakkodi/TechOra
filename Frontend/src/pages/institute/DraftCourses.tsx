@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useDraftCourseListQuery } from '../../store/slices/institutionSlice';
 import InstituteSidebar from '../../components/sidebar/InstituteSidebar';
 import useDebouncedValue from '../../hooks/debounceHook';
+import { CourseDocument } from 'src/types/courseType';
 
 const DraftCourses = () => {
 
@@ -105,7 +106,7 @@ const DraftCourses = () => {
           </div>
 
           <div className="space-y-4">
-            {course.map((course: any) => (
+            {course.map((course: CourseDocument) => (
               <div
                 key={course._id}
                 className="bg-white rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-all duration-300 flex items-center p-4"
@@ -126,7 +127,7 @@ const DraftCourses = () => {
                   <div className="text-sm text-gray-600">
                     <div className="flex items-center mb-1">
                       <span className="mr-2 text-gray-500">Instructor:</span>
-                      <span className="font-medium">{course.tutorId.tutorname}</span>
+                      <span className="font-medium">{course?.tutorId?.tutorname}</span>
                     </div>
                     <div className="flex items-center">
                       <span className="mr-2 text-gray-500">Duration:</span>
@@ -138,7 +139,7 @@ const DraftCourses = () => {
                     <div className="text-sm text-gray-600">
                       <div className="flex items-center mb-1">
                         <span className="mr-2 text-gray-500">Enrolled:</span>
-                        <span className="font-medium">{course.enrolled} 10 Students</span>
+                        <span className="font-medium">{course?.enrolledStudents} Students</span>
                       </div>
                       <div className="flex items-center">
                         <span className="mr-2 text-gray-500">Status:</span>

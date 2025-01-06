@@ -2,8 +2,9 @@ import React from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { X } from 'lucide-react';
+import { Module } from 'src/types/courseType';
 
-const ModuleEditModal = ({ module, isOpen, onClose, onSave }:{module:any;isOpen:any;onClose:any;onSave:any}) => {
+const ModuleEditModal = ({ module, isOpen, onClose, onSave }:{module:Module | null;isOpen:any;onClose:any;onSave:any}) => {
   const validationSchema = Yup.object().shape({
     title: Yup.string()
       .required('Title is required')
@@ -29,9 +30,9 @@ const ModuleEditModal = ({ module, isOpen, onClose, onSave }:{module:any;isOpen:
 
         <Formik
           initialValues={{
-            title: module.title,
-            duration: module.duration,
-            description: module.description,
+            title: module?.title,
+            duration: module?.duration,
+            description: module?.description,
             video: null
           }}
           validationSchema={validationSchema}

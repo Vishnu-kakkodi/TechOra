@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from "express";
-import { decodedToken } from "../helperFunction/authHelper";
 import { HttpException } from "../middleware/error.middleware";
 import STATUS_CODES from "../constants/statusCode";
 import MESSAGES from "../constants/message";
@@ -21,10 +20,12 @@ export class NotificationController {
         try {
             const userId: string | null = req.user?._id;
             if(!userId){
-                res.json({message:"Authentication failed"});
+                res.json({status: STATUS_CODES.UNAUTHORIZED,message:MESSAGES.ERROR.USER_ID_REQUIRED});
             }
             const response = await this.notificationService.notification(userId);
-            res.status(201).json({
+            res.json({
+                status: STATUS_CODES.SUCCESS,
+                message: MESSAGES.SUCCESS.DATA_RETRIEVED,
                 data: response,
             });
 
@@ -42,10 +43,12 @@ export class NotificationController {
             const userId: string | null = req.user?._id;
             const notificationId = req.params.notificationId;
             if(!userId){
-                res.json({message:"Authentication failed"});
+                res.json({status: STATUS_CODES.UNAUTHORIZED,message:MESSAGES.ERROR.USER_ID_REQUIRED});
             }
             const response = await this.notificationService.notificationRead(userId,notificationId);
-            res.status(201).json({
+            res.json({
+                status: STATUS_CODES.SUCCESS,
+                message: MESSAGES.SUCCESS.DATA_RETRIEVED,
                 data: response,
             });
 

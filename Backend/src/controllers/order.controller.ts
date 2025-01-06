@@ -51,7 +51,7 @@ export class OrderController {
         try {
             const { orderItems, total } = req.body.orderDetails;
             if (!Array.isArray(orderItems) || typeof total !== 'number') {
-                throw new Error('Invalid order details');
+                throw new HttpException(STATUS_CODES.BAD_REQUEST,MESSAGES.ERROR.INVALID_ORDER_DETAIL);
             }
             const userId: string | null = req.user?._id;
             let order;
@@ -59,7 +59,7 @@ export class OrderController {
             if (isExistingOrder(req.body)) {
                 order = await this.orderService.getOrderById(req.body.orderDetails.orderId);
                 if (!order) {
-                    throw new Error('Order not found');
+                    throw new HttpException(STATUS_CODES.NOT_FOUND,MESSAGES.ERROR.ORDER_NOT_FOUND);
                 }
             } else {
                 order = await this.orderService.createOrder(
@@ -92,7 +92,9 @@ export class OrderController {
                 cancel_url: `${process.env.FRONT_END_URL}/cancel?orderId=${order._id}`,
             });
             res.json({
-                id: session.id,
+                status:STATUS_CODES.SUCCESS,
+                message: MESSAGES.SUCCESS.DATA_RETRIEVED,
+                data: session.id,
             });
         } catch (error) {
             next(error)
@@ -110,7 +112,9 @@ export class OrderController {
             const userId: string | null = req.user?._id;
             const order = await this.orderService.updatePayment(orderId,userId);
             res.json({
-                order
+                status: STATUS_CODES.SUCCESS,
+                message: MESSAGES.SUCCESS.DATA_RETRIEVED,
+                data:order
             });
         } catch (error) {
             next(error)
@@ -131,8 +135,9 @@ export class OrderController {
             const userId: string | null = req.user?._id;           
             const {orders,total} = await this.orderService.orderList(userId,page,limit,search,filter,sort);
             res.json({
-                orders,
-                total
+                status: STATUS_CODES.SUCCESS,
+                message: MESSAGES.SUCCESS.DATA_RETRIEVED,
+                data:{orders,total}
             });
         } catch (error) {
             next(error)
@@ -147,8 +152,10 @@ export class OrderController {
         try{
             const orderId = req.params.orderId
             const order = await this.orderService.orderDetail(orderId);
-            res.status(201).json({
-                order
+            res.json({
+                status:STATUS_CODES.SUCCESS,
+                message: MESSAGES.SUCCESS.DATA_RETRIEVED,
+                data:order
             });
         }catch(error){
             next(error);

@@ -3,6 +3,7 @@ import { CourseDetailResponse } from '../../types/courseType';
 import { TutorFormData } from '../../types/institutionTypes';
 import { UserRole } from './userSlice';
 import { InstituteDocument } from '../../types/Institute/InstituteDocument';
+import { ApiResponse } from 'src/types/responseType';
 
 const baseQueryWithRole = fetchBaseQuery({
   baseUrl: `${import.meta.env.VITE_BACKEND_URL}/api/`,
@@ -122,7 +123,7 @@ export const institutionSlice = createApi({
     providesTags: ['Institution'],
    }),
 
-   coursedetail: builder.query<CourseDetailResponse, string>({
+   coursedetail: builder.query<ApiResponse<null>, string>({
     query: (courseId) =>({
       url: `/institution/course-detail/${courseId}`,
       method:'GET',

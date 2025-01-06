@@ -26,10 +26,10 @@ export class QuizController {
                 throw new HttpException(STATUS_CODES.BAD_REQUEST, MESSAGES.ERROR.BAD_REQUEST)
               }
             const quizId = await this.quizService.createQuiz(quizData,tutorId);
-            res.status(201).json({
+            res.json({
                 status: STATUS_CODES.SUCCESS,
-                data: quizId,
                 message: MESSAGES.SUCCESS.QUIZ_CREATED,
+                data: quizId,
             });
         } catch (error) {
             next(error)
@@ -132,8 +132,9 @@ export class QuizController {
         try{
             const quizId = (req.query.quizId as string);
             const quiz= await this.quizService.quizDetail(quizId);
-            res.status(201).json({
-                message:"Quiz Detail fetched succesfully",
+            res.json({
+                status:STATUS_CODES.SUCCESS,
+                message:MESSAGES.SUCCESS.DATA_RETRIEVED,
                 data:quiz
             });
         }catch(error){
@@ -154,8 +155,8 @@ export class QuizController {
               }
             const quizId = (req.query.quizId as string);
             await this.quizService.updateQuiz(quizData,quizId);
-            res.status(201).json({
-                status: STATUS_CODES.SUCCESS,
+            res.json({
+                status: STATUS_CODES.CREATED,
                 message: MESSAGES.SUCCESS.QUIZ_UPDATED,
             });
         }catch(error){
@@ -173,9 +174,9 @@ export class QuizController {
             const mark: string = req.body.mark;
             const quizId: string = req.body.quizId;
             await this.quizService.quizResult(userId,mark,quizId);
-            res.status(201).json({
-                status: STATUS_CODES.SUCCESS,
-                message: "Result Added"
+            res.json({
+                status: STATUS_CODES.CREATED,
+                message: MESSAGES.SUCCESS.QUIZ_RESULT_ADDED
             })
         }catch(error){
             next(error);
