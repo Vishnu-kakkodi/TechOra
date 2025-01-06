@@ -35,9 +35,7 @@ const AdminLoginModal: React.FC = () => {
         console.log("Mutation started");
 
         const response = await adminLogin(values).unwrap();
-        console.log("Mutation ended");
-
-        toast.success('Admin login successful!');
+        toast.success(response?.message);
         dispatch(setAdminCredentials({ ...response.adminData }));
         navigate('/admin/dashboard');
       } catch (err) {

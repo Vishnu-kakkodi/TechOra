@@ -48,7 +48,7 @@ const CourseList = () => {
     const total = courseData?.total || 0;
     const courseCategories = courseData?.department || [];
     const totalCourse = courseData?.totalCourse || 0;
-    const Colleges = courses.map((c: any) => c.institutionId.collegeName);
+    const Colleges = courses.map((c: CourseDocument) => c?.institutionId?.collegeName);
     const popularColleges = Array.from(new Set(Colleges));
 
     const containerVariants = {
@@ -170,7 +170,7 @@ const CourseList = () => {
                                     <div>
                                         <h2 className="text-xl font-bold mb-4 text-gray-800">Categories</h2>
                                         <div className="space-y-2">
-                                            {courseCategories.map((category:any, index:any) => (
+                                            {courseCategories.map((category:string, index:number) => (
                                                 <motion.label
                                                     key={index}
                                                     className="flex items-center py-2 px-3 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
@@ -222,7 +222,7 @@ const CourseList = () => {
                         animate="visible"
                         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
                     >
-                        {courses.map((course:any) => (
+                        {courses.map((course:CourseDocument) => (
                             <div
                                 key={course.id}
                                 className="bg-white border border-gray-200 overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2"
@@ -245,7 +245,7 @@ const CourseList = () => {
                                         </h3>
                                         <div className="flex items-center text-gray-600 text-xs md:text-sm">
                                             <User size={14} className="mr-2 text-gray-500" />
-                                            <span>{course.tutorId.tutorname}</span>
+                                            <span>{course?.tutorId?.tutorname}</span>
                                         </div>
                                     </div>
 
@@ -284,7 +284,7 @@ const CourseList = () => {
                                     {/* Price and Enroll Button */}
                                     <div className="flex justify-between items-center">
                                         <div className="text-base md:text-lg font-bold text-blue-700">
-                                            ₹{course.price.toFixed(2)}
+                                            ₹{course?.price?.toFixed(2)}
                                         </div>
                                         <button onClick={() => handleAddToCart(course._id)} className="bg-blue-600 text-white px-4 py-2 text-sm md:text-base rounded-full hover:bg-blue-700 transition-colors">
                                             Add To Cart

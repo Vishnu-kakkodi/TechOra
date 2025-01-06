@@ -46,8 +46,8 @@ export class UserController {
                 sameSite: 'strict',
                 maxAge: 5 * 60 * 1000
             });
-            res.status(STATUS_CODES.SUCCESS).json({
-                success: true,
+            res.json({
+                status: STATUS_CODES.SUCCESS,
                 message: MESSAGES.SUCCESS.OTP_SEND,
             });
 
@@ -70,7 +70,7 @@ export class UserController {
             const user = await this.userService.createUser(CookieData, otp);
             if (user) {
                 res.clearCookie('userData');
-                res.status(201).json({ user, status: STATUS_CODES.CREATED, message: MESSAGES.SUCCESS.USER_CREATED });
+                res.json({ status: STATUS_CODES.CREATED, message: MESSAGES.SUCCESS.USER_CREATED, data: user });
             }
         } catch (error) {
             next(error)
@@ -87,7 +87,7 @@ export class UserController {
             const email = req.cookies.userData.user.email;
             const user: CreateUserDto = req.cookies.userData.user;
             if (!email) {
-                throw new Error('No user data found');
+                throw new HttpException(STATUS_CODES.NOT_FOUND,MESSAGES.ERROR.DATA_NOTFOUND);
             }
             const response = await this.userService.resendOtp(email);
             if (response) {
@@ -103,9 +103,8 @@ export class UserController {
                     maxAge: 5 * 60 * 1000,
                 });
             }
-            res.status(201).json({ OTP: "Otp send successfully" })
+            res.json({ status: STATUS_CODES.CREATED, message:MESSAGES.SUCCESS.OTP_SEND })
         } catch (error) {
-            console.error('Error', error);
             next(error)
         }
     }
@@ -120,7 +119,7 @@ export class UserController {
 
             const userDetails = await this.userService.getUser(req.body.email, req.body.password);
             if (!userDetails) {
-                throw new HttpException(404, 'User not found');
+                throw new HttpException(STATUS_CODES.NOT_FOUND,MESSAGES.ERROR.USER_NOT_FOUND);
             }
             const { accessToken, refreshToken, ...userData } = userDetails;
             const Token = {
@@ -128,7 +127,7 @@ export class UserController {
                 refreshToken: refreshToken
             }
             setCookie(res, 'user', Token);
-            res.json({ userDetails });
+            res.json({ status:STATUS_CODES.SUCCESS, message:MESSAGES.SUCCESS.LOGIN_SUCCESS,data:userDetails });
         } catch (error) {
             next(error)
         }
@@ -143,7 +142,7 @@ export class UserController {
             const { email, userName, phoneNumber } = req.body
             const userDetails = await this.userService.googleSign(email, userName, phoneNumber);
             if (!userDetails) {
-                throw new HttpException(404, 'User not found');
+                throw new HttpException(STATUS_CODES.NOT_FOUND,MESSAGES.ERROR.USER_NOT_FOUND);
             }
             const { accessToken, refreshToken, ...user } = userDetails;
             const Token = {
@@ -151,7 +150,7 @@ export class UserController {
                 refreshToken: refreshToken
             }
             setCookie(res, 'user', Token);
-            res.status(201).json({ userDetails, status: STATUS_CODES.CREATED, message: MESSAGES.SUCCESS.USER_CREATED });
+            res.json({ status: STATUS_CODES.CREATED, message: MESSAGES.SUCCESS.USER_CREATED, data: userDetails });
         } catch (error) {
             next(error)
         }
@@ -177,9 +176,9 @@ export class UserController {
                     sameSite: 'strict',
                     maxAge: 2 * 60 * 1000,
                 });
-                res.status(201).json({ message: 'Successful' });
+                res.json({ status:STATUS_CODES.CREATED,message: MESSAGES.SUCCESS.EMAIL_VERIFIED });
             } else {
-                res.status(400).json({ message: 'Verification failed' });
+                res.json({ status:STATUS_CODES.BAD_REQUEST,message:MESSAGES.ERROR.EMAIL_VERIFICATION_FAILED });
             }
         } catch (error) {
             next(error)
@@ -202,7 +201,7 @@ export class UserController {
             }
             if (response) {
                 res.clearCookie('userData');
-                res.status(201).json({ message: 'Successfull', data: email });
+                res.json({ status: STATUS_CODES.SUCCESS, message: MESSAGES.SUCCESS.OTP_VERIFIED, data: email });
             }
         } catch (error) {
             next(error)
@@ -217,7 +216,7 @@ export class UserController {
         try {
             const { email, password } = req.body;
             await this.userService.forgotPassword(email, password);
-            res.status(201).json({ message: MESSAGES.SUCCESS.PASSWORD_CHANGED });
+            res.json({ status:STATUS_CODES.CREATED,message: MESSAGES.SUCCESS.PASSWORD_CHANGED });
         } catch (error) {
             next(error)
         }
@@ -232,7 +231,7 @@ export class UserController {
             const credential = req.body;
             const userId: string | null = req.user?._id;
             await this.userService.changePassword(credential, userId);
-            res.status(STATUS_CODES.SUCCESS).json({ message: MESSAGES.SUCCESS.PASSWORD_CHANGED });
+            res.json({ status:STATUS_CODES.CREATED, message: MESSAGES.SUCCESS.PASSWORD_CHANGED });
         } catch (error) {
             next(error)
         }
@@ -279,8 +278,8 @@ export class UserController {
             });
 
             res.status(200).json({
-                success: true,
-                message: 'Logged out successfully'
+                status: STATUS_CODES.SUCCESS,
+                message: MESSAGES.SUCCESS.LOGOUT_SUCCESS
             });
         } catch (error) {
             next(error)
@@ -300,8 +299,8 @@ export class UserController {
                 throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
             }
             res.status(200).json({
-                success: true,
-                message: 'Logged out successfully',
+                status: STATUS_CODES.SUCCESS,
+                message: MESSAGES.SUCCESS.DATA_RETRIEVED,
                 data: user
             });
         } catch (error) {
@@ -327,8 +326,8 @@ export class UserController {
                 throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
             }
             res.status(200).json({
-                success: true,
-                message: 'Profile updated successfully',
+                status: STATUS_CODES.SUCCESS,
+                message: MESSAGES.SUCCESS.PROFILE_UPDATED,
                 data: updatedUser
             });
         } catch (error) {
@@ -347,12 +346,11 @@ export class UserController {
                 throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
             }
             const  quizWinners = await this.userService.quizWinners();
-            res.status(201).json(
-                {
-                courses,
-                winners:quizWinners
-                }
-            );
+            res.json({
+                status: STATUS_CODES.SUCCESS,
+                message: MESSAGES.SUCCESS.DATA_RETRIEVED,
+                data:{courses,winners:quizWinners}
+        });
         } catch (error) {
             next(error)
         }

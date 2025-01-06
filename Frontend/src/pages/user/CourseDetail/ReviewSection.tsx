@@ -1,6 +1,7 @@
 import React from 'react';
 import { Plus } from 'lucide-react';
 import ReactStars from 'react-stars';
+import { Review } from 'src/types/reviewType';
 
 interface ReviewSectionProps {
   Review: any;
@@ -95,11 +96,11 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({
         <h4 className="text-lg font-semibold mb-4">What Others Are Saying</h4>
         {Review?.data?.response?.userReviews && Review.data.response.userReviews.length > 0 ? (
           <ul className="space-y-6">
-            {Review.data.response.userReviews.map((review: any, index: number) => (
+            {Review.data.response.userReviews.map((review: Review, index: number) => (
               <li key={index} className="border-b pb-4">
                 <div className="flex justify-between items-center mb-2">
                   <h5 className="font-semibold">
-                    {review.userId?.userName || "Anonymous User"}
+                    {review?.userId?.userName || "Anonymous User"}
                   </h5>
                   <ReactStars
                     count={5}

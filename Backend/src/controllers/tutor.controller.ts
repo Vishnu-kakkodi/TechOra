@@ -27,7 +27,7 @@ export class TutorController{
                 refreshToken: refreshToken
             }
             setCookie(res,'tutor',Token);
-            res.json({ tutor,message:"Login successfully" });
+            res.json({ ststus:STATUS_CODES.SUCCESS,message:MESSAGES.SUCCESS.LOGIN_SUCCESS,data:tutor });
         } catch (error) {
             next(error)
         }
@@ -42,9 +42,9 @@ export class TutorController{
             const tutorId: string | null = req.user?._id;
             let fileLocation = (req.file as any).location; 
             const tutor = await this.tutorService.uploadPhoto(tutorId,fileLocation);
-            res.status(201).json({
-                success:true,
-                message:"Profile photo updated",
+            res.json({
+                status:STATUS_CODES.SUCCESS,
+                message:MESSAGES.SUCCESS.PROFILE_PHOTO_UPDATED,
                 data:tutor
             })
         }catch(error){
@@ -65,9 +65,9 @@ export class TutorController{
                 experiance,
                 education
             });     
-            res.status(200).json({
-                success: true,
-                message: 'Profile updated successfully',
+            res.json({
+                status: STATUS_CODES.SUCCESS,
+                message: MESSAGES.SUCCESS.PROFILE_UPDATED,
                 data: updatedTutor
             });
            }catch(error){
@@ -111,8 +111,10 @@ export class TutorController{
             if (!data) {
                 throw new HttpException(STATUS_CODES.BAD_REQUEST, MESSAGES.ERROR.BAD_REQUEST)
               }
-              res.status(201).json({
-                data
+              res.json({
+                status:STATUS_CODES.SUCCESS,
+                message:MESSAGES.SUCCESS.DATA_RETRIEVED,
+                data:data
             });
         } catch (error) {
             next(error)
@@ -133,8 +135,8 @@ export class TutorController{
             });
 
             res.status(200).json({
-                success: true,
-                message: 'Logged out successfully'
+                status:STATUS_CODES.SUCCESS,
+                message: MESSAGES.SUCCESS.LOGOUT_SUCCESS
             });
         } catch (error) {
             next(error)

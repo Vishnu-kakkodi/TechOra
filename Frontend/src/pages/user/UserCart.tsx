@@ -7,6 +7,7 @@ import { CartItem } from '../../types/cartType';
 import { toast } from 'react-toastify';
 import {loadStripe, Stripe} from '@stripe/stripe-js';
 import { orderItems } from '../../types/userSide/orderType';
+import { ApiResponse } from 'src/types/responseType';
 
 interface UserCartProps {
   onRemoveItem?: (id: string) => void;
@@ -15,12 +16,10 @@ interface UserCartProps {
 
 const UserCart: React.FC<UserCartProps> = ({ onRemoveItem, onCheckout }) => {
   const { data: cartData, refetch  } = useCartPageQuery(null);
-  const cartItems = cartData?.Data;
+  const cartItems = cartData?.data;
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
   const [payment] = usePaymentMutation();
   const [removecart] = useRemoveCartMutation();
-
-  console.log(cartData,"cartItemsss")
 
   useEffect(() => {
     refetch();
@@ -67,7 +66,7 @@ const UserCart: React.FC<UserCartProps> = ({ onRemoveItem, onCheckout }) => {
 
     const res = await removecart({courseId:id}).unwrap();
     if(res){
-      toast.success("Course removed");
+      toast.success(res.message);
       refetch();
     }
     setSelectedItems(prev => {

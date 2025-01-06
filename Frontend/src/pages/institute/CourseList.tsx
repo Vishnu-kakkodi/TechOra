@@ -14,13 +14,14 @@ import { useCourseListQuery, useListCourseMutation } from '../../store/slices/in
 import { toast } from 'react-toastify';
 import InstituteFooter from '../../components/footer/InstituteFooter';
 import useDebouncedValue from '../../hooks/debounceHook';
+import { CourseDocument } from 'src/types/courseType';
 
 const CourseList = () => {
   const navigate = useNavigate();
   const [activeDropdowns, setActiveDropdowns] = useState<{ [key: string]: boolean }>({});
   const [listCourse] = useListCourseMutation();
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(8);
+  const [limit, setLimit] = useState(4);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState('');
   const [sort, setSort] = useState('');
@@ -121,35 +122,6 @@ const CourseList = () => {
                   />
                 </div>
               </div>
-
-              {/* Department Filter */}
-              {/* <div className="relative">
-          <select
-            value={selectedDepartment}
-            onChange={(e) => setSelectedDepartment(e.target.value)}
-            className="appearance-none w-[180px] px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-          >
-            <option value="all">All Departments</option>
-            <option value="cs">Computer Science</option>
-            <option value="math">Mathematics</option>
-            <option value="business">Business</option>
-          </select>
-          <ChevronDown className="absolute right-2 top-2.5 h-4 w-4 text-gray-500 pointer-events-none" />
-        </div> */}
-
-              {/* Status Filter */}
-              {/* <div className="relative">
-          <select
-            value={selectedStatus}
-            onChange={(e) => setSelectedStatus(e.target.value)}
-            className="appearance-none w-[180px] px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-          >
-            <option value="all">All Status</option>
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-          </select>
-          <ChevronDown className="absolute right-2 top-2.5 h-4 w-4 text-gray-500 pointer-events-none" />
-        </div> */}
             </div>
 
             {course.length === 0 && (
@@ -170,7 +142,7 @@ const CourseList = () => {
             )}
 
 <div className="space-y-4">
-  {course.map((course: any) => (
+  {course.map((course: CourseDocument) => (
     <div 
       key={course._id} 
       className="bg-white rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-all duration-300 flex items-center p-4"
@@ -191,7 +163,7 @@ const CourseList = () => {
         <div className="text-sm text-gray-600">
           <div className="flex items-center mb-1">
             <span className="mr-2 text-gray-500">Instructor:</span>
-            <span className="font-medium">{course.tutorId.tutorname}</span>
+            <span className="font-medium">{course?.tutorId?.tutorname}</span>
           </div>
           <div className="flex items-center">
             <span className="mr-2 text-gray-500">Duration:</span>
@@ -203,7 +175,7 @@ const CourseList = () => {
           <div className="text-sm text-gray-600">
             <div className="flex items-center mb-1">
               <span className="mr-2 text-gray-500">Enrolled:</span>
-              <span className="font-medium">{course.enrolled} 10 Students</span>
+              <span className="font-medium">{course?.enrolledStudents} Students</span>
             </div>
             <div className="flex items-center">
               <span className="mr-2 text-gray-500">Status:</span>

@@ -14,6 +14,7 @@ import { useCreateCourseMutation } from '../../store/slices/tutorSlice';
 import TutorSidebar from '../../components/sidebar/tutorSidebar';
 import { useNotificationSocket } from '../../useNotificationHook';
 import { toast } from 'react-toastify';
+import { CourseDocument } from 'src/types/courseType';
 
 interface CourseFormValues {
   title: string;
@@ -136,7 +137,10 @@ const AddCourse: React.FC = () => {
         body: formData
       }).unwrap();
 
-              if (response?.data) {
+      const courseData: CourseDocument | null = response?.data;
+
+
+              if (courseData) {
                   if (isConnected) {
                       try {
                           await sendNotification({
@@ -155,8 +159,7 @@ const AddCourse: React.FC = () => {
                   }
               }
 
-      console.log('Course created successfully:', response.data._id);
-      navigate('/tutor/upload-videos', { state: { draftId: response.data._id } });
+      navigate('/tutor/upload-videos', { state: { draftId: response.data } });
     } catch (error: any) {
       console.error('Failed to create course:', error);
       setSubmitError(error.message || 'An unexpected error occurred');
@@ -165,7 +168,7 @@ const AddCourse: React.FC = () => {
     }
   };
   const handleImageChange = (
-    setFieldValue: (field: string, value: any) => void,
+    setFieldValue: (field: string, value: File) => void,
     event: ChangeEvent<HTMLInputElement>
   ): void => {
     const file = event.currentTarget.files?.[0];
@@ -179,7 +182,7 @@ const AddCourse: React.FC = () => {
     }
   };
 
-  const removeImage = (setFieldValue: (field: string, value: any) => void): void => {
+  const removeImage = (setFieldValue: (field: string, value: File | null) => void): void => {
     setFieldValue('thumbnail', null);
     setPreviewUrl('');
   };

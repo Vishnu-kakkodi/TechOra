@@ -59,7 +59,7 @@ const ListQuiz = () => {
         { label: 'Oldest', value: 'oldest' },
       ];
 
-    const getDifficultyColor = (level: any) => {
+    const getDifficultyColor = (level: string | undefined) => {
         switch (level) {
             case 'easy': return 'text-green-600 bg-green-50';
             case 'medium': return 'text-yellow-600 bg-yellow-50';
@@ -68,7 +68,7 @@ const ListQuiz = () => {
         }
     };
 
-    const getStatusColor = (status: any) => {
+    const getStatusColor = (status: string) => {
         return status === 'published'
             ? 'text-green-600 bg-green-50'
             : 'text-yellow-600 bg-yellow-50';

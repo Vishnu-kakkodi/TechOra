@@ -14,6 +14,7 @@ import InstituteFooter from '../../components/footer/InstituteFooter';
 import useDebouncedValue from '../../hooks/debounceHook';
 import { useCourseListQuery, useListCourseMutation } from '../../store/slices/tutorSlice';
 import TutorSidebar from '../../components/sidebar/tutorSidebar';
+import { CourseDocument } from 'src/types/courseType';
 
 const CourseList = () => {
   const navigate = useNavigate();
@@ -57,7 +58,7 @@ const CourseList = () => {
     setSearch(value);
   };
 
-  const handleEdit = (courseId: number) => {
+  const handleEdit = (courseId: string) => {
     navigate(`/tutor/courses/edit/${courseId}`);
   };
 
@@ -130,35 +131,6 @@ const CourseList = () => {
                   />
                 </div>
               </div>
-
-              {/* Department Filter */}
-              {/* <div className="relative">
-          <select
-            value={selectedDepartment}
-            onChange={(e) => setSelectedDepartment(e.target.value)}
-            className="appearance-none w-[180px] px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-          >
-            <option value="all">All Departments</option>
-            <option value="cs">Computer Science</option>
-            <option value="math">Mathematics</option>
-            <option value="business">Business</option>
-          </select>
-          <ChevronDown className="absolute right-2 top-2.5 h-4 w-4 text-gray-500 pointer-events-none" />
-        </div> */}
-
-              {/* Status Filter */}
-              {/* <div className="relative">
-          <select
-            value={selectedStatus}
-            onChange={(e) => setSelectedStatus(e.target.value)}
-            className="appearance-none w-[180px] px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-          >
-            <option value="all">All Status</option>
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-          </select>
-          <ChevronDown className="absolute right-2 top-2.5 h-4 w-4 text-gray-500 pointer-events-none" />
-        </div> */}
             </div>
 
 {course.length > 0 ? (
@@ -177,38 +149,38 @@ const CourseList = () => {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {course.map((courseItem: any) => (
-                    <tr key={courseItem._id} className="hover:bg-gray-50">
+                  {course.map((courseItem: CourseDocument) => (
+                    <tr key={courseItem?._id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div className="flex-shrink-0 h-10 w-10">
                             <img 
                               className="h-10 w-10 rounded-md object-cover" 
-                              src={courseItem.thumbnail} 
-                              alt={courseItem.title} 
+                              src={courseItem?.thumbnail} 
+                              alt={courseItem?.title} 
                             />
                           </div>
                           <div className="ml-4">
-                            <div className="text-sm font-medium text-gray-900">{courseItem.title}</div>
+                            <div className="text-sm font-medium text-gray-900">{courseItem?.title}</div>
                           </div>
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {courseItem.tutorId.tutorname}
+                        {courseItem?.tutorId?.tutorname}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {courseItem.department}
+                        {courseItem?.department}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {courseItem.duration} Weeks
+                        {courseItem?.duration} Weeks
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          courseItem.status === 'published' 
+                          courseItem?.status === 'published' 
                             ? 'bg-green-100 text-green-800' 
                             : 'bg-red-100 text-red-800'
                         }`}>
-                          {courseItem.status}
+                          {courseItem?.status}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">

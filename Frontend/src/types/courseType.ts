@@ -1,4 +1,5 @@
 import { Document, Types } from "mongoose";
+import { InstituteDocument } from "./Institute/InstituteDocument";
 
 export interface CourseDetailResponse {
   status: string;
@@ -45,7 +46,7 @@ export interface Course {
   totalReviews?: number;
   averageRating?: number;
   enrolledStudents?: number
-  institutionId?: Types.ObjectId | string;
+  institutionId?: InstituteDocument;
   modules: Module[];
   totalModules?: number;
   totalDuration?: number;

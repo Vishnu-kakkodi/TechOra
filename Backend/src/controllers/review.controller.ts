@@ -22,8 +22,10 @@ export class ReviewController {
             const userId: string | null = req.user?._id;
             const { courseId,currentValue,reviewText } = req.body;
             const response = await this.reviewService.createReview(currentValue,reviewText,userId,courseId);
-            res.status(201).json({
-                message: response,
+            res.json({
+                status:STATUS_CODES.SUCCESS,
+                message:MESSAGES.SUCCESS.DATA_RETRIEVED,
+                data: response
             });
         } catch (error) {
             next(error)
@@ -39,8 +41,9 @@ export class ReviewController {
         try {
             const courseId = req.query.courseId as string;            
             const {response,total} = await this.reviewService.Review(courseId);
-            res.status(201).json({
-                message: "Review fetched",
+            res.json({
+                status:STATUS_CODES.SUCCESS,
+                message:MESSAGES.SUCCESS.DATA_RETRIEVED,
                 data: {response,total}
             });
         } catch (error) {

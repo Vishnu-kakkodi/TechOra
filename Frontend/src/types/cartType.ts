@@ -42,7 +42,7 @@ export interface Cart {
 
 export interface cartResponse {
     message: string;
-    Data: {
+    data: {
         _id: string;
         userId: string;
         items: CartItem[];

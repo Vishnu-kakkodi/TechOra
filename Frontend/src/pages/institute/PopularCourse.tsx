@@ -1,11 +1,12 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCourseListQuery } from '../../store/slices/institutionSlice';
+import { CourseDocument } from 'src/types/courseType';
 
 const PopularCourse = () => {
   const navigate = useNavigate();
   const { data = {} } = useCourseListQuery(null);
-  const courses = data.data || [] as any;
+  const courses = data.data || [] as CourseDocument[];
 
   const latestCourses = [...courses]
     .sort((a, b) => Number(new Date(b.createdAt)) - Number(new Date(a.createdAt)))
@@ -15,7 +16,7 @@ const PopularCourse = () => {
     <div className='flex'>
       <div className="p-6 w-full">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {latestCourses.map((course: any) => (
+          {latestCourses.map((course: CourseDocument) => (
             <div 
               key={course._id} 
               className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow duration-300"
@@ -35,15 +36,15 @@ const PopularCourse = () => {
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-500">Instructor</span>
-                    <span className="font-medium">{course.instructor}</span>
+                    <span className="font-medium">{course?.tutorId?.tutorname}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-500">Duration</span>
-                    <span className="font-medium">{course.duration} Weeks</span>
+                    <span className="font-medium">{course?.duration} Weeks</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-500">Enrolled</span>
-                    <span className="font-medium">{course.enrolled} Students</span>
+                    <span className="font-medium">{course.enrolledStudents} Students</span>
                   </div>
                   <div className="flex justify-between text-sm items-center">
                     <span className="text-gray-500">Status</span>

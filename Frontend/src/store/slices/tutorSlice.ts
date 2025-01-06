@@ -1,6 +1,7 @@
 import { createApi, BaseQueryFn, FetchArgs, fetchBaseQuery, FetchBaseQueryError } from '@reduxjs/toolkit/query/react';
 import { CourseDetailResponse } from '../../types/courseType';
 import { UserRole } from './userSlice';
+import { ApiResponse } from 'src/types/responseType';
 
 const baseQueryWithRole = fetchBaseQuery({
   baseUrl: `${import.meta.env.VITE_BACKEND_URL}/api/`,
@@ -43,7 +44,7 @@ export const tutorSlice = createApi({
       invalidatesTags: ['Tutor'],
     }),
 
-    createCourse: builder.mutation<any, { body: FormData }>({
+    createCourse: builder.mutation<ApiResponse<null>, { body: FormData }>({
       query: ( payload ) => ({
         url: '/tutor/create-course', 
         method: 'POST',
@@ -62,7 +63,7 @@ export const tutorSlice = createApi({
     providesTags: ['Tutor'],
    }),
 
-   createModule: builder.mutation<any, { body: FormData }>({
+   createModule: builder.mutation<ApiResponse<null>, { body: FormData }>({
     query:(payload)=>({
       url: '/tutor/create-module',
       method: 'POST',
@@ -82,7 +83,7 @@ export const tutorSlice = createApi({
     providesTags: ['Tutor'],
    }),
 
-   coursedetail: builder.query<CourseDetailResponse, string>({
+   coursedetail: builder.query<ApiResponse<null>, string>({
     query: (courseId) =>({
       url: `/tutor/course-detail/${courseId}`,
       method:'GET',
@@ -157,7 +158,7 @@ export const tutorSlice = createApi({
     invalidatesTags: ['Tutor'],
   }),
 
-  updateCourse: builder.mutation<any, {values:any, id:string|undefined}>({
+  updateCourse: builder.mutation<ApiResponse<null>, {values:any, id:string|undefined}>({
     query: ({values,id}) => ({
         url: `/tutor/course-update/?courseId=${id}`, 
         method: 'POST',

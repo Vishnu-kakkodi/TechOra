@@ -18,6 +18,7 @@ import Hero1 from '../../../layout/userLayout/Hero1';
 import Hero4 from '../../../layout/userLayout/Hero4';
 import Hero3 from '../../../layout/userLayout/Hero3';
 import Hero2 from '../../../layout/userLayout/Hero2';
+import { CourseDocument } from 'src/types/courseType';
 
 const UserHome = () => {
 
@@ -41,7 +42,7 @@ const UserHome = () => {
 
 
   const { data = {} } = useHomeDataQuery(null);
-  const courses = data.courses?.course || [] as any;
+  const courses: CourseDocument[] = data.courses?.course || [];
   const winners = data.winners?.quizWinners || [] as any;
 
 
@@ -140,7 +141,7 @@ const UserHome = () => {
 
             {/* Grid Container */}
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-8">
-              {courses.map((course: any) => (
+              {courses.map((course: CourseDocument) => (
                 <div
                   key={course.id}
                   className="bg-white border border-gray-200 overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2"
@@ -168,7 +169,7 @@ const UserHome = () => {
                       </div>
                       <div className="flex items-center text-gray-600 text-xs md:text-sm">
                         <User size={14} className="mr-2 text-gray-500" />
-                        <span>{course.tutorId.tutorname}</span>
+                        <span>{course?.tutorId?.tutorname}</span>
                       </div>
                     </div>
 
@@ -201,7 +202,7 @@ const UserHome = () => {
                       </div>
                       <div className="flex items-center">
                         <BookOpen size={14} className="mr-1 text-green-500" />
-                        <span>{course.level}</span>
+                        <span>Medium</span>
                       </div>
                       <div className="flex items-center">
                         <User size={14} className="mr-1 text-purple-500" />
@@ -212,7 +213,7 @@ const UserHome = () => {
                     {/* Price and Enroll Button */}
                     <div className="flex justify-between items-center">
                       <div className="text-base md:text-lg font-bold text-blue-700">
-                        ₹{course.price.toFixed(2)}
+                        ₹{course?.price?.toFixed(2)}
                       </div>
                       <button onClick={() => handleAddToCart(course._id)} className="bg-blue-600 text-white px-4 py-2 text-sm md:text-base rounded-full hover:bg-blue-700 transition-colors">
                         Add To Cart

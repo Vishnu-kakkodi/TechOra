@@ -1,7 +1,8 @@
 import React from 'react';
+import { CourseDocument } from 'src/types/courseType';
 
 interface InstructorDetailsProps {
-  course: any;
+  course: CourseDocument;
 }
 
 const InstructorDetails: React.FC<InstructorDetailsProps> = ({ course }) => {
@@ -10,13 +11,13 @@ const InstructorDetails: React.FC<InstructorDetailsProps> = ({ course }) => {
       <h3 className="text-lg font-bold mb-4">Instructor Details</h3>
       <div className="flex items-center space-x-4">
         <img
-          src={course.tutorId.profilePic}
+          src={course?.tutorId?.profilePic}
           alt={course?.tutorId?.tutorname}
           className="w-16 h-16 rounded-full object-cover"
         />
         <div>
           <p className="font-medium">{course?.tutorId?.tutorname}</p>
-          <p className="text-sm text-gray-500">{course?.tutorId.department}</p>
+          <p className="text-sm text-gray-500">{course?.tutorId?.department}</p>
         </div>
       </div>
       <div className="mt-4 space-y-4">
