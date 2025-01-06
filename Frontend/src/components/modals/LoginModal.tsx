@@ -49,7 +49,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ setLoginModalOpen, setOtpModalO
         localStorage.setItem('email', email);
         toast.success('Google sign-in successful!');
         setLoginModalOpen(false);
-        dispatch(setCredentials({ ...response.data?.userDetails }));
+        dispatch(setCredentials({ ...response.data?.data }));
         navigate('/home');
       }
     } catch (error) {

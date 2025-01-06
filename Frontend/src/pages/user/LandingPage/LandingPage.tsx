@@ -67,8 +67,8 @@ const LandingPage = () => {
 
 
   const { data = {} } = useHomeDataQuery(null);
-  const courses: CourseDocument[] = data.courses?.course || [];
-  const winners = data.winners?.quizWinners || [] as any;
+  const courses: CourseDocument[] = data?.data?.courses?.course || [];
+  const winners = data?.data?.winners?.quizWinners || [] as any;
 
   const handleForgotPassword = () => {
     setLoginModalOpen(false);
