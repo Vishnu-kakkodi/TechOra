@@ -47,7 +47,7 @@ const TutorLogin: React.FC<ForgotPasswordProps> = ({ setModalOpen }) => {
     onSubmit: async (values, { setSubmitting }) => {
       try {
         const response = await login(values).unwrap();
-        dispatch(setTutorCredential(response.tutor));
+        dispatch(setTutorCredential(response.data));
         navigate('/tutor/dashboard');
       } catch (err) {
         console.error('Tutor login error:', err);
