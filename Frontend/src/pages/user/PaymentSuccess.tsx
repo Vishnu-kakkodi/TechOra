@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { usePaymentSuccessMutation } from '../../store/slices/userSlice';
 import { CheckCircleIcon } from 'lucide-react';
+import { OrderResponse } from 'src/types/userSide/orderType';
 
 interface CourseItem {
     course: {
@@ -35,15 +36,16 @@ interface OrderDetails {
 const PaymentSuccess: React.FC = () => {
     const [searchParams] = useSearchParams();
     const orderId = searchParams.get('orderId');
-    const [orderDetails, setOrderDetails] = useState<OrderDetails | null>(null);
+    const [orderDetails, setOrderDetails] = useState<any | null>(null);
     const [paymentSuccess] = usePaymentSuccessMutation();
 
     useEffect(() => {
         const updateOrderPaymentStatus = async () => {
             if (orderId) {
                 try {
-                    const orderResponse = await paymentSuccess(orderId) as { data: OrderDetails };
-                    setOrderDetails(orderResponse.data);
+                    const orderResponse = await paymentSuccess(orderId);
+                    const Data = orderResponse?.data?.data
+                    setOrderDetails(Data);
                 } catch (err) {
                     console.error('Error updating payment status:', err);
                 }
@@ -52,6 +54,7 @@ const PaymentSuccess: React.FC = () => {
 
         updateOrderPaymentStatus();
     }, [orderId, paymentSuccess]);
+
 
     if (!orderId) {
         return (
@@ -69,8 +72,6 @@ const PaymentSuccess: React.FC = () => {
         );
     }
 
-    const { order } = orderDetails;
-
     return (
         <div className="min-h-screen bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-8">
@@ -86,35 +87,35 @@ const PaymentSuccess: React.FC = () => {
                     <div className="grid md:grid-cols-2 gap-6">
                         <div>
                             <p className="text-gray-600">Order ID: 
-                                <span className="font-semibold ml-2 text-gray-900">{order.orderId}</span>
+                                <span className="font-semibold ml-2 text-gray-900">{orderDetails?.orderId}</span>
                             </p>
                             <p className="text-gray-600 mt-2">Payment Method: 
-                                <span className="font-semibold ml-2 text-gray-900">{order.paymentMethod}</span>
+                                <span className="font-semibold ml-2 text-gray-900">{orderDetails?.paymentMethod}</span>
                             </p>
                             <p className="text-gray-600 mt-2">Total Items: 
-                                <span className="font-semibold ml-2 text-gray-900">{order.totalItems}</span>
+                                <span className="font-semibold ml-2 text-gray-900">{orderDetails?.totalItems}</span>
                             </p>
                         </div>
                         <div className="text-right">
-                            <p className="text-2xl font-bold text-gray-900">Total: ₹{order.totalPrice.toFixed(2)}</p>
+                            <p className="text-2xl font-bold text-gray-900">Total: ₹{orderDetails?.totalPrice.toFixed(2)}</p>
                         </div>
                     </div>
 
                     <div className="mt-8">
                         <h3 className="text-xl font-semibold text-gray-900 mb-4">Purchased Courses</h3>
                         <div className="grid md:grid-cols-2 gap-6">
-                            {order.items.map((item) => (
+                            {orderDetails?.items?.map((item:any) => (
                                 <div 
-                                    key={item.course._id} 
+                                    key={item?.course._id} 
                                     className="bg-gray-50 rounded-lg overflow-hidden shadow-md flex"
                                 >
                                     <img 
-                                        src={item.course.thumbnail} 
-                                        alt={item.course.title} 
+                                        src={item?.course?.thumbnail} 
+                                        alt={item?.course?.title} 
                                         className="w-32 h-24 object-cover"
                                     />
                                     <div className="p-4 flex-grow">
-                                        <h4 className="font-bold text-gray-900">{item.course.title}</h4>
+                                        <h4 className="font-bold text-gray-900">{item?.course?.title}</h4>
                                         <p className="text-gray-800 font-semibold mt-2">
                                             ₹ {item.price.toFixed(2)}
                                         </p>

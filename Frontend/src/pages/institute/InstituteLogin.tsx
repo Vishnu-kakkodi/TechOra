@@ -56,7 +56,7 @@ const InstituteLogin: React.FC<ForgotPasswordProps> = ({ setModalOpen }) => {
       try {
         const response = await login(values).unwrap();
         console.log(response.institute, "response")
-        dispatch(setInstituteCredentials(response.institute));
+        dispatch(setInstituteCredentials(response.data));
         navigate('/institute/dashboard');
       } catch (err) {
         console.error('Institute login error:', err);

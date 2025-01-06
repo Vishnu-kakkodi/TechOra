@@ -29,7 +29,8 @@ const MESSAGES = {
       DEPARTMENT_CREATED: 'Department created successfully',
       QUIZ_RESULT_ADDED: "Result Added",
       PROFILE_PHOTO_UPDATED: "Profile photo updated",
-      PROFILE_UPDATED: "Profile updated"
+      PROFILE_UPDATED: "Profile updated",
+      ORDER_CREATED: "Order Created",
     },
   
     ERROR: {
@@ -62,7 +63,8 @@ const MESSAGES = {
       ORDER_NOT_FOUND: 'Order not found',
       EMAIL_VERIFICATION_FAILED: 'Verification failed',
       REQUIRED_FIELD_MISSING: 'Missing required fields',
-      PASSWORD_MISMATCH: "Password mismatch"
+      PASSWORD_MISMATCH: "Password mismatch",
+      INVALID_PAYMENT_METHOD: "Invalid Payment method"
     },
   
     VALIDATION: {

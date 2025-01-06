@@ -225,14 +225,14 @@ export const userSlice = createApi({
     }),
 
     payment: builder.mutation({
-      query: ({orderDetails}) => ({
+      query: ({orderDetails,paymentMethod}) => ({
         url: '/users/payment',
         method: 'POST',
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: {orderDetails}, 
+        body: {orderDetails,paymentMethod}, 
       }),
     }),
 

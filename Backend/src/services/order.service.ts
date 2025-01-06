@@ -30,7 +30,7 @@ class OrderService implements IOrderService {
         }
     }
 
-    async createOrder(orderId: string, userId: string, orderItems: Array<{ courseId: string, price: number }>, total: number): Promise<OrderDocument> {
+    async createOrder(orderId: string, userId: string, orderItems: Array<{ courseId: string, price: number }>, paymentMethod: string, total: number): Promise<OrderDocument> {
         try {
             return this.orderRepository.create({
                 orderId,
@@ -43,7 +43,7 @@ class OrderService implements IOrderService {
                 totalItems: orderItems.length,
                 totalPrice: total,
                 paymentStatus: 'Pending',
-                paymentMethod: 'Stripe',
+                paymentMethod: paymentMethod,
                 transactionId: "abcde"
             });
         } catch (error) {

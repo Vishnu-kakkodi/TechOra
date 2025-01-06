@@ -16,20 +16,18 @@ const OrderDetail = () => {
     const [showAll, setShowAll] = useState(false);
     const { orderId } = useParams<{ orderId: string }>();
     const navigate = useNavigate();
-    const { data: order, isLoading, isError } = useGetOrderDetailQuery({orderId});
+    const { data: responseData, isLoading, isError } = useGetOrderDetailQuery({orderId});
     const [currentOrder, setCurrentOrder] = useState<Order | null>(null);
     const [payment] = usePaymentMutation();
 
-
+    const order = responseData?.data;
     useEffect(() => {
-        if (order?.order) {
-            setCurrentOrder(order.order);
+        if (order) {
+            setCurrentOrder(order);
             setLoading(false);
         }
     }, [order]);   
     
-    console.log(currentOrder)
-
     
 
     if (isLoading || loading) {

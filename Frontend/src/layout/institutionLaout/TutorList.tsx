@@ -25,9 +25,8 @@ const TutorList: React.FC<TutorListProps> = ({ itemsPerPage = 10 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   
-  const { data: { institutes } = { institutes: [] }} = useTutorListQuery(null);
-
-  const filteredTutors = institutes?.filter((tutor: Tutor) => 
+  const { data: institutes = { institutes: [] }} = useTutorListQuery(null);
+  const filteredTutors = institutes?.data?.filter((tutor: Tutor) => 
     tutor.tutorname.toLowerCase().includes(searchTerm.toLowerCase()) ||
     tutor.department.toLowerCase().includes(searchTerm.toLowerCase())
   ) || [];

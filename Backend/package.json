@@ -29,6 +29,7 @@
     "order-id": "^2.1.2",
     "otp-generator": "^4.0.1",
     "paypal-rest-sdk": "^1.8.1",
+    "razorpay": "^2.9.5",
     "socket.io": "^4.8.1",
     "springedge": "^1.0.6",
     "stripe": "^17.3.1"

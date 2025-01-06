@@ -13,7 +13,7 @@ const OrderList = () => {
   const debouncedSearchTerm = useDebouncedValue(search, 500);
 
   const {
-    data: order,
+    data: responseData,
     isLoading,
     isError
   } = useGetOrdersQuery({
@@ -38,8 +38,8 @@ const OrderList = () => {
     );
   }
 
-  const orders = order?.orders || [];
-  const total = order?.total || 0;
+  const orders = responseData?.data?.orders || [];
+  const total = responseData?.data?.total || 0;
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setPage(1);
