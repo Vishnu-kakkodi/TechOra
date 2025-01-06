@@ -32,7 +32,7 @@ class TutorService implements ITutorService {
                 throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
               }
             if (tutor.password !== password) {
-                throw new HttpException(400, "Password mismatch");
+                throw new HttpException(STATUS_CODES.BAD_REQUEST, MESSAGES.ERROR.PASSWORD_MISMATCH);
             }
 
             const accessToken = helperFunction.accesstoken(tutor.id, "tutor");

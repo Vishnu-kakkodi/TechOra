@@ -51,9 +51,6 @@ class CartService implements ICartService {
         return information = 'Already added'
       }
 
-      console.log("Test");
-
-
       if (cart) {
         cart.items.push(newItem);
         cart.totalItems += 1;

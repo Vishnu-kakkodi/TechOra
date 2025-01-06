@@ -68,7 +68,6 @@ class OrderService implements IOrderService {
             }
             return updatedOrder;
         } catch (error) {
-            console.log(error, "Error updating payment");
             throw new HttpException(STATUS_CODES.SERVER_ERROR, MESSAGES.ERROR.SERVER_ERROR)
         }
     }
@@ -105,7 +104,6 @@ class OrderService implements IOrderService {
             const {orders, total} = await this.orderRepository.find(query, skip, limit, sortOptions)
             return {orders, total};
         } catch (error) {
-            console.log(error, "Error updating payment");
             throw error
         }
     }
@@ -114,7 +112,6 @@ class OrderService implements IOrderService {
         try {
             return await this.orderRepository.findOne(orderId)
         } catch (error) {
-            console.log(error, "Error updating payment");
             throw new HttpException(STATUS_CODES.SERVER_ERROR, MESSAGES.ERROR.SERVER_ERROR)
         }
     }

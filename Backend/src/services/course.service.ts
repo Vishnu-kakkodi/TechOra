@@ -34,7 +34,7 @@ class CourseService implements ICourseService {
   async createCourse(courseData: CreateCourseDto, tutorId: string): Promise<Course> {
     try {
       if (!courseData.title || !courseData.institutionId) {
-        throw new HttpException(400, 'Missing required fields');
+        throw new HttpException(STATUS_CODES.BAD_REQUEST, MESSAGES.ERROR.REQUIRED_FIELD_MISSING);
       }
       if (tutorId) {
         courseData.tutorId = tutorId;

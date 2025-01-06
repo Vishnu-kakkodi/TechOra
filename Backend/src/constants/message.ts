@@ -34,7 +34,7 @@ const MESSAGES = {
   
     ERROR: {
       USER_NOT_FOUND: "User not found.",
-      INSTITUTE_NOT_FOUND: "User not found.",
+      INSTITUTE_NOT_FOUND: "Institute not found.",
       TIME_EXPIRED: "Time expired, Try again.",
       EMAIL_ALREADY_EXISTS: "Email already exists.",
       INVALID_CREDENTIALS: "Invalid email or password.",
@@ -60,7 +60,9 @@ const MESSAGES = {
       FILE_UPLOAD_FAILED: "File uploading failed",
       INVALID_ORDER_DETAIL: 'Invalid order details',
       ORDER_NOT_FOUND: 'Order not found',
-      EMAIL_VERIFICATION_FAILED: 'Verification failed'
+      EMAIL_VERIFICATION_FAILED: 'Verification failed',
+      REQUIRED_FIELD_MISSING: 'Missing required fields',
+      PASSWORD_MISMATCH: "Password mismatch"
     },
   
     VALIDATION: {

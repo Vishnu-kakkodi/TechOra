@@ -38,7 +38,6 @@ class QuizService implements IQuizService {
             const createdQuiz = await this.quizRepository.create(newItem);
             return createdQuiz._id 
         } catch (error) {
-            console.error('Error creating course:', error);
             throw error;
         }
 
@@ -80,7 +79,6 @@ class QuizService implements IQuizService {
               
             return await this.quizRepository.find(query,skip,limit,sortOptions);
         } catch (error) {
-            console.error('Error creating course:', error);
             throw new HttpException(STATUS_CODES.SERVER_ERROR, MESSAGES.ERROR.SERVER_ERROR)
         }
 
@@ -121,7 +119,6 @@ class QuizService implements IQuizService {
               }
             return await this.quizRepository.findQuizz("institutionId",institutionId,query,skip,limit,sortOptions);
         } catch (error) {
-            console.error('Error creating course:', error);
             throw new HttpException(STATUS_CODES.SERVER_ERROR, MESSAGES.ERROR.SERVER_ERROR)
         }
 
@@ -163,7 +160,6 @@ class QuizService implements IQuizService {
               }
             return await this.quizRepository.findQuizz("tutorId",tutorId,query,skip,limit,sortOptions);
         } catch (error) {
-            console.error('Error creating course:', error);
             throw new HttpException(STATUS_CODES.SERVER_ERROR, MESSAGES.ERROR.SERVER_ERROR)
         }
 
@@ -177,7 +173,6 @@ class QuizService implements IQuizService {
               }
             return await this.quizRepository.findQuiz(quizId);
         } catch (error) {
-            console.error('Error creating course:', error);
             throw error;
         }
     }
@@ -186,7 +181,6 @@ class QuizService implements IQuizService {
         try {
             return await this.quizRepository.UpdateQuiz(quizData,quizId);
         } catch (error) {
-            console.error('Error creating course:', error);
             throw error;
         }
     }
@@ -199,7 +193,6 @@ class QuizService implements IQuizService {
               }
             return await this.quizRepository.findLatestQuiz(instituteId);
         } catch (error) {
-            console.error('Error creating course:', error);
             throw error;
         }
     }
@@ -231,9 +224,7 @@ class QuizService implements IQuizService {
 
             return
 
-
         } catch (error) {
-            console.error('Error creating course:', error);
             throw error;
         }
     }

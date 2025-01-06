@@ -122,10 +122,10 @@ class InstituteService implements InstituteService {
                 throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
               }
             if (institute.collegeCode !== collegeCode) {
-                throw new HttpException(400, "Password mismatch");
+                throw new HttpException(STATUS_CODES.BAD_REQUEST, MESSAGES.ERROR.PASSWORD_MISMATCH);
             }
             if (institute.status !== InstituteStatus.Active) {
-                throw new HttpException(400, "Institution does not exist");
+                throw new HttpException(STATUS_CODES.BAD_REQUEST, MESSAGES.ERROR.INSTITUTE_NOT_FOUND);
             }
 
             const accessToken = helperFunction.accesstoken(institute.id, "institute");

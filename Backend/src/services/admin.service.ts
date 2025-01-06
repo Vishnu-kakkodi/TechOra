@@ -13,6 +13,8 @@ import dotenv from 'dotenv';
 import { emailSend } from "../utils/emailSend";
 import { FilterQuery } from 'mongoose';
 import { IAdminService } from "../interfaces/IServiceInterface/IAdminService";
+import STATUS_CODES from "../constants/statusCode";
+import MESSAGES from "../constants/message";
 dotenv.config();
 
 export type SearchQueryType = FilterQuery<{
@@ -59,7 +61,7 @@ class AdminService implements IAdminService {
         }
 
         if (!admin) {
-            throw new HttpException(400, "User does not exist");
+            throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND);
         }
 
         return Promise.resolve(admin);
@@ -113,13 +115,12 @@ class AdminService implements IAdminService {
         try {
             const user = await this.userRepository.findById(userId);
             if (!user) {
-                throw new HttpException(400, "User not found");
+                throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.USER_NOT_FOUND);
             }
             user.status = user.status === UserStatus.Active ? UserStatus.Inactive : UserStatus.Active;
             await user.save();
             return user;
         } catch (error) {
-            console.error("Error updating user status:", error);
             throw error;
         }
     }
@@ -128,13 +129,12 @@ class AdminService implements IAdminService {
         try {
             const institute = await this.instituteRepository.findById(instituteId);
             if (!institute) {
-                throw new HttpException(400, "Institute not found");
+                throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.INSTITUTE_NOT_FOUND);
             }
             institute.status = InstituteStatus.Active;
             await institute.save();
             return institute;
         } catch (error) {
-            console.error("Error updating institution status:", error);
             throw error;
         }
     }
@@ -144,7 +144,7 @@ class AdminService implements IAdminService {
         try {
             const institute = await this.instituteRepository.findById(instituteId);
             if (!institute) {
-                throw new HttpException(400, "Institute not found");
+                throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.INSTITUTE_NOT_FOUND);
             }
             institute.status = InstituteStatus.Reject;
             await institute.save();
@@ -152,7 +152,6 @@ class AdminService implements IAdminService {
             await emailSend(institute.instituteEmail,subject,rejectReason);
             return institute;
         } catch (error) {
-            console.error("Error updating institution status:", error);
             throw error;
         }
     }
@@ -161,13 +160,12 @@ class AdminService implements IAdminService {
         try {
             const institute = await this.instituteRepository.findById(instituteId);
             if (!institute) {
-                throw new HttpException(400, "Institute not found");
+                throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.INSTITUTE_NOT_FOUND);
             }
             institute.status = InstituteStatus.Inactive;
             await institute.save();
             return institute;
         } catch (error) {
-            console.error("Error updating institution status:", error);
             throw error;
         }
     }
@@ -176,13 +174,12 @@ class AdminService implements IAdminService {
         try {
             const institute = await this.instituteRepository.findById(instituteId);
             if (!institute) {
-                throw new HttpException(400, "Institute not found");
+                throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.INSTITUTE_NOT_FOUND);
             }
             institute.status = InstituteStatus.Active;
             await institute.save();
             return institute;
         } catch (error) {
-            console.error("Error updating institution status:", error);
             throw error;
         }
     }
@@ -192,11 +189,10 @@ class AdminService implements IAdminService {
         try {
             const institute = await this.instituteRepository.findById(instituteId);
             if (!institute) {
-                throw new HttpException(400, "Institute not found");
+                throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.INSTITUTE_NOT_FOUND);
             }
             return institute;
         } catch (error) {
-            console.error("Error updating institution status:", error);
             throw error;
         }
     }
@@ -206,7 +202,7 @@ class AdminService implements IAdminService {
         try {
             const key = this.getKeyFromUrl(url);
             if (!key) {
-                throw new Error('Invalid URL format');
+                throw new HttpException(STATUS_CODES.BAD_REQUEST,MESSAGES.ERROR.INVALID_FORMAT);
             }
             const params = {
                 Bucket: process.env.AWS_S3_BUCKET_NAME!,
@@ -218,7 +214,7 @@ class AdminService implements IAdminService {
             if (s3Response.Body instanceof Readable) {
                 responseBody = await this.streamToBuffer(s3Response.Body);
             } else {
-                throw new Error('Unexpected response body type');
+                throw new HttpException(STATUS_CODES.BAD_REQUEST,MESSAGES.ERROR.INVALID_FORMAT);
             }
             const response: DownloadDocResponse = {
                 Body: responseBody,
@@ -226,7 +222,6 @@ class AdminService implements IAdminService {
             };
             return response;
         } catch (error) {
-            console.error("Error downloading document:", error);
             throw error;
         }
     }
@@ -241,7 +236,6 @@ class AdminService implements IAdminService {
 
             return pathname
         } catch (error) {
-            console.error('Error parsing URL:', error);
             return null;
         }
     }

@@ -67,7 +67,7 @@ class UserService implements IUserService {
             const user = await this.userRepository.findByEmail(email)
 
             if (!user) {
-                throw new HttpException(STATUS_CODES.NOT_FOUND, "user");
+                throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.USER_NOT_FOUND);
             }
 
             if (user) {
@@ -131,7 +131,7 @@ class UserService implements IUserService {
         try {
             const user = await this.userRepository.findByEmail(email)
             if (!user) {
-                throw new HttpException(400, "User does not exist");
+                throw new HttpException(STATUS_CODES.BAD_REQUEST, MESSAGES.ERROR.USER_NOT_FOUND);
             }
             const generateNumericOTP = (length: number): string => {
                 let otp = '';
@@ -185,9 +185,9 @@ class UserService implements IUserService {
         try {
             console.log(otp, CookieData)
             if (otp !== CookieData) {
-                throw new Error('Invalid OTP');
+                throw new HttpException(STATUS_CODES.BAD_REQUEST,MESSAGES.ERROR.INVALID_OTP);
             } else if (otp === CookieData) {
-                return "Otp Verified"
+                return MESSAGES.SUCCESS.OTP_VERIFIED
             }
         } catch (error) {
             throw error
@@ -271,7 +271,6 @@ class UserService implements IUserService {
             if (user) {
                 const validPassword = await PasswordUtils.comparePassword(currentPassword, user.password);
                 if (!validPassword) {
-                    console.log("Error")
                     throw new HttpException(STATUS_CODES.UNAUTHORIZED, MESSAGES.ERROR.INVALID_CURRENT_PASSWORD)
                 }
                 if (currentPassword === newPassword) {
