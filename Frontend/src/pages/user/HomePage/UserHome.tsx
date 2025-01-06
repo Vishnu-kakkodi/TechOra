@@ -41,9 +41,9 @@ const UserHome = () => {
 
 
 
-  const { data = {} } = useHomeDataQuery(null);
-  const courses: CourseDocument[] = data?.data.courses?.course || [];
-  const winners = data?.data.winners?.quizWinners || [] as any;
+  const { data: homeData } = useHomeDataQuery(null);
+  const courses: CourseDocument[] = homeData?.data?.courses?.course || [];
+  const winners = homeData?.data?.winners?.quizWinners || [] as any;
 
 
 
