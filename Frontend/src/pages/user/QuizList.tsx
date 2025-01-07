@@ -9,6 +9,7 @@ import useDebouncedValue from '../../hooks/debounceHook';
 import { useAppSelector } from '../../store/hook';
 import { toast } from 'react-toastify';
 import Footer from '../../components/footer/Footer';
+import enterFullScreen from '../../utils/enterFullScreen';
 
 
 const QuizList = () => {
@@ -69,9 +70,12 @@ const QuizList = () => {
       return;
     }
 
+    const appElement = document.documentElement;
+    enterFullScreen(appElement);
+
     navigate(`/start-quiz/quizId=${quiz._id}`, {
       state: { quiz: quiz }
-    }); console.log('Starting quiz:', quiz._id);
+    }); 
   };
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {

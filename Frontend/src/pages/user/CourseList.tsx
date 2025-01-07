@@ -101,7 +101,7 @@ const CourseList = () => {
         try {
             const response = await addTocart({ courseId }).unwrap();
             if (response) {
-                toast.success("Course added to cart successfully!");
+                toast.success(response.message);
             }
         } catch (error: unknown) {
             const ApiError = error as ApiError;

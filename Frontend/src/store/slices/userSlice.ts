@@ -178,7 +178,7 @@ export const userSlice = createApi({
       providesTags: ['User']
     }),
 
-    addToCart: builder.mutation<string, { courseId: string }>({
+    addToCart: builder.mutation<ApiResponse<null>, { courseId: string }>({
       query: ({courseId}) =>({
         url: '/users/add-cart',
         method: 'POST',

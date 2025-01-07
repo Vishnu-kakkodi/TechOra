@@ -6,16 +6,19 @@ import mongoose from "mongoose";
 import STATUS_CODES from "../constants/statusCode";
 import MESSAGES from "../constants/message";
 import { ICartService } from "../interfaces/IServiceInterface/ICartService";
+import { UserRepository } from "../repositories/user.repository";
 
 class CartService implements ICartService {
   private courseRepository: CourseRepository;
   private cartRepository: CartRepository;
+  private userRepository: UserRepository;
 
 
 
-  constructor(courseRepository: CourseRepository, cartRepository: CartRepository) {
+  constructor(courseRepository: CourseRepository, cartRepository: CartRepository, userRepository: UserRepository) {
     this.courseRepository = courseRepository;
     this.cartRepository = cartRepository;
+    this.userRepository = userRepository
   }
 
   async addToCart(userId: string | null, courseId: string): Promise<any> {
@@ -26,11 +29,16 @@ class CartService implements ICartService {
       if (!userId) {
         throw new HttpException(STATUS_CODES.BAD_REQUEST, MESSAGES.ERROR.BAD_REQUEST)
       }
+
+      let user = await this .userRepository.findById(userId);
+
+      if(user?.purchasedCourses.includes(new mongoose.Types.ObjectId(courseId))){
+        throw new HttpException(STATUS_CODES.CONFLICT, MESSAGES.ERROR.COURSE_ALREADY_PURCHASED)
+      }
+
       let cart = await this.cartRepository.findCart(userId);
 
       let course = await this.courseRepository.findById(courseId);
-
-
 
       if (!course) {
         throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
@@ -48,7 +56,7 @@ class CartService implements ICartService {
       let information: string = 'Item added successfully'
 
       if (courseExists) {
-        return information = 'Already added'
+        throw new HttpException(STATUS_CODES.CONFLICT, MESSAGES.ERROR.ALREADY_ADDED_TO_CART)
       }
 
       if (cart) {

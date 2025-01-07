@@ -64,7 +64,8 @@ const MESSAGES = {
       EMAIL_VERIFICATION_FAILED: 'Verification failed',
       REQUIRED_FIELD_MISSING: 'Missing required fields',
       PASSWORD_MISMATCH: "Password mismatch",
-      INVALID_PAYMENT_METHOD: "Invalid Payment method"
+      INVALID_PAYMENT_METHOD: "Invalid Payment method",
+      COURSE_ALREADY_PURCHASED: "This course has already been purchased."
     },
   
     VALIDATION: {
