@@ -60,7 +60,6 @@ const ChatModal: React.FC<ChatModalProps> = ({
     new Notification("New Message", {
       body: message.text,
     });
-    toast.success(message.text);
     const audio = new Audio(notificationSound);
     audio.play();
   }, []);
