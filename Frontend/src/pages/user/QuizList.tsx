@@ -168,16 +168,56 @@ const QuizList = () => {
             {/* Filter Button */}
             <button
               onClick={toggleFilter}
-              className="block md:hidden p-2 bg-gray-100 rounded-md shadow-sm"
+              className="block md:hidden mt-4"
             >
-              <FilterIcon className="inline-block mr-2 text-gray-600" />
-              Filter
+              <FilterIcon />
             </button>
 
           </div>
 
-          <div className="relative block md:hidden mt-4">
-            {/* Filter Dropdown */}
+          {isFilterOpen && (
+            <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-end">
+              <div className="bg-white w-full rounded-t-lg p-4 shadow-lg">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-lg font-semibold text-gray-800">Filter Categories</h3>
+                  <button onClick={toggleFilter} className="text-gray-500 hover:text-gray-800">
+                    ✖
+                  </button>
+                </div>
+
+                {/* Filter Dropdown */}
+                <div className="mt-4">
+                  <label htmlFor="filter-dropdown" className="block text-sm font-medium text-gray-700 mb-2">
+                    Select Categories
+                  </label>
+                  <select
+                    id="filter-dropdown"
+                    multiple
+                    value={selectedCategories}
+                    onChange={handleFilterChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:outline-none h-32 overflow-auto"
+                  >
+                    {/* Default "Select All" Option */}
+                    <option
+                      value="select-all"
+                      onClick={handleSelectAll}
+                      className="text-gray-700 font-semibold"
+                    >
+                      Select All
+                    </option>
+                    {/* Map other options */}
+                    {quizCategories.map((option: string) => (
+                      <option key={option} value={option} className="text-gray-700">
+                        {option}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* <div className="relative block md:hidden mt-4">
             {isFilterOpen && (
               <div className="relative mt-4">
                 <label htmlFor="filter-dropdown" className="block text-sm font-medium text-gray-700 mb-2">
@@ -190,7 +230,6 @@ const QuizList = () => {
                   onChange={handleFilterChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:outline-none h-32 overflow-auto"
                 >
-                  {/* Default "Select All" Option */}
                   <option
                     value="select-all"
                     onClick={handleSelectAll}
@@ -198,7 +237,6 @@ const QuizList = () => {
                   >
                     Select All
                   </option>
-                  {/* Map other options */}
                   {quizCategories.map((option: string) => (
                     <option key={option} value={option} className="text-gray-700">
                       {option}
@@ -207,7 +245,7 @@ const QuizList = () => {
                 </select>
               </div>
             )}
-          </div>
+          </div> */}
         </div>
       </motion.div>
 
@@ -309,83 +347,7 @@ const QuizList = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 bg-gray-100">
-            {quizzes.map((quiz: QuizDocument) => (
-              <div
-                key={quiz._id}
-                className="bg-white rounded-lg border border-gray-200 p-6 shadow-md"
-              >
-                <div className="flex justify-between gap-6">
-                  <div className="flex flex-col items-center">
-                    <div className="bg-red-500 text-white text-xs px-2 py-1 rounded-md text-center">
-                      {quiz.status}
-                    </div>
-
-                    <div className="text-xs border-2 border-black rounded-md bg-gray-100 p-2 mt-2 text-center">
-                      <div className="text-lg font-semibold bg-black text-white p-1 rounded">
-                        {new Date(quiz.createdAt).toLocaleString('en-US', { month: 'short' }).toUpperCase()}
-                      </div>
-                      <div className="text-lg font-semibold text-gray-700">
-                        {new Date(quiz.createdAt).getDate()}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col justify-center gap-2 bg-gray-100 border-2 border-red-100 p-1 rounded-[5px]">
-                    <p className="text-[10px] text-gray-700">
-                      <strong>START DATE:</strong> <span className="font-medium">{quiz.startDate}</span>
-                    </p>
-                    <p className="text-[10px] text-gray-700">
-                      <strong>END DATE:</strong> <span className="font-medium">{quiz.startDate}</span>
-                    </p>
-                    <p className="text-[10px] text-gray-700">
-                      <strong>Duration:</strong> <span className="font-medium">{quiz.duration}</span>
-                    </p>
-                  </div>
-
-                  <div className="flex flex-col justify-start gap-2">
-                    <h2 className="text-lg font-bold">{quiz.title}</h2>
-                    <p className="text-sm text-gray-500">
-                      <strong>Conducted By:</strong> Department of {quiz.department}
-                    </p>
-                    <p className="text-sm text-gray-500">{quiz.institutionId?.collegeName}</p>
-                  </div>
-                </div>
-                <motion.div
-                  className="flex justify-end mt-4"
-                  initial={{ opacity: 0, x: 50 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  <button
-                    onClick={() => handleStartQuiz(quiz)}
-                    className="
-      flex items-center justify-center 
-      px-6 py-3 
-      bg-indigo-600 
-      text-white 
-      rounded-lg 
-      shadow-md 
-      hover:bg-indigo-700 
-      focus:outline-none 
-      focus:ring-2 
-      focus:ring-indigo-500 
-      focus:ring-offset-2 
-      transition-all 
-      duration-300 
-      transform 
-      hover:scale-105 
-      active:scale-95
-    "
-                  >
-                    <PlayCircle className="mr-2" size={20} />
-                    Start Quiz
-                  </button>
-                </motion.div>
-              </div>
-            ))}
-          </div> */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 bg-gray-100">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 m-4 bg-gray-100 w-[400px]">
             {quizzes.map((quiz: QuizDocument) => (
               <div
                 key={quiz._id}
