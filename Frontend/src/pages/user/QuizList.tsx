@@ -216,36 +216,6 @@ const QuizList = () => {
               </div>
             </div>
           )}
-
-          {/* <div className="relative block md:hidden mt-4">
-            {isFilterOpen && (
-              <div className="relative mt-4">
-                <label htmlFor="filter-dropdown" className="block text-sm font-medium text-gray-700 mb-2">
-                  Select Categories
-                </label>
-                <select
-                  id="filter-dropdown"
-                  multiple
-                  value={selectedCategories}
-                  onChange={handleFilterChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:outline-none h-32 overflow-auto"
-                >
-                  <option
-                    value="select-all"
-                    onClick={handleSelectAll}
-                    className="text-gray-700 font-semibold"
-                  >
-                    Select All
-                  </option>
-                  {quizCategories.map((option: string) => (
-                    <option key={option} value={option} className="text-gray-700">
-                      {option}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
-          </div> */}
         </div>
       </motion.div>
 

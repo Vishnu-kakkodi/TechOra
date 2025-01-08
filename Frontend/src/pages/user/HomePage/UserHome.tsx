@@ -107,7 +107,7 @@ const UserHome = () => {
         <div className="container mt-10 px-4 sm:px-6 lg:px-8">
           <div className="bg-black rounded-lg shadow-xl p-8 md:p-12 flex flex-col md:flex-row items-center justify-between">
             <div className="mb-6 md:mb-0 md:mr-8">
-              <h2 className="text-3xl text-white md:text-4xl font-bold text-gray-800 mb-4">
+              <h2 className="text-3xl text-white md:text-4xl font-bold mb-4">
                 Test Your Knowledge!
               </h2>
               <p className="text-lg text-white mb-6">

@@ -274,20 +274,37 @@ const Navbar = () => {
       </div>
 
       {isOpen && (
-        <div className="md:hidden">
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            {['Course', 'Quiz', 'Leaderboard', 'Cart', 'Account'].map((item) => (
-              <Link
-                key={item}
-                to={`/${item.toLowerCase()}`}
-                className="block px-3 py-2 rounded-md text-base font-medium text-gray-800 hover:bg-gray-100"
-              >
-                {item}
-              </Link>
-            ))}
-          </div>
-        </div>
-      )}
+  <div className="fixed inset-0 z-50 bg-black/50" onClick={() => setIsOpen(false)}>
+    <div
+      className="absolute top-0 left-0 w-1/2 h-full bg-white p-4"
+      onClick={(e) => e.stopPropagation()} 
+    >
+      <div className="flex justify-between items-center mb-4">
+        <span className="text-lg font-bold">Menu</span>
+        <button
+          onClick={() => setIsOpen(false)}
+          className="text-gray-600 hover:text-yellow-400"
+        >
+          <X className="h-6 w-6" />
+        </button>
+      </div>
+
+      <nav className="space-y-4">
+        {['Course', 'Quiz', 'Leaderboard', 'Cart', 'Account'].map((item) => (
+          <Link
+            key={item}
+            to={`/${item.toLowerCase()}`}
+            className="block px-4 py-2 rounded-md text-base bg-red-100 font-medium border-2 text-gray-800 hover:bg-red-400"
+            onClick={() => setIsOpen(false)} 
+          >
+            {item}
+          </Link>
+        ))}
+      </nav>
+    </div>
+  </div>
+)}
+
     </header>
   );
 };

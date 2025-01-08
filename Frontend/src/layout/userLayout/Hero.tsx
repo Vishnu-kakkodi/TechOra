@@ -67,7 +67,7 @@ export default function Hero() {
           <img
             src={slide.image}
             alt={`Slide ${index + 1}`}
-            className="w-full h-full object-cover"
+            className="w-full h-3/4 md:h-full object-center"
           />
           
           {/* Text Content - Only visible on md and larger screens */}
@@ -90,27 +90,6 @@ export default function Hero() {
         </div>
       ))}
 
-      {/* Navigation Controls */}
-      {/* <button
-        onClick={handlePrev}
-        className="absolute left-4 top-1/2 transform -translate-y-1/2 
-                   bg-black bg-opacity-50 hover:bg-opacity-70 
-                   text-white p-2 rounded-full 
-                   transition-all duration-200"
-      >
-        <ArrowBigLeft className="w-6 h-6" />
-      </button>
-      <button
-        onClick={handleNext}
-        className="absolute right-4 top-1/2 transform -translate-y-1/2 
-                   bg-black bg-opacity-50 hover:bg-opacity-70 
-                   text-white p-2 rounded-full 
-                   transition-all duration-200"
-      >
-        <ArrowBigRight className="w-6 h-6" />
-      </button> */}
-
-      {/* Indicators */}
       <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
         {slides.map((_, index) => (
           <button
