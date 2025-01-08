@@ -2,6 +2,8 @@ import React, { useState, useEffect, useMemo } from 'react';
 import {
   ChevronRight,
   ChevronLeft,
+  ChevronDown, 
+  ChevronUp,
   CheckCircle,
   XCircle,
   HelpCircle,
@@ -301,6 +303,7 @@ const QuizAttempt: React.FC = () => {
         correct={correct}
         passMark={passMark}
         navigate={navigate}
+        selectedAnswers={selectedAnswers}
       />
     );
   }
@@ -539,21 +542,145 @@ const QuizAttempt: React.FC = () => {
 export default QuizAttempt;
 
 
-export const QuizResults = ({ quiz, score, percentage, answered, correct, passMark, navigate }: {
-  quiz: any;
-  score: any;
-  percentage: any;
-  answered: any;
-  correct: any;
-  passMark: any;
-  navigate: any;
-}) => {
+// export const QuizResults = ({ quiz, score, percentage, answered, correct, passMark, navigate }: {
+//   quiz: any;
+//   score: any;
+//   percentage: any;
+//   answered: any;
+//   correct: any;
+//   passMark: any;
+//   navigate: any;
+// }) => {
+//   return (
+//     <div className='flex justify-center items-center h-screen'>
+//       <motion.div
+//         initial={{ opacity: 0, y: 20 }}
+//         animate={{ opacity: 1, y: 0 }}
+//         className="w-full max-w-3xl  p-8 bg-white rounded-xl shadow-lg border-2"
+//       >
+//         <h1 className="text-3xl font-bold text-center mb-8 text-gray-800">
+//           {quiz.title} - Results
+//         </h1>
+
+//         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+//           <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-xl">
+//             <div className="text-center">
+//               <motion.div
+//                 initial={{ scale: 0 }}
+//                 animate={{ scale: 1 }}
+//                 className="text-7xl font-bold text-blue-600 mb-2"
+//               >
+//                 {percentage}%
+//               </motion.div>
+//               <p className="text-gray-600">Overall Score</p>
+//             </div>
+//           </div>
+
+//           <div className="grid grid-cols-2 gap-4">
+//             <div className="bg-gray-50 p-4 rounded-xl text-center">
+//               <div className="flex items-center justify-center mb-2">
+//                 <Check className="w-6 h-6 text-green-500" />
+//               </div>
+//               <div className="text-2xl font-bold text-gray-800">{correct}</div>
+//               <p className="text-sm text-gray-600">Correct Answers</p>
+//             </div>
+
+//             <div className="bg-gray-50 p-4 rounded-xl text-center">
+//               <div className="flex items-center justify-center mb-2">
+//                 <X className="w-6 h-6 text-red-500" />
+//               </div>
+//               <div className="text-2xl font-bold text-gray-800">{answered - correct}</div>
+//               <p className="text-sm text-gray-600">Incorrect Answers</p>
+//             </div>
+//             {score / (quiz.totalQuestions * quiz.positiveScore) === 0 && (
+//               <div className="bg-gray-50 p-4 rounded-xl text-center col-span-2">
+//                 <div className="text-2xl font-bold text-red-500">
+//                   {quiz.totalQuestions * quiz.negativeScore} Negative Points
+//                 </div>
+//               </div>
+//             )}
+//             {score / (quiz.totalQuestions * quiz.positiveScore) > 0 && (
+//               <div className="bg-gray-50 p-4 rounded-xl text-center col-span-2">
+//                 <div className="text-2xl font-bold text-gray-800">{score} / {quiz.totalQuestions * quiz.positiveScore}</div>
+//                 <p className="text-sm text-gray-600">Total Points</p>
+//               </div>
+//             )}
+//           </div>
+//         </div>
+
+//         <motion.div
+//           initial={{ opacity: 0 }}
+//           animate={{ opacity: 1 }}
+//           transition={{ delay: 0.5 }}
+//           className="text-center mb-8"
+//         >
+//           {score >= passMark ? (
+//             <div className="bg-green-50 p-6 rounded-xl">
+//               <Trophy className="w-12 h-12 text-green-500 mx-auto mb-4" />
+//               <p className="text-xl font-semibold text-green-700">
+//                 Congratulations! You've passed the quiz!
+//               </p>
+//             </div>
+//           ) : (
+//             <div className="bg-red-50 p-6 rounded-xl">
+//               <div className="w-12 h-12 text-red-500 mx-auto mb-4">😔</div>
+//               <p className="text-xl font-semibold text-red-700">
+//                 Unfortunately, you did not pass. Keep practicing!
+//               </p>
+//             </div>
+//           )}
+//         </motion.div>
+
+//         <div className="flex flex-col sm:flex-row justify-center gap-4">
+//           <Link to='/quiz'>
+//           <button
+//             className="flex items-center justify-center gap-2 border-2 border-green-500 text-green-700 px-6 py-3 rounded-lg hover:bg-green-50 active:bg-green-100 transition-all duration-200 ease-in-out shadow-sm hover:shadow-md"
+//           >
+//             <ArrowBigRight className="w-5 h-5" />
+//             Move to Next
+//           </button>
+//           </Link>
+//         </div>
+//       </motion.div>
+//     </div>
+//   );
+// };
+
+
+
+export const QuizResults = ({ 
+  quiz, 
+  score, 
+  percentage, 
+  answered, 
+  correct, 
+  passMark, 
+  navigate,
+  selectedAnswers 
+}:
+{
+    quiz: any;
+    score: any;
+    percentage: any;
+    answered: any;
+    correct: any;
+    passMark: any;
+    navigate: any;
+    selectedAnswers:any;
+  }
+  ) => {
+  const [expandedQuestion, setExpandedQuestion] = useState(null);
+
+  const toggleQuestion = (questionId:any) => {
+    setExpandedQuestion(expandedQuestion === questionId ? null : questionId);
+  };
+
   return (
-    <div className='flex justify-center items-center h-screen'>
+    <div className="flex justify-center items-center min-h-screen py-8">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-3xl  p-8 bg-white rounded-xl shadow-lg border-2"
+        className="w-full max-w-4xl p-8 bg-white rounded-xl shadow-lg border-2 mx-4"
       >
         <h1 className="text-3xl font-bold text-center mb-8 text-gray-800">
           {quiz.title} - Results
@@ -589,19 +716,17 @@ export const QuizResults = ({ quiz, score, percentage, answered, correct, passMa
               <div className="text-2xl font-bold text-gray-800">{answered - correct}</div>
               <p className="text-sm text-gray-600">Incorrect Answers</p>
             </div>
-            {score / (quiz.totalQuestions * quiz.positiveScore) === 0 && (
-              <div className="bg-gray-50 p-4 rounded-xl text-center col-span-2">
-                <div className="text-2xl font-bold text-red-500">
-                  {quiz.totalQuestions * quiz.negativeScore} Negative Points
-                </div>
+
+            <div className="bg-gray-50 p-4 rounded-xl text-center col-span-2">
+              <div className="text-2xl font-bold text-gray-800">
+                {score > 0 ? (
+                  `${score} / ${quiz.totalQuestions * quiz.positiveScore}`
+                ) : (
+                  `-${quiz.totalQuestions * quiz.negativeScore} Points`
+                )}
               </div>
-            )}
-            {score / (quiz.totalQuestions * quiz.positiveScore) > 0 && (
-              <div className="bg-gray-50 p-4 rounded-xl text-center col-span-2">
-                <div className="text-2xl font-bold text-gray-800">{score} / {quiz.totalQuestions * quiz.positiveScore}</div>
-                <p className="text-sm text-gray-600">Total Points</p>
-              </div>
-            )}
+              <p className="text-sm text-gray-600">Total Points</p>
+            </div>
           </div>
         </div>
 
@@ -628,18 +753,88 @@ export const QuizResults = ({ quiz, score, percentage, answered, correct, passMa
           )}
         </motion.div>
 
+        {/* Answer Review Section */}
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">Answer Review</h2>
+          <div className="space-y-4">
+            {quiz.questions.map((question:any, qIndex:any) => {
+              const userAnswerIndex = selectedAnswers[question._id];
+              const correctAnswerIndex = question.options.findIndex((opt:any) => opt.isCorrect);
+              const isCorrect = userAnswerIndex !== undefined && 
+                              question.options[userAnswerIndex].isCorrect;
+
+              return (
+                <motion.div
+                  key={question._id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: qIndex * 0.1 }}
+                  className="border rounded-lg overflow-hidden"
+                >
+                  <div
+                    onClick={() => toggleQuestion(question._id)}
+                    className={`p-4 cursor-pointer flex items-center justify-between
+                      ${isCorrect ? 'bg-green-50' : 'bg-red-50'}`}
+                  >
+                    <div className="flex items-center space-x-4">
+                      <span className="font-medium">Question {qIndex + 1}</span>
+                      {isCorrect ? (
+                        <Check className="w-5 h-5 text-green-500" />
+                      ) : (
+                        <X className="w-5 h-5 text-red-500" />
+                      )}
+                    </div>
+                    {expandedQuestion === question._id ? (
+                      <ChevronUp className="w-5 h-5" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5" />
+                    )}
+                  </div>
+
+                  {expandedQuestion === question._id && (
+                    <div className="p-4 bg-white">
+                      <p className="font-medium mb-4">{question.question}</p>
+                      <div className="space-y-2">
+                        {question.options.map((option:any, index:any) => (
+                          <div
+                            key={option._id}
+                            className={`p-3 rounded ${
+                              index === correctAnswerIndex
+                                ? 'bg-green-100 border-green-200'
+                                : index === userAnswerIndex && !option.isCorrect
+                                ? 'bg-red-100 border-red-200'
+                                : 'bg-gray-50'
+                            }`}
+                          >
+                            <div className="flex items-center space-x-2">
+                              <span>{option.text}</span>
+                              {index === correctAnswerIndex && (
+                                <Check className="w-4 h-4 text-green-500" />
+                              )}
+                              {index === userAnswerIndex && !option.isCorrect && (
+                                <X className="w-4 h-4 text-red-500" />
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+
         <div className="flex flex-col sm:flex-row justify-center gap-4">
           <Link to='/quiz'>
-          <button
-            className="flex items-center justify-center gap-2 border-2 border-green-500 text-green-700 px-6 py-3 rounded-lg hover:bg-green-50 active:bg-green-100 transition-all duration-200 ease-in-out shadow-sm hover:shadow-md"
-          >
-            <ArrowBigRight className="w-5 h-5" />
-            Move to Next
-          </button>
+            <button className="flex items-center justify-center gap-2 border-2 border-green-500 text-green-700 px-6 py-3 rounded-lg hover:bg-green-50 active:bg-green-100 transition-all duration-200 ease-in-out shadow-sm hover:shadow-md">
+              <ArrowBigRight className="w-5 h-5" />
+              Move to Next
+            </button>
           </Link>
         </div>
       </motion.div>
     </div>
   );
 };
-

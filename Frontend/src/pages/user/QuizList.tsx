@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Clock, FileText, Check, Cross, X, Search, Menu, PlayCircle } from 'lucide-react';
+import { Clock, FileText, Check, Cross, X, Search, Menu, PlayCircle, Filter, FilterIcon } from 'lucide-react';
 import Navbar from '../../components/header/Navbar';
 import { useQuizListQuery } from '../../store/slices/userSlice';
 import { QuizDocument } from '../../types/quizType';
@@ -15,7 +15,7 @@ import enterFullScreen from '../../utils/enterFullScreen';
 const QuizList = () => {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(4);
+  const [limit, setLimit] = useState(6);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState('');
   const [sort, setSort] = useState('');
@@ -43,7 +43,7 @@ const QuizList = () => {
   });
 
   const quizzes = quizData?.quiz || [];
-  const total = quizData?.total || quizzes.length;;
+  const total = quizData?.total || quizzes.length;
   const quizCategories = quizData?.department || [];
 
   if (isError) {
@@ -75,7 +75,7 @@ const QuizList = () => {
 
     navigate(`/start-quiz/quizId=${quiz._id}`, {
       state: { quiz: quiz }
-    }); 
+    });
   };
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -113,6 +113,30 @@ const QuizList = () => {
     );
   };
 
+  const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedValues = Array.from(e.target.selectedOptions, (option) => option.value);
+    if (selectedValues.includes("select-all")) {
+      handleSelectAll();
+    } else {
+      setSelectedCategories(selectedValues);
+    }
+  };
+
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+
+  const toggleFilter = () => {
+    setIsFilterOpen(!isFilterOpen);
+  };
+
+  const handleSelectAll = () => {
+    if (selectedCategories.length === quizCategories.length) {
+      setSelectedCategories([]);
+    } else {
+      setSelectedCategories(quizCategories);
+    }
+  };
+
+
 
   return (
     <>
@@ -121,23 +145,82 @@ const QuizList = () => {
       <motion.div
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: "easeOut" }} className="ml-8 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        className=" w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
+      >
         <div>
-          <h1 className="text-4xl md:text-5xl mb-5 font-extrabold text-gradient bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 text-transparent bg-clip-text text-center mt-6">
-            We Found 23 Featured Tournaments for You
+          <h1 className="text-2xl md:text-5xl mb-5 font-extrabold text-gradient bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 text-transparent bg-clip-text mt-6 text-center">
+            We Found {total} Featured Tournaments for You
           </h1>
+
+          <div className='flex justify-between gap-2'>
+            {/* Search Bar for Mobile */}
+            <div className="relative block md:hidden mt-4">
+              <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+              <input
+                type="text"
+                placeholder="Search tournaments"
+                value={search}
+                onChange={handleSearchChange}
+                className="w-full px-8 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:outline-none"
+              />
+            </div>
+            {/* Filter Button */}
+            <button
+              onClick={toggleFilter}
+              className="block md:hidden p-2 bg-gray-100 rounded-md shadow-sm"
+            >
+              <FilterIcon className="inline-block mr-2 text-gray-600" />
+              Filter
+            </button>
+
+          </div>
+
+          <div className="relative block md:hidden mt-4">
+            {/* Filter Dropdown */}
+            {isFilterOpen && (
+              <div className="relative mt-4">
+                <label htmlFor="filter-dropdown" className="block text-sm font-medium text-gray-700 mb-2">
+                  Select Categories
+                </label>
+                <select
+                  id="filter-dropdown"
+                  multiple
+                  value={selectedCategories}
+                  onChange={handleFilterChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:outline-none h-32 overflow-auto"
+                >
+                  {/* Default "Select All" Option */}
+                  <option
+                    value="select-all"
+                    onClick={handleSelectAll}
+                    className="text-gray-700 font-semibold"
+                  >
+                    Select All
+                  </option>
+                  {/* Map other options */}
+                  {quizCategories.map((option: string) => (
+                    <option key={option} value={option} className="text-gray-700">
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+          </div>
         </div>
       </motion.div>
+
       <div className='flex'>
         <div>
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="lg:hidden fixed top-[60px] left-2 z-50 p-2 bg-white rounded-lg shadow-lg"
+            className="lg:hidden fixed top-[60px] left-2 z-50 p-2 bg-white rounded-lg shadow-lg hidden sm:block"
           >
             {isOpen ? (
               <X className="h-6 w-6 text-gray-600" />
             ) : (
-              <Menu className="h-6 w-6 text-gray-600" />
+              <Menu className="h-6 w-6 text-gray-600 hidden sm:block" />
             )}
           </button>
           <div
@@ -226,7 +309,7 @@ const QuizList = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 bg-gray-100">
+          {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 bg-gray-100">
             {quizzes.map((quiz: QuizDocument) => (
               <div
                 key={quiz._id}
@@ -301,7 +384,108 @@ const QuizList = () => {
                 </motion.div>
               </div>
             ))}
+          </div> */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 bg-gray-100">
+            {quizzes.map((quiz: QuizDocument) => (
+              <div
+                key={quiz._id}
+                className="bg-white rounded-lg border border-gray-200 p-6 shadow-md"
+              >
+                {/* Mobile Layout */}
+                <div className="flex flex-col gap-4 sm:hidden">
+                  {/* Row 1: Status, Calendar, Start & End Date */}
+                  <div className="flex items-center justify-between">
+                    {/* Status */}
+                    <div className="bg-red-500 text-white text-xs px-2 py-1 rounded-md">
+                      {quiz.status}
+                    </div>
+
+                    {/* Start & End Date */}
+                    <div className="text-xs text-gray-700">
+                      <p>
+                        <strong>START:</strong> {quiz.startDate}
+                      </p>
+                      <p>
+                        <strong>END:</strong> {quiz.startDate}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Row 2: Quiz Title */}
+                  <div className="text-lg font-bold text-center">{quiz.title}</div>
+
+                  {/* Row 3: Conducted By */}
+                  <div className="text-sm text-gray-500 text-center">
+                    <p>
+                      <strong>Conducted By:</strong> Department of {quiz.department}
+                    </p>
+                    <p>{quiz.institutionId?.collegeName}</p>
+                  </div>
+
+                  {/* Row 4: Start Quiz Button */}
+                  <div className="flex justify-center mt-2">
+                    <button
+                      onClick={() => handleStartQuiz(quiz)}
+                      className="flex items-center justify-center px-6 py-3 bg-indigo-600 text-white rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-300 transform hover:scale-105 active:scale-95"
+                    >
+                      <PlayCircle className="mr-2" size={20} />
+                      Start Quiz
+                    </button>
+                  </div>
+                </div>
+
+                {/* Larger Screens Layout (Unchanged) */}
+                <div className="hidden sm:block">
+                  <div className="flex justify-between gap-6">
+                    <div className="flex flex-col items-center">
+                      <div className="bg-red-500 text-white text-xs px-2 py-1 rounded-md text-center">
+                        {quiz.status}
+                      </div>
+
+                      <div className="text-xs border-2 border-black rounded-md bg-gray-100 p-2 mt-2 text-center">
+                        <div className="text-lg font-semibold bg-black text-white p-1 rounded">
+                          {new Date(quiz.createdAt).toLocaleString('en-US', { month: 'short' }).toUpperCase()}
+                        </div>
+                        <div className="text-lg font-semibold text-gray-700">
+                          {new Date(quiz.createdAt).getDate()}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col justify-center gap-2 bg-gray-100 border-2 border-red-100 p-1 rounded-[5px]">
+                      <p className="text-[10px] text-gray-700">
+                        <strong>START DATE:</strong> <span className="font-medium">{quiz.startDate}</span>
+                      </p>
+                      <p className="text-[10px] text-gray-700">
+                        <strong>END DATE:</strong> <span className="font-medium">{quiz.startDate}</span>
+                      </p>
+                      <p className="text-[10px] text-gray-700">
+                        <strong>Duration:</strong> <span className="font-medium">{quiz.duration}</span>
+                      </p>
+                    </div>
+
+                    <div className="flex flex-col justify-start gap-2">
+                      <h2 className="text-lg font-bold">{quiz.title}</h2>
+                      <p className="text-sm text-gray-500">
+                        <strong>Conducted By:</strong> Department of {quiz.department}
+                      </p>
+                      <p className="text-sm text-gray-500">{quiz.institutionId?.collegeName}</p>
+                    </div>
+                  </div>
+                  <div className="flex justify-end mt-4">
+                    <button
+                      onClick={() => handleStartQuiz(quiz)}
+                      className="flex items-center justify-center px-6 py-3 bg-indigo-600 text-white rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-300 transform hover:scale-105 active:scale-95"
+                    >
+                      <PlayCircle className="mr-2" size={20} />
+                      Start Quiz
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
+
           <div className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6 mt-4">
             <div className="flex flex-1 justify-between sm:hidden">
               <button
