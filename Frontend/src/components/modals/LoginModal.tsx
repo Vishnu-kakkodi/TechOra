@@ -80,10 +80,14 @@ const LoginModal: React.FC<LoginModalProps> = ({ setLoginModalOpen, setOtpModalO
     onSubmit: async (values, { setSubmitting }) => {
       try {
         const response = await login(values).unwrap();
+        if(response.status===200){
         toast.success(response.message);
         setLoginModalOpen(false);
         dispatch(setCredentials({ ...response.data }));
         navigate('/home');
+        }else{
+          toast.error(response.message);
+        }
       } catch (error: unknown) {
         const ApiError = error as ApiError
         toast.error(ApiError.data.message)
