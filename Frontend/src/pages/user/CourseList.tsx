@@ -5,6 +5,7 @@ import {
     BookOpen,
     ChevronDown,
     Clock,
+    Filter,
     FilterIcon,
     Heart,
     Menu,
@@ -34,7 +35,7 @@ const CourseList = () => {
     const [addTocart] = useAddToCartMutation();
     const [isOpen, setIsOpen] = useState(false);
     const [page, setPage] = useState(1);
-    const [limit, setLimit] = useState(3);
+    const [limit, setLimit] = useState(4);
     const [search, setSearch] = useState("");
     const [filter, setFilter] = useState('');
     const [sort, setSort] = useState('');
@@ -137,10 +138,17 @@ const CourseList = () => {
     };
 
     const [isFilterOpen, setIsFilterOpen] = useState(false);
+    const [isFilterDataOpen, setIsFilterDataOpen] = useState(false);
+
 
     const toggleFilter = () => {
         setIsFilterOpen(!isFilterOpen);
     };
+
+    const toggleFilterData = () => {
+        setIsFilterDataOpen((prev) => !prev);
+    };
+
 
     const handleSelectAll = () => {
         if (selectedCategories.length === courseCategories.length) {
@@ -154,98 +162,78 @@ const CourseList = () => {
         <>
             <Navbar />
             <div className="flex min-h-screen bg-gray-50">
-                <motion.button
-                    onClick={() => setIsOpen(!isOpen)}
-                    className="lg:hidden fixed top-[60px] left-2 z-50 p-2 bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow hidden sm:block"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                >
-                    {isOpen ? (
-                        <X className="h-6 w-6 text-gray-600" />
-                    ) : (
-                        <Menu className="h-6 w-6 text-gray-600 hidden sm:block" />
-                    )}
-                </motion.button>
+                <div className="flex-1 px-4 lg:px-8 py-6 ">
+                    <motion.div
+                        initial={{ opacity: 0, y: 50 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, ease: "easeOut" }}
+                        className=" w-full max-w-7xl  px-4 sm:px-6 lg:px-8"
+                    >
+                        <div className='sm:flex-wrap sm:justify-between sm:items-baseline  md:gap-8'>
+                            <div>
+                                <h1 className="text-2xl md:text-4xl mb-5 font-extrabold text-gradient bg-gradient-to-r from-blue-500 via-cyan-500 to-green-500 text-transparent bg-clip-text mt-6 text-center">
+                                    We Found {total} Featured Courses for You
+                                </h1>
 
-                <AnimatePresence>
-                    {(isOpen || window.innerWidth >= 1024) && (
-                        <motion.div
-                            initial="hidden"
-                            animate="visible"
-                            exit="hidden"
-                            variants={sidebarVariants}
-                            className="fixed lg:relative inset-y-0 left-0 z-40 m-5 w-80  bg-purple-100 shadow-lg"
-                        >
-                            <div className="h-full overflow-y-auto pt-16 lg:pt-0">
-                                <div className="p-6 space-y-8">
-                                    <div>
-                                        <h2 className="text-xl font-bold mb-4 text-gray-800">Search</h2>
-                                        <div className="relative">
-                                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
-                                            <input
-                                                type="text"
-                                                placeholder="Search courses..."
-                                                value={search}
-                                                onChange={handleSearchChange}
-                                                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow"
+                            </div>
+                            <div className='flex justify-between items-baseline gap-4'>
+                                {/* Search Bar for Mobile */}
+                                <div className="relative w-full  mt-4">
+                                    <Search className="absolute left-2 top-5 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+                                    <input
+                                        type="text"
+                                        placeholder="Search tournaments"
+                                        value={search}
+                                        onChange={handleSearchChange}
+                                        className="w-full px-8 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                                    />
+                                </div>
+                                <div className="hidden relative md:inline-block">
+                                    {/* Filter Button */}
+                                    <button
+                                        onClick={toggleFilterData}
+                                        className="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-400"
+                                        aria-expanded={isFilterOpen}
+                                        aria-haspopup="true"
+                                    >
+                                        Filter
+                                        <svg
+                                            className="ml-2 h-5 w-5 text-gray-400"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            viewBox="0 0 20 20"
+                                            fill="currentColor"
+                                            aria-hidden="true"
+                                        >
+                                            <path
+                                                fillRule="evenodd"
+                                                d="M5.292 7.707a1 1 0 011.414 0L10 11.414l3.293-3.707a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                                clipRule="evenodd"
                                             />
-                                        </div>
-                                    </div>
+                                        </svg>
+                                    </button>
 
-                                    <div>
-                                        <h2 className="text-xl font-bold mb-4 text-gray-800">Categories</h2>
-                                        <div className="space-y-2">
-                                            {courseCategories.map((category: string, index: number) => (
-                                                <motion.label
+                                    {/* Filter Options Container */}
+                                    <div className={isFilterDataOpen ? "absolute z-10 mt-4 w-96 bg-white shadow-lg rounded-md ring-1 ring-black ring-opacity-5 focus:outline-none p-5" : "hidden"}>
+                                        <div className="grid grid-cols-4 gap-3 mb-4">
+                                            {courseCategories.map((filter: any, index: any) => (
+                                                <button
                                                     key={index}
-                                                    className="flex items-center py-2 px-3 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
-                                                    whileHover={{ scale: 1.02 }}
-                                                    whileTap={{ scale: 0.98 }}
+                                                    onClick={() => handleCategoryToggle(filter)}
+                                                    className={`
+                                  p-3 text-sm  rounded-lg text-center transition-colors
+                                  ${selectedCategories.includes(filter)
+                                                            ? 'bg-yellow-400 text-white'
+                                                            : 'bg-gray-100 text-gray-800 hover:bg-gray-400'
+                                                        }
+                                `}
                                                 >
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={selectedCategories.includes(category)}
-                                                        onChange={() => handleCategoryToggle(category)}
-                                                        className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                                                    />
-                                                    <span className="ml-3 text-gray-700">{category}</span>
-                                                </motion.label>
+                                                    {filter}
+                                                </button>
                                             ))}
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
 
-                <div className="flex-1 px-4 lg:px-8 py-6 ">
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="bg-white shadow-md rounded-xl p-6 mb-8"
-                    >
-                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
-                            <div className="text-gray-800 text-[25px] font-medium">
-                                We Offer <span className="text-blue-600 font-bold">{totalCourse}</span> courses for You
-                            </div>
-                            <div className='flex justify-end gap-4'>
-                                <div className="relative w-[300px]">
-                                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-8 text-gray-500" />
-                                    <input
-                                        type="text"
-                                        placeholder="Search courses..."
-                                        value={search}
-                                        onChange={handleSearchChange}
-                                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    />
-                                </div>
-                                <button
-                                    onClick={toggleFilter}
-                                    className="block md:hidden mt-4"
-                                >
-                                    <FilterIcon />
-                                </button>
                                 <select
                                     className="bg-gray-50 text-gray-800 font-medium py-2 px-4 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow"
                                     value={sort}
@@ -254,49 +242,58 @@ const CourseList = () => {
                                     <option value="newest">Newest First</option>
                                     <option value="oldest">Oldest First</option>
                                 </select>
-                            </div>
 
-                            {isFilterOpen && (
-                                <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-end">
-                                    <div className="bg-white w-full rounded-t-lg p-4 shadow-lg">
-                                        <div className="flex justify-between items-center">
-                                            <h3 className="text-lg font-semibold text-gray-800">Filter Categories</h3>
-                                            <button onClick={toggleFilter} className="text-gray-500 hover:text-gray-800">
-                                                ✖
-                                            </button>
-                                        </div>
+                                {/* Filter Button */}
+                                <button
+                                    onClick={toggleFilter}
+                                    className="block md:hidden mt-4"
+                                >
+                                    <FilterIcon />
+                                </button>
 
-                                        {/* Filter Dropdown */}
-                                        <div className="mt-4">
-                                            <label htmlFor="filter-dropdown" className="block text-sm font-medium text-gray-700 mb-2">
-                                                Select Categories
-                                            </label>
-                                            <select
-                                                id="filter-dropdown"
-                                                multiple
-                                                value={selectedCategories}
-                                                onChange={handleFilterChange}
-                                                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:outline-none h-32 overflow-auto"
-                                            >
-                                                {/* Default "Select All" Option */}
-                                                <option
-                                                    value="select-all"
-                                                    onClick={handleSelectAll}
-                                                    className="text-gray-700 font-semibold"
+
+                                {isFilterOpen && (
+                                    <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-end">
+                                        <div className="bg-white w-full rounded-t-lg p-4 shadow-lg">
+                                            <div className="flex justify-between items-center">
+                                                <h3 className="text-lg font-semibold text-gray-800">Filter Categories</h3>
+                                                <button onClick={toggleFilter} className="text-gray-500 hover:text-gray-800">
+                                                    ✖
+                                                </button>
+                                            </div>
+
+                                            {/* Filter Dropdown */}
+                                            <div className="mt-4">
+                                                <label htmlFor="filter-dropdown" className="block text-sm font-medium text-gray-700 mb-2">
+                                                    Select Categories
+                                                </label>
+                                                <select
+                                                    id="filter-dropdown"
+                                                    multiple
+                                                    value={selectedCategories}
+                                                    onChange={handleFilterChange}
+                                                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:outline-none h-32 overflow-auto"
                                                 >
-                                                    Select All
-                                                </option>
-                                                {/* Map other options */}
-                                                {courseCategories.map((option: string) => (
-                                                    <option key={option} value={option} className="text-gray-700">
-                                                        {option}
+                                                    {/* Default "Select All" Option */}
+                                                    <option
+                                                        value="select-all"
+                                                        onClick={handleSelectAll}
+                                                        className="text-gray-700 font-semibold"
+                                                    >
+                                                        Select All
                                                     </option>
-                                                ))}
-                                            </select>
+                                                    {/* Map other options */}
+                                                    {courseCategories.map((option: string) => (
+                                                        <option key={option} value={option} className="text-gray-700">
+                                                            {option}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            )}
+                                )}
+                            </div>
                         </div>
                     </motion.div>
 
@@ -304,79 +301,91 @@ const CourseList = () => {
                         variants={containerVariants}
                         initial="hidden"
                         animate="visible"
-                        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
                     >
-                        {courses.map((course: CourseDocument) => (
-                            <div
-                                key={course.id}
-                                className="bg-white border border-gray-200 overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2"
-                            >
-                                {/* Course Image */}
-                                <div className="relative">
-                                    <img
-                                        src={course.thumbnail}
-                                        alt={course.title}
-                                        className="w-full h-44 md:h-52 object-cover"
-                                    />
-                                </div>
+                        <div className="grid mx-1 my-5 md:m-2 lg:m-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6 bg-gray-100">
+                            {courses.length > 0 ? (
+                                courses.map((course: CourseDocument) => (
+                                    <div
+                                        key={course.id}
+                                        className="bg-white border border-gray-200 overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2"
+                                    >
+                                        {/* Course Image */}
+                                        <div className="relative">
+                                            <img
+                                                src={course.thumbnail}
+                                                alt={course.title}
+                                                className="w-full h-44 md:h-52 object-fill"
+                                            />
+                                        </div>
 
-                                {/* Course Content */}
-                                <div className="p-4 md:p-6">
-                                    {/* Title and Tutor */}
-                                    <div className="mb-3">
-                                        <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-1 truncate">
-                                            {course.title}
-                                        </h3>
-                                        <div className="flex items-center text-gray-600 text-xs md:text-sm">
-                                            <User size={14} className="mr-2 text-gray-500" />
-                                            <span>{course?.tutorId?.tutorname}</span>
+                                        {/* Course Content */}
+                                        <div className="p-4 md:p-6">
+                                            {/* Title and Tutor */}
+                                            <div className="mb-3">
+                                                <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-1 truncate">
+                                                    {course.title}
+                                                </h3>
+                                                <div className="flex items-center text-gray-600 text-xs md:text-sm">
+                                                    <User size={14} className="mr-2 text-gray-500" />
+                                                    <span>{course?.tutorId?.tutorname}</span>
+                                                </div>
+                                            </div>
+
+                                            {/* Description */}
+                                            <p className="text-gray-600 text-sm mb-3 md:mb-4 line-clamp-3">
+                                                {course.description}
+                                            </p>
+
+                                            {/* Rating Section */}
+                                            <div className="flex items-center space-x-2 mb-3 md:mb-4">
+                                                <ReactStars
+                                                    count={5}
+                                                    value={course.averageRating}
+                                                    size={18}
+                                                    edit={false}
+                                                    color1={"#d1d5db"}
+                                                    color2={"#facc15"}
+                                                />
+                                                <span className="text-yellow-700 font-semibold text-sm">
+                                                    {course.averageRating} ({course.totalReviews} reviews)
+                                                </span>
+                                            </div>
+
+                                            {/* Course Details */}
+                                            <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs md:text-sm text-gray-700 mb-3">
+                                                <div className="flex items-center">
+                                                    <Clock size={14} className="mr-1 text-blue-500" />
+                                                    <span>{course.duration} Weeks</span>
+                                                </div>
+                                                <div className="flex items-center">
+                                                    <User size={14} className="mr-1 text-purple-500" />
+                                                    <span>{course.enrolledStudents} Enrolled</span>
+                                                </div>
+                                            </div>
+
+                                            {/* Price and Enroll Button */}
+                                            <div className="flex justify-between items-center">
+                                                <div className="text-base md:text-lg font-bold text-blue-700">
+                                                    ₹{course?.price?.toFixed(2)}
+                                                </div>
+                                                <button onClick={() => handleAddToCart(course._id)} className="bg-blue-600 text-white px-4 py-2 text-sm md:text-base rounded-full hover:bg-blue-700 transition-colors">
+                                                    Add To Cart
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
-
-                                    {/* Description */}
-                                    <p className="text-gray-600 text-sm mb-3 md:mb-4 line-clamp-3">
-                                        {course.description}
+                                ))
+                            ) : (
+                                <div className="text-center py-10 col-span-full">
+                                    <p className="text-xl md:text-2xl font-semibold text-gray-700">
+                                        No courses available at the moment.
                                     </p>
-
-                                    {/* Rating Section */}
-                                    <div className="flex items-center space-x-2 mb-3 md:mb-4">
-                                        <ReactStars
-                                            count={5}
-                                            value={course.averageRating}
-                                            size={18}
-                                            edit={false}
-                                            color1={"#d1d5db"}
-                                            color2={"#facc15"}
-                                        />
-                                        <span className="text-yellow-700 font-semibold text-sm">
-                                            {course.averageRating} ({course.totalReviews} reviews)
-                                        </span>
-                                    </div>
-
-                                    {/* Course Details */}
-                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs md:text-sm text-gray-700 mb-3">
-                                        <div className="flex items-center">
-                                            <Clock size={14} className="mr-1 text-blue-500" />
-                                            <span>{course.duration} Weeks</span>
-                                        </div>
-                                        <div className="flex items-center">
-                                            <User size={14} className="mr-1 text-purple-500" />
-                                            <span>{course.enrolledStudents} Enrolled</span>
-                                        </div>
-                                    </div>
-
-                                    {/* Price and Enroll Button */}
-                                    <div className="flex justify-between items-center">
-                                        <div className="text-base md:text-lg font-bold text-blue-700">
-                                            ₹{course?.price?.toFixed(2)}
-                                        </div>
-                                        <button onClick={() => handleAddToCart(course._id)} className="bg-blue-600 text-white px-4 py-2 text-sm md:text-base rounded-full hover:bg-blue-700 transition-colors">
-                                            Add To Cart
-                                        </button>
-                                    </div>
+                                    <p className="text-sm md:text-base text-gray-500 mt-2">
+                                        Please check back later or explore other categories.
+                                    </p>
                                 </div>
-                            </div>
-                        ))}
+                            )}
+                        </div>
                     </motion.div>
 
                     <motion.div

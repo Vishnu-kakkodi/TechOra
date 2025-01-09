@@ -136,6 +136,13 @@ const QuizList = () => {
     }
   };
 
+  const [isFilterDataOpen, setIsFilterDataOpen] = useState(false);
+
+
+  const toggleFilterData = () => {
+    setIsFilterDataOpen((prev) => !prev);
+  };
+
 
 
   return (
@@ -146,17 +153,19 @@ const QuizList = () => {
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        className=" w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
+        className=" w-full max-w-7xl  px-4 sm:px-6 lg:px-8"
       >
-        <div>
-          <h1 className="text-2xl md:text-5xl mb-5 font-extrabold text-gradient bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 text-transparent bg-clip-text mt-6 text-center">
-            We Found {total} Featured Tournaments for You
-          </h1>
+        <div className='sm:flex-wrap sm:justify-between sm:items-baseline  md:gap-8'>
+          <div>
+            <h1 className="text-2xl md:text-4xl mb-5 font-extrabold text-gradient bg-gradient-to-r from-blue-500 via-cyan-500 to-green-500 text-transparent bg-clip-text mt-6 text-center">
+              We Found {total} Featured Tournaments for You
+            </h1>
 
-          <div className='flex justify-between gap-2'>
+          </div>
+          <div className='flex justify-between items-baseline gap-4'>
             {/* Search Bar for Mobile */}
-            <div className="relative block md:hidden mt-4">
-              <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+            <div className="relative w-full  mt-4">
+              <Search className="absolute left-2 top-5 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
               <input
                 type="text"
                 placeholder="Search tournaments"
@@ -165,6 +174,61 @@ const QuizList = () => {
                 className="w-full px-8 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:outline-none"
               />
             </div>
+            <div className="hidden relative md:inline-block">
+              {/* Filter Button */}
+              <button
+                onClick={toggleFilterData}
+                className="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-400"
+                aria-expanded={isFilterOpen}
+                aria-haspopup="true"
+              >
+                Filter
+                <svg
+                  className="ml-2 h-5 w-5 text-gray-400"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  aria-hidden="true"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M5.292 7.707a1 1 0 011.414 0L10 11.414l3.293-3.707a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </button>
+
+              {/* Filter Options Container */}
+              <div className={isFilterDataOpen ? "absolute z-10 mt-4 w-96 bg-white shadow-lg rounded-md ring-1 ring-black ring-opacity-5 focus:outline-none p-5" : "hidden"}>
+                <div className="grid grid-cols-4 gap-3 mb-4">
+                  {quizCategories.map((filter: any, index: any) => (
+                    <button
+                      key={index}
+                      onClick={() => handleCategoryToggle(filter)}
+                      className={`
+              p-3 text-sm  rounded-lg text-center transition-colors
+              ${selectedCategories.includes(filter)
+                          ? 'bg-yellow-400 text-white'
+                          : 'bg-gray-100 text-gray-800 hover:bg-gray-400'
+                        }
+            `}
+                    >
+                      {filter}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <select
+              className="bg-gray-50 text-gray-800 font-medium py-2 px-4 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow"
+              value={sort}
+              onChange={(e) => setSort(e.target.value)}
+            >
+              <option value="newest">Newest First</option>
+              <option value="oldest">Oldest First</option>
+            </select>
+
             {/* Filter Button */}
             <button
               onClick={toggleFilter}
@@ -173,151 +237,74 @@ const QuizList = () => {
               <FilterIcon />
             </button>
 
-          </div>
 
-          {isFilterOpen && (
-            <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-end">
-              <div className="bg-white w-full rounded-t-lg p-4 shadow-lg">
-                <div className="flex justify-between items-center">
-                  <h3 className="text-lg font-semibold text-gray-800">Filter Categories</h3>
-                  <button onClick={toggleFilter} className="text-gray-500 hover:text-gray-800">
-                    ✖
-                  </button>
-                </div>
+            {isFilterOpen && (
+              <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-end">
+                <div className="bg-white w-full rounded-t-lg p-4 shadow-lg">
+                  <div className="flex justify-between items-center">
+                    <h3 className="text-lg font-semibold text-gray-800">Filter Categories</h3>
+                    <button onClick={toggleFilter} className="text-gray-500 hover:text-gray-800">
+                      ✖
+                    </button>
+                  </div>
 
-                {/* Filter Dropdown */}
-                <div className="mt-4">
-                  <label htmlFor="filter-dropdown" className="block text-sm font-medium text-gray-700 mb-2">
-                    Select Categories
-                  </label>
-                  <select
-                    id="filter-dropdown"
-                    multiple
-                    value={selectedCategories}
-                    onChange={handleFilterChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:outline-none h-32 overflow-auto"
-                  >
-                    {/* Default "Select All" Option */}
-                    <option
-                      value="select-all"
-                      onClick={handleSelectAll}
-                      className="text-gray-700 font-semibold"
+                  {/* Filter Dropdown */}
+                  <div className="mt-4">
+                    <label htmlFor="filter-dropdown" className="block text-sm font-medium text-gray-700 mb-2">
+                      Select Categories
+                    </label>
+                    <select
+                      id="filter-dropdown"
+                      multiple
+                      value={selectedCategories}
+                      onChange={handleFilterChange}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:outline-none h-32 overflow-auto"
                     >
-                      Select All
-                    </option>
-                    {/* Map other options */}
-                    {quizCategories.map((option: string) => (
-                      <option key={option} value={option} className="text-gray-700">
-                        {option}
+                      {/* Default "Select All" Option */}
+                      <option
+                        value="select-all"
+                        onClick={handleSelectAll}
+                        className="text-gray-700 font-semibold"
+                      >
+                        Select All
                       </option>
-                    ))}
-                  </select>
+                      {/* Map other options */}
+                      {quizCategories.map((option: string) => (
+                        <option key={option} value={option} className="text-gray-700">
+                          {option}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="mt-4 flex justify-between">
+                    <button
+                      // onClick={handleClearFilter}
+                      className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200"
+                    >
+                      Clear
+                    </button>
+                    <button
+                      // onClick={handleFilterChange}
+                      className="px-4 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-600"
+                    >
+                      Apply
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </motion.div>
 
       <div className='flex'>
-        <div>
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="lg:hidden fixed top-[60px] left-2 z-50 p-2 bg-white rounded-lg shadow-lg hidden sm:block"
-          >
-            {isOpen ? (
-              <X className="h-6 w-6 text-gray-600" />
-            ) : (
-              <Menu className="h-6 w-6 text-gray-600 hidden sm:block" />
-            )}
-          </button>
-          <div
-            className={`fixed lg:relative inset-y-0 left-0 z-40 w-80 transform transition-transform duration-300 ease-in-out bg-gray-50 
-          ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}
-          >
-            {isOpen && (
-              <div
-                className="fixed inset-0 bg-black bg-opacity-50 lg:hidden -z-10"
-                onClick={() => setIsOpen(false)}
-              />
-            )}
-
-            <div className="h-full overflow-y-auto pt-16 lg:pt-0">
-              <div className="p-6">
-                <div className="mb-8">
-                  <h2 className="text-lg font-bold mb-4">Search</h2>
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
-                    <input
-                      type="text"
-                      placeholder="Search courses..."
-                      value={search}
-                      onChange={handleSearchChange}
-                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-                </div>
-
-                <div className="mb-8">
-                  <h2 className="text-lg font-bold mb-2">Course Categories</h2>
-                  <div className="bg-white border rounded-lg p-4">
-                    {quizCategories.map((category: any, index: any) => (
-                      <label key={index} className="flex items-center py-2 hover:bg-gray-50 rounded px-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={selectedCategories.includes(category)}
-                          onChange={() => handleCategoryToggle(category)}
-                          className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                        />
-                        <span className="ml-3 text-sm text-gray-600">{category}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-              </div>
-              <div className="relative ml-5" ref={dropdownRef}>
-                <div className="flex items-center space-x-2">
-                  <span className="text-red-700 font-medium text-sm sm:text-base">Sort By:</span>
-                  <select
-                    className="bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 px-4 rounded-md"
-                    value={sort}
-                    onChange={(e) => setSort(e.target.value)}
-                    aria-expanded={isDropdownOpen}
-                    aria-haspopup="true"
-                  >
-                    <option value="">Default</option>
-                    <option value="newest">New Courses</option>
-                    <option value="oldest">Old Courses</option>
-                  </select>
-                </div>
-
-                {isDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-20 border border-gray-200">
-                    <div className="py-1">
-                      {sortOptions.map((option) => (
-                        <button
-                          key={option.value}
-                          className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
-                          onClick={() => {
-                            setIsDropdownOpen(false);
-                          }}
-                        >
-                          {option.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
         < motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 m-4 bg-gray-100 w-[400px]">
+          <div className="grid w-[400] m-2 md:m-2 lg:m-4 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6 p-6 bg-gray-100">
             {quizzes.map((quiz: QuizDocument) => (
               <div
                 key={quiz._id}
@@ -367,7 +354,7 @@ const QuizList = () => {
                 </div>
 
                 {/* Larger Screens Layout (Unchanged) */}
-                <div className="hidden sm:block">
+                <div className="hidden sm:block m-3">
                   <div className="flex justify-between gap-6">
                     <div className="flex flex-col items-center">
                       <div className="bg-red-500 text-white text-xs px-2 py-1 rounded-md text-center">
@@ -384,18 +371,6 @@ const QuizList = () => {
                       </div>
                     </div>
 
-                    <div className="flex flex-col justify-center gap-2 bg-gray-100 border-2 border-red-100 p-1 rounded-[5px]">
-                      <p className="text-[10px] text-gray-700">
-                        <strong>START DATE:</strong> <span className="font-medium">{quiz.startDate}</span>
-                      </p>
-                      <p className="text-[10px] text-gray-700">
-                        <strong>END DATE:</strong> <span className="font-medium">{quiz.startDate}</span>
-                      </p>
-                      <p className="text-[10px] text-gray-700">
-                        <strong>Duration:</strong> <span className="font-medium">{quiz.duration}</span>
-                      </p>
-                    </div>
-
                     <div className="flex flex-col justify-start gap-2">
                       <h2 className="text-lg font-bold">{quiz.title}</h2>
                       <p className="text-sm text-gray-500">
@@ -404,7 +379,16 @@ const QuizList = () => {
                       <p className="text-sm text-gray-500">{quiz.institutionId?.collegeName}</p>
                     </div>
                   </div>
-                  <div className="flex justify-end mt-4">
+                  <div className="flex justify-between mt-4 gap-4">
+
+                    <div className="flex flex-col justify-center gap-2 bg-gray-100 border-2 border-red-100 p-1 rounded-[5px]">
+                      <p className="text-[10px] text-gray-700">
+                        <strong>END DATE:</strong> <span className="font-medium">{quiz.startDate}</span>
+                      </p>
+                      <p className="text-[10px] text-gray-700">
+                        <strong>Duration:</strong> <span className="font-medium">{quiz.duration}</span>
+                      </p>
+                    </div>
                     <button
                       onClick={() => handleStartQuiz(quiz)}
                       className="flex items-center justify-center px-6 py-3 bg-indigo-600 text-white rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-300 transform hover:scale-105 active:scale-95"
