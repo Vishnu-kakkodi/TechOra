@@ -2,10 +2,11 @@ import { BaseRepository } from "./base.repository";
 import { CartModel } from "../models/cart.model";
 import { CartDocument } from "../type/cart.type";
 import mongoose from 'mongoose';
+import { ICartRepository } from "../interfaces/IRepositoryInterface/ICartRepository";
 
 
 
-export class CartRepository extends BaseRepository<CartDocument> {
+export class CartRepository extends BaseRepository<CartDocument> implements ICartRepository {
     constructor() {
         super(CartModel);
     }
@@ -48,7 +49,7 @@ export class CartRepository extends BaseRepository<CartDocument> {
         }
     }
 
-    async findOneAndUpdate(userId: string | number, courseIds: mongoose.Types.ObjectId[] | undefined) {
+    async findOneAndUpdate(userId: string | number, courseIds: mongoose.Types.ObjectId[] | undefined): Promise<void> {
         try {
             const mongoUserId = new mongoose.Types.ObjectId(userId);
             const updatedCart = await this.model.findOneAndUpdate(

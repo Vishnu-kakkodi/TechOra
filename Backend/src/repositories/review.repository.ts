@@ -4,10 +4,11 @@ import { CartDocument } from "../type/cart.type";
 import mongoose from 'mongoose';
 import { ReviewDocument } from "../type/review.type";
 import { Types } from 'mongoose';
+import { IReviewRepository } from "../interfaces/IRepositoryInterface/IReviewRepository";
 
 
 
-export class ReviewRepository extends BaseRepository<ReviewDocument> {
+export class ReviewRepository extends BaseRepository<ReviewDocument> implements IReviewRepository {
     constructor() {
         super(ReviewModel);
     }

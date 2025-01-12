@@ -6,13 +6,15 @@ import MESSAGES from "../constants/message";
 import { WishlistRepository } from "../repositories/wishlist.repository";
 import { WishlistDocument } from "../type/wishlist.type";
 import { IWishlistService } from "../interfaces/IServiceInterface/IWishlistService";
+import { ICourseRepository } from "../interfaces/IRepositoryInterface/ICourseRepository";
+import { IWishlistRepository } from "../interfaces/IRepositoryInterface/IWishlistRepository";
 
 
 class WishlistService implements IWishlistService {
-  private courseRepository: CourseRepository;
-  private wishlistRepository: WishlistRepository;
+  private courseRepository: ICourseRepository;
+  private wishlistRepository: IWishlistRepository;
 
-  constructor(courseRepository: CourseRepository, wishlistRepository: WishlistRepository) {
+  constructor(courseRepository: ICourseRepository, wishlistRepository: IWishlistRepository) {
     this.courseRepository = courseRepository;
     this.wishlistRepository = wishlistRepository;
   }

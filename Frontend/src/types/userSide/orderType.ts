@@ -1,3 +1,5 @@
+import { Tutor } from "../courseType";
+
 export interface orderItems{
     courseId: string[]
   }
@@ -16,6 +18,7 @@ export interface orderItems{
   interface Course {
     _id: string;
     title: string;
+    tutorId: Tutor;
     department: string;
     instructor: string;
     duration: string;

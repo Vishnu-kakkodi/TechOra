@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useGetOrderDetailQuery, useGetOrdersQuery } from '../../store/slices/userSlice';
 import { AlertCircle, CheckCircle, Clock, ChevronDown, ChevronUp } from 'lucide-react';
 import { Order } from '../../types/userSide/orderType';
-import {loadStripe, Stripe} from '@stripe/stripe-js';
+import { loadStripe, Stripe } from '@stripe/stripe-js';
 import { usePaymentMutation } from '../../store/slices/userSlice';
 import { toast } from 'react-toastify';
 
@@ -12,11 +12,11 @@ import { toast } from 'react-toastify';
 
 const OrderDetail = () => {
     const [loading, setLoading] = useState(true);
-    const [visibleCourses, setVisibleCourses] = useState(2); 
+    const [visibleCourses, setVisibleCourses] = useState(2);
     const [showAll, setShowAll] = useState(false);
     const { orderId } = useParams<{ orderId: string }>();
     const navigate = useNavigate();
-    const { data: responseData, isLoading, isError } = useGetOrderDetailQuery({orderId});
+    const { data: responseData, isLoading, isError } = useGetOrderDetailQuery({ orderId });
     const [currentOrder, setCurrentOrder] = useState<Order | null>(null);
     const [payment] = usePaymentMutation();
 
@@ -26,9 +26,9 @@ const OrderDetail = () => {
             setCurrentOrder(order);
             setLoading(false);
         }
-    }, [order]);   
-    
-    
+    }, [order]);
+
+
 
     if (isLoading || loading) {
         return (
@@ -40,7 +40,7 @@ const OrderDetail = () => {
 
     if (isError) {
         return <div>Error fetching course data.</div>;
-      }
+    }
 
     if (!currentOrder) {
         return (
@@ -59,44 +59,44 @@ const OrderDetail = () => {
     }));
 
     const total = currentOrder.totalPrice
-  
+
     console.log(orderItems)
-  
+
     const orderDetails = {
-      orderId,
-      orderItems,
-      total
+        orderId,
+        orderItems,
+        total
     }
 
     const handleContinuePayment = async () => {
         const stripe = await loadStripe("pk_test_51QNDQKGEFHCzggCSwTwIr16xAKbs3fvWWrDx2gIHy97ldM7yvXRv1Br5AEd2RI4xhEkVBrrfW2f7ZtBziCqbDsS300AGTVPbgi");
         if (!stripe) {
-          console.error('Stripe failed to load');
-          return;
+            console.error('Stripe failed to load');
+            return;
         }
-      
+
         try {
-          console.log(orderDetails,"Details")
-          const response = await payment({orderDetails});
-          
-          if (response.data && response.data.id) {
-            const result = await stripe.redirectToCheckout({
-              sessionId: response.data.id
-            });
-      
-            if (result.error) {
-              console.error('Checkout Error:', result.error);
-              toast.error('Checkout failed');
+            console.log(orderDetails, "Details")
+            const response = await payment({ orderDetails });
+
+            if (response.data && response.data.id) {
+                const result = await stripe.redirectToCheckout({
+                    sessionId: response.data.id
+                });
+
+                if (result.error) {
+                    console.error('Checkout Error:', result.error);
+                    toast.error('Checkout failed');
+                }
+            } else {
+                toast.error('Failed to create checkout session');
             }
-          } else {
-            toast.error('Failed to create checkout session');
-          }
         } catch (error) {
-          console.error('Checkout Process Error:', error);
-          toast.error('An error occurred during checkout');
+            console.error('Checkout Process Error:', error);
+            toast.error('An error occurred during checkout');
         }
-      };
-    
+    };
+
 
     const getStatusIcon = (status: 'Pending' | 'Completed') => {
         if (status === "Completed") return <CheckCircle className="w-6 h-6 text-green-500" />;
@@ -117,7 +117,7 @@ const OrderDetail = () => {
     const displayedCourses = currentOrder.items.slice(0, visibleCourses);
 
     return (
-        <div className="p-4 bg-gray-100 min-h-screen w-full">
+        <div className="p-4 bg-gray-100 min-h-screen w-full m-2 ">
             <div className="max-w-7xl mx-auto">
                 <div className="mb-4">
                     <h1 className="text-2xl font-bold">Order Details</h1>
@@ -126,35 +126,35 @@ const OrderDetail = () => {
                 <div className="flex flex-col lg:flex-row gap-4">
                     <div className="w-full lg:w-1/3 bg-white rounded-lg shadow-md p-4">
                         <h2 className="text-lg font-semibold mb-4">Order Information</h2>
-                        <div className="space-y-3">
-                            <div className="bg-gray-50 p-3 rounded">
+                        <div className="space-y-2">
+                            <div className="bg-gray-100 p-3 rounded">
                                 <p className="text-sm text-gray-500">Order ID</p>
                                 <p className="font-medium">{currentOrder.orderId}</p>
                             </div>
-                            <div className="bg-gray-50 p-3 rounded">
+                            <div className="bg-gray-100 p-3 rounded">
                                 <p className="text-sm text-gray-500">Transaction ID</p>
                                 <p className="font-medium">{currentOrder.transactionId || 'N/A'}</p>
                             </div>
-                            <div className="bg-gray-50 p-3 rounded">
+                            <div className="bg-gray-100 p-3 rounded">
                                 <p className="text-sm text-gray-500">Order Date</p>
                                 <p className="font-medium">
                                     {new Date(currentOrder.createdAt).toLocaleDateString()}
                                 </p>
                             </div>
-                            <div className="bg-gray-50 p-3 rounded">
+                            <div className="bg-gray-100 p-3 rounded">
                                 <p className="text-sm text-gray-500">Total Amount</p>
                                 <p className="font-medium">₹{currentOrder.totalPrice.toFixed(2)}</p>
                             </div>
-                            <div className="bg-gray-50 p-3 rounded">
+                            <div className="bg-gray-100 p-3 rounded">
                                 <p className="text-sm text-gray-500">Payment Method</p>
                                 <p className="font-medium">{currentOrder.paymentMethod}</p>
                             </div>
-                            <div className="bg-gray-50 p-3 rounded">
+                            <div className="bg-gray-100 p-3 rounded">
                                 <p className="text-sm text-gray-500">Total Items</p>
                                 <p className="font-medium">{currentOrder.totalItems}</p>
                             </div>
-                            
-                            <div className="mt-4 p-3 bg-gray-50 rounded">
+
+                            <div className="mt-4 p-3 bg-gray-100 rounded">
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center space-x-2">
                                         {getStatusIcon(currentOrder.paymentStatus)}
@@ -164,7 +164,7 @@ const OrderDetail = () => {
                                     </div>
                                 </div>
                                 {currentOrder.paymentStatus === "Pending" && (
-                                    <button 
+                                    <button
                                         onClick={handleContinuePayment}
                                         className="w-full mt-3 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
                                     >
@@ -187,25 +187,27 @@ const OrderDetail = () => {
                                 >
                                     <div className="flex flex-col sm:flex-row justify-between">
                                         <div className="flex-1">
+                                            <div className='flex justify-between'>
                                             <h4 className="font-semibold">{item.course.title}</h4>
-                                            <p className="text-sm text-gray-600 mt-1">
+                                            <div className="mt-3 sm:mt-0 sm:ml-4 sm:text-right">
+                                                <p className="font-semibold">Course Price: ₹{item.price.toFixed(2)}</p>
+                                            </div>
+                                            </div>
+                                            <p className="text-sm text-gray-600 mt-1 text-justify">
                                                 {item.course.description}
                                             </p>
                                             <div className="mt-2 text-sm text-gray-500 grid grid-cols-2 gap-2">
-                                                <p>Instructor: {item.course.instructor}</p>
-                                                <p>Department: {item.course.department}</p>
-                                                <p>Duration: {item.course.duration} Weeks</p>
-                                                <p>Total Modules: {item.course.totalModules}</p>
+                                                <p className='font-bold'>Instructor: {item.course.tutorId.tutorname}</p>
+                                                <p className='font-bold'>Department: {item.course.department}</p>
+                                                <p className='font-bold'>Duration: {item.course.duration} Weeks</p>
+                                                <p className='font-bold'>Total Modules: {item.course.totalModules}</p>
                                             </div>
-                                        </div>
-                                        <div className="mt-3 sm:mt-0 sm:ml-4 sm:text-right">
-                                            <p className="font-semibold">₹{item.price.toFixed(2)}</p>
                                         </div>
                                     </div>
                                 </div>
                             ))}
                         </div>
-                        
+
                         {currentOrder.items.length > 2 && (
                             <button
                                 onClick={toggleViewMore}

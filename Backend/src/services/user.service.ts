@@ -13,6 +13,9 @@ import { UpdatePassword, UserCookieData } from "../type/types/user.types";
 import { CourseRepository } from "../repositories/course.repository";
 import { CourseDocument } from "../type/course.type";
 import { IUserService } from "../interfaces/IServiceInterface/IUserService";
+import { IUserRepository } from "../interfaces/IRepositoryInterface/IUserRepository";
+import { ICourseRepository } from "../interfaces/IRepositoryInterface/ICourseRepository";
+import { log } from "console";
 
 export interface userDetail extends CreateUserDto {
     OTP: string;
@@ -20,9 +23,13 @@ export interface userDetail extends CreateUserDto {
 
 
 class UserService implements IUserService {
-    constructor(private readonly userRepository: UserRepository,
-        private readonly courseRepository: CourseRepository
-    ) { }
+    private readonly userRepository: IUserRepository;
+    private readonly courseRepository: ICourseRepository
+
+    constructor(userRepository: IUserRepository,courseRepository: ICourseRepository) {
+        this.userRepository = userRepository;
+        this.courseRepository = courseRepository;
+     }
 
     async initiateUser(userDetail: CreateUserDto): Promise<userDetail> {
         try {
@@ -63,9 +70,8 @@ class UserService implements IUserService {
 
     async getUser(email: string, password: string): Promise<IUserDocument | null> {
         try {
-            console.log(email, password)
-            const user = await this.userRepository.findByEmail(email)
 
+            const user = await this.userRepository.findByEmail(email)
             if (!user) {
                 throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.USER_NOT_FOUND);
             }

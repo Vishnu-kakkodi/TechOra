@@ -215,14 +215,23 @@ const Navbar = () => {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-between items-center mb-4">
-              <span className="text-lg font-bold">Menu</span>
-              <button
+            {userdata?.profilePhoto && (
+                <div className="w-13 h-13 rounded-full overflow-hidden">
+                  <img
+                    src={userdata.profilePhoto}
+                    alt={userdata.userName || 'User profile'}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              )}
+              {/* <button
                 onClick={() => setIsOpen(false)}
                 className="text-gray-600 hover:text-yellow-400"
               >
                 <X className="h-6 w-6" />
-              </button>
+              </button> */}
             </div>
+            <p className='mb-2 text-wrap text-lg font-bold text-center'>{userdata?.userName}</p>
             <nav className="space-y-4">
               {['Course', 'Quiz', 'Leaderboard', 'Cart', 'Account'].map((item) => (
                 <Link

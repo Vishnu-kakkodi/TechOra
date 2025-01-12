@@ -236,8 +236,7 @@ const ChatModal: React.FC<ChatModalProps> = ({
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -20, scale: 0.95 }}
           transition={{ duration: 0.2 }}
-          className={`fixed top-24 right-6 w-96 rounded-2xl shadow-2xl border-2 border-white/50 overflow-hidden z-50 ${isDarkTheme ? "bg-gray-900 text-gray-200" : "bg-gradient-to-br from-indigo-50 to-purple-100"
-            }`}
+          className={`fixed top-24 sm:top-24 sm:right-6 sm:w-96 rounded-2xl shadow-2xl border-2 border-white/50 overflow-hidden z-50 ${isDarkTheme ? "bg-gray-900 text-gray-200" : "bg-gradient-to-br from-indigo-50 to-purple-100"}`}
         >
           <div className="bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white p-4 flex justify-between items-center">
             <div className="flex items-center gap-4">
@@ -296,17 +295,17 @@ const ChatModal: React.FC<ChatModalProps> = ({
                 >
                   <div
                     className={`relative max-w-[80%] px-4 py-2 rounded-xl shadow-md ${isSender
-                      ? "bg-gradient-to-br from-green-500 to-green-400 text-white"
+                      ? "bg-gradient-to-br from-green-500 to-green-300 text-black"
                       : "bg-gray-200 text-gray-800"
                       } ${message.status === "failed" ? "border-2 border-red-500" : ""}`}
                   >
                     <div className="flex items-center justify-between">
                       <p className="text-sm">{message.text}</p>
                       <div className="ml-2 flex items-center text-xs space-x-1 relative">
-                        <span className={`${isSender ? "text-gray-200" : "text-black"}`}>{messageTime}</span>
+                        <span className={`${isSender ? "text-black" : "text-black"}`}>{messageTime}</span>
                         {isSender && (
                           <span
-                            className={`flex items-center font-bold text-xs ${message.isRead ? "text-blue-500" : "text-black-500"
+                            className={`flex items-center font-bold text-xs ${message.isRead ? "text-blue-800" : "text-white"
                               }`}
                           >
                             <svg

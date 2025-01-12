@@ -3,6 +3,7 @@ import { UserModel } from "../models/user.model";
 import { IUserDocument } from "../type/user.type";
 import { HttpException } from "../middleware/error.middleware";
 import mongoose, { FilterQuery } from 'mongoose';
+import { IUserRepository } from "../interfaces/IRepositoryInterface/IUserRepository";
 
 interface UpdateProfileData {
     userName?: string;
@@ -21,7 +22,7 @@ export type SearchQueryType = FilterQuery<{
   }>;
 
 
-export class UserRepository extends BaseRepository<IUserDocument> {
+export class UserRepository extends BaseRepository<IUserDocument> implements IUserRepository {
     constructor(){
         super(UserModel);
     }
@@ -58,7 +59,7 @@ export class UserRepository extends BaseRepository<IUserDocument> {
         }
     }
 
-    async findByIdAndUpdate(userId:string, courseIds: mongoose.Types.ObjectId[] | undefined){
+    async findByIdAndUpdate(userId:string, courseIds: mongoose.Types.ObjectId[] | undefined):Promise<void>{
         try{
             const mongoUserId = new mongoose.Types.ObjectId(userId);
             const updatedUser = await this.model.findByIdAndUpdate(
@@ -81,7 +82,7 @@ export class UserRepository extends BaseRepository<IUserDocument> {
     }
 
 
-    async UpdateProfile(userId: string, updatedData: Partial<UpdateProfileData>) {
+    async UpdateProfile(userId: string, updatedData: Partial<UpdateProfileData>): Promise<any> {
         try {
             const id = new mongoose.Types.ObjectId(userId);
             

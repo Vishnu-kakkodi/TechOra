@@ -9,7 +9,7 @@ import useDebouncedValue from '../../hooks/debounceHook';
 import { useAppSelector } from '../../store/hook';
 import { toast } from 'react-toastify';
 import Footer from '../../components/footer/Footer';
-import enterFullScreen from '../../utils/enterFullScreen';
+import enterFullScreen from '../../../src/utils/fullScreen';
 
 
 const QuizList = () => {

@@ -13,14 +13,16 @@ import { authMiddleware } from "../middleware/auth.middleware";
 import CourseService from "../services/course.service";
 import InstituteService from "../services/institute.service";
 import QuizService from "../services/quiz.service";
+import { InstituteRepository } from "../repositories/institute.repository";
 
 const router = Router();
-const instituteService = new InstituteService();
 const courseRepository = new CourseRepository();
 const cartRepository = new CartRepository();
 const userRepository = new UserRepository();
 const tutorRepository = new TutorRepository();
 const wishlistRepository = new WishlistRepository();
+const instituteRepository = new InstituteRepository();
+const instituteService = new InstituteService(instituteRepository,tutorRepository);
 const courseService = new CourseService(courseRepository,cartRepository,userRepository,tutorRepository,wishlistRepository);
 const instituteController = new InstitutionController(instituteService);
 const quizRepository = new QuizRepository();

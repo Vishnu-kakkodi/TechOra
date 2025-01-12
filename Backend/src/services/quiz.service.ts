@@ -7,16 +7,19 @@ import MESSAGES from "../constants/message";
 import { UserRepository } from "../repositories/user.repository";
 import { TutorRepository } from "../repositories/tutor.repository";
 import { IQuizService } from "../interfaces/IServiceInterface/IQuizService";
+import { IQuizRepository } from "../interfaces/IRepositoryInterface/IQuizRepository";
+import { IUserRepository } from "../interfaces/IRepositoryInterface/IUserRepository";
+import { ITutorRepository } from "../interfaces/IRepositoryInterface/ITutorRepository";
 
 
 
 class QuizService implements IQuizService {
-    private quizRepository: QuizRepository;
-    private userRepository: UserRepository;
-    private tutorRepository: TutorRepository;
+    private quizRepository: IQuizRepository;
+    private userRepository: IUserRepository;
+    private tutorRepository: ITutorRepository;
 
 
-    constructor(quizRepository: QuizRepository, userRepository: UserRepository, tutorRepository: TutorRepository) {
+    constructor(quizRepository: IQuizRepository, userRepository: IUserRepository, tutorRepository: ITutorRepository) {
         this.quizRepository = quizRepository;
         this.userRepository  = userRepository;
         this.tutorRepository =  tutorRepository;

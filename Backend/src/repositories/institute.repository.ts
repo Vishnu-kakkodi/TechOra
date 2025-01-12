@@ -2,6 +2,7 @@ import { BaseRepository } from "./base.repository";
 import { InstituteModel } from "../models/institute.model";
 import { InstituteDocument } from "../type/institute.type";
 import mongoose, { FilterQuery } from "mongoose";
+import { IInstituteRepository } from "../interfaces/IRepositoryInterface/IInstituteRepository";
 
 export type SearchQueryTypeInstitute = FilterQuery<{
     collegeName: string;
@@ -12,7 +13,7 @@ export type SearchQueryTypeInstitute = FilterQuery<{
 
 
 
-export class InstituteRepository extends BaseRepository<InstituteDocument> {
+export class InstituteRepository extends BaseRepository<InstituteDocument> implements IInstituteRepository {
     constructor(){
         super(InstituteModel);
     }

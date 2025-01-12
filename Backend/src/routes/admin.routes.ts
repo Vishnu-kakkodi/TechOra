@@ -2,9 +2,13 @@ import { Router } from "express";
 import { AdminController } from "../controllers/admin.controller";
 import { authMiddleware } from "../middleware/auth.middleware";
 import AdminService from "../services/admin.service";
+import { UserRepository } from "../repositories/user.repository";
+import { InstituteRepository } from "../repositories/institute.repository";
 
 const router = Router();
-const adminService = new AdminService();
+const userRepository = new UserRepository();
+const instituteRepository = new InstituteRepository();
+const adminService = new AdminService(userRepository,instituteRepository);
 const adminController = new AdminController(adminService);
 
 router.get('/user-list',authMiddleware,adminController.getUser.bind(adminController));

@@ -9,13 +9,16 @@ import { TutorRepository } from "../repositories/tutor.repository";
 import { TutorDocument } from "../type/tutor.type";
 import STATUS_CODES from "../constants/statusCode";
 import MESSAGES from "../constants/message";
+import { IInstituteRepository } from "../interfaces/IRepositoryInterface/IInstituteRepository";
+import { ITutorRepository } from "../interfaces/IRepositoryInterface/ITutorRepository";
+import { IInstituteService } from "../interfaces/IServiceInterface/IInsrituteService";
 
-class InstituteService implements InstituteService {
-    private instituteRepository: InstituteRepository;
-    private tutorRepository: TutorRepository
-    constructor() {
-        this.instituteRepository = new InstituteRepository();
-        this.tutorRepository = new TutorRepository();
+class InstituteService implements IInstituteService {
+    private readonly instituteRepository: IInstituteRepository;
+    private readonly tutorRepository: ITutorRepository
+    constructor(instituteRepository:IInstituteRepository,tutorRepository:ITutorRepository) {
+        this.instituteRepository = instituteRepository;
+        this.tutorRepository = tutorRepository;
     }
 
     async trackStatus(trackID: string): Promise<InstituteDocument | null> {

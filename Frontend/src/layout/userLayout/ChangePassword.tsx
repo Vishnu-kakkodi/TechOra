@@ -59,20 +59,7 @@ const ChangePassword: React.FC = () => {
   };
 
   return (
-    <div className="h-full min-h-screen bg-gradient-to-br from-indigo-100 to-purple-100 m-2 flex justify-center items-center p-4 sm:p-8 border-2 border-brown-500 w-full">
-      <div className="flex flex-col lg:flex-row shadow-2xl rounded-2xl overflow-hidden max-w-4xl w-full bg-white">
-        {/* Image Section - Hidden on mobile, visible from lg breakpoint */}
-        <div className="hidden lg:block w-full lg:w-1/2 relative">
-          <img
-            src={ChangePasswordIMG}
-            alt="Change Password"
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 opacity-70"></div>
-        </div>
-
-        {/* Form Section */}
-        <div className="w-full lg:w-1/2 p-6 sm:p-8 lg:p-12 bg-white flex flex-col justify-center">
+        <div className=" h-full w-full mx-10 my-10 sm:m-auto sm:mt-10 sm:w-3/4 border-black border-2 p-6 lg:w-[500px] sm:p-8 lg:p-12 bg-white flex flex-col justify-center">
           <div className="flex justify-center mb-6">
             <ShieldCheck className="w-12 h-12 sm:w-16 sm:h-16 text-blue-600 animate-pulse" />
           </div>
@@ -139,8 +126,6 @@ const ChangePassword: React.FC = () => {
             )}
           </Formik>
         </div>
-      </div>
-    </div>
   );
 };
 

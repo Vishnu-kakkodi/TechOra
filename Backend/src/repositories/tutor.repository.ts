@@ -3,6 +3,7 @@ import  {TutorModel}  from "../models/tutor.model";
 import { InstituteDocument } from "../type/institute.type";
 import { TutorDocument } from "../type/tutor.type";
 import mongoose from "mongoose";
+import { ITutorRepository } from "../interfaces/IRepositoryInterface/ITutorRepository";
 
 interface UpdateProfileData {
     tutorname?: string;
@@ -12,7 +13,7 @@ interface UpdateProfileData {
 }
 
 
-export class TutorRepository extends BaseRepository<TutorDocument> {
+export class TutorRepository extends BaseRepository<TutorDocument> implements ITutorRepository {
     constructor(){
         super(TutorModel);
     }
@@ -127,7 +128,7 @@ export class TutorRepository extends BaseRepository<TutorDocument> {
       }
 
 
-      async UpdateProfile(tutorId: string, updatedData: Partial<UpdateProfileData>) {
+      async UpdateProfile(tutorId: string, updatedData: Partial<UpdateProfileData>):Promise<any> {
         try {
             const id = new mongoose.Types.ObjectId(tutorId);
             

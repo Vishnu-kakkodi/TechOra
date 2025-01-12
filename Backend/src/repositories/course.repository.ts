@@ -3,6 +3,7 @@ import { CourseModel } from "../models/course.model";
 import { CourseDocument, Module } from "../type/course.type";
 import mongoose, { FilterQuery, Types } from 'mongoose'
 import { UpdateCourseDto } from "../dtos/course.dtos";
+import { ICourseRepository } from "../interfaces/IRepositoryInterface/ICourseRepository";
 
 export type SearchCourse = FilterQuery<{
     title: string;
@@ -12,11 +13,14 @@ export type SearchCourse = FilterQuery<{
 
 
 
-export class CourseRepository extends BaseRepository<CourseDocument> {
+export class CourseRepository extends BaseRepository<CourseDocument> implements ICourseRepository {
+    
     constructor() {
         super(CourseModel);
     }
-      async findDraft(
+      
+    
+    async findDraft(
         query: any,
         skip: number,
         limit: number,

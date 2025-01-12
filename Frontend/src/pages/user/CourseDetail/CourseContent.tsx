@@ -25,13 +25,13 @@ const CourseContent: React.FC<CourseContentProps> = ({
     <div className="bg-white rounded-lg shadow-md overflow-hidden">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
-          <div className="aspect-w-16 aspect-h-9">
+          <div className="aspect-w-16 m-2 border-2 aspect-h-9">
             {isVideoPlaying && currentVideo ? (
               <video
                 src={currentVideo}
                 controls
                 onEnded={handleVideoEnd}
-                className="w-full h-full object-cover"
+                className="w-full h-[350px] object-cover"
               />
             ) : (
               <img
@@ -43,7 +43,7 @@ const CourseContent: React.FC<CourseContentProps> = ({
           </div>
           <div className="p-4">
             <h1 className="text-2xl font-bold mb-2">{course?.title}</h1>
-            <p className="text-gray-600">{course?.description}</p>
+            <p className="text-gray-600 text-justify">{course?.description}</p>
           </div>
         </div>
         <div className="lg:col-span-1 p-4">

@@ -13,17 +13,22 @@ import { TutorRepository } from "../repositories/tutor.repository";
 import { WishlistRepository } from "../repositories/wishlist.repository";
 import { WishlistDocument } from "../type/wishlist.type";
 import { ICourseService } from "../interfaces/IServiceInterface/ICourseService";
+import { ICourseRepository } from "../interfaces/IRepositoryInterface/ICourseRepository";
+import { ICartRepository } from "../interfaces/IRepositoryInterface/ICartRepository";
+import { IUserRepository } from "../interfaces/IRepositoryInterface/IUserRepository";
+import { ITutorRepository } from "../interfaces/IRepositoryInterface/ITutorRepository";
+import { IWishlistRepository } from "../interfaces/IRepositoryInterface/IWishlistRepository";
 
 
 class CourseService implements ICourseService {
-  private courseRepository: CourseRepository;
-  private cartRepository: CartRepository;
-  private userRepository: UserRepository;
-  private tutorRepository: TutorRepository;
-  private wishlistRepository: WishlistRepository;
+  private courseRepository: ICourseRepository;
+  private cartRepository: ICartRepository;
+  private userRepository: IUserRepository;
+  private tutorRepository: ITutorRepository;
+  private wishlistRepository: IWishlistRepository;
 
 
-  constructor(courseRepository: CourseRepository, cartRepository: CartRepository, userRepository: UserRepository, tutorRepository: TutorRepository, wishlistRepository: WishlistRepository) {
+  constructor(courseRepository: ICourseRepository, cartRepository: ICartRepository, userRepository: IUserRepository, tutorRepository: ITutorRepository, wishlistRepository: IWishlistRepository) {
     this.courseRepository = courseRepository;
     this.cartRepository = cartRepository;
     this.userRepository = userRepository;

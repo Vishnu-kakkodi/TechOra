@@ -10,13 +10,16 @@ import mongoose from "mongoose";
 import { NotificationRepository } from "../repositories/notification.repository";
 import { INotification } from "../type/notification.type";
 import { ITutorService } from "../interfaces/IServiceInterface/ITutorService";
+import { ITutorRepository } from "../interfaces/IRepositoryInterface/ITutorRepository";
+import { IUserRepository } from "../interfaces/IRepositoryInterface/IUserRepository";
+import { INotificationRepository } from "../interfaces/IRepositoryInterface/INotificationRepository";
 
 class TutorService implements ITutorService {
-    private tutorRepository: TutorRepository;
-    private userRepository: UserRepository;
-    private notificationRepository: NotificationRepository;
+    private tutorRepository: ITutorRepository;
+    private userRepository: IUserRepository;
+    private notificationRepository: INotificationRepository;
 
-    constructor(tutorRepository: TutorRepository, userRepository:UserRepository, notificationRepository:NotificationRepository) {
+    constructor(tutorRepository: ITutorRepository, userRepository:IUserRepository, notificationRepository:INotificationRepository) {
         this.tutorRepository = tutorRepository;
         this.userRepository = userRepository;
         this.notificationRepository = notificationRepository
@@ -27,9 +30,13 @@ class TutorService implements ITutorService {
             if(!tutorEmail){
                 throw new HttpException(STATUS_CODES.UNAUTHORIZED, MESSAGES.ERROR.UNAUTHORIZED)
               }
+              console.log("oooo")
             const tutor = await this.tutorRepository.findOne(tutorEmail)
+            console.log("oooo")
+
             if(!tutor){
-                throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
+              console.log("oooo")
+                throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.INVALID_CREDENTIALS)
               }
             if (tutor.password !== password) {
                 throw new HttpException(STATUS_CODES.BAD_REQUEST, MESSAGES.ERROR.PASSWORD_MISMATCH);
@@ -41,7 +48,7 @@ class TutorService implements ITutorService {
             return { ...tutor.toObject(), accessToken, refreshToken };
 
         } catch (error) {
-            throw new HttpException(STATUS_CODES.SERVER_ERROR, MESSAGES.ERROR.SERVER_ERROR)
+          throw error
         }
     }
 

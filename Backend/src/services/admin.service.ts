@@ -15,6 +15,8 @@ import { FilterQuery } from 'mongoose';
 import { IAdminService } from "../interfaces/IServiceInterface/IAdminService";
 import STATUS_CODES from "../constants/statusCode";
 import MESSAGES from "../constants/message";
+import { IUserRepository } from "../interfaces/IRepositoryInterface/IUserRepository";
+import { IInstituteRepository } from "../interfaces/IRepositoryInterface/IInstituteRepository";
 dotenv.config();
 
 export type SearchQueryType = FilterQuery<{
@@ -33,12 +35,12 @@ AWS.config.update({
 class AdminService implements IAdminService {
     private s3Client: S3Client;
 
-    private userRepository: UserRepository;
-    private instituteRepository: InstituteRepository
+    private userRepository: IUserRepository;
+    private instituteRepository: IInstituteRepository
 
-    constructor() {
-        this.userRepository = new UserRepository();
-        this.instituteRepository = new InstituteRepository();
+    constructor(userRepository: IUserRepository, instituteRepository: IInstituteRepository) {
+        this.userRepository = userRepository
+        this.instituteRepository = instituteRepository;
         this.s3Client = new S3Client({
             region: process.env.AWS_REGION,
             credentials: {

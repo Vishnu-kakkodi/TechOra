@@ -4,6 +4,7 @@ import { QuizDocument } from "../type/quiz.type";
 import mongoose, { FilterQuery } from "mongoose";
 import { HttpException } from "../middleware/error.middleware";
 import STATUS_CODES from "../constants/statusCode";
+import { IQuizRepository } from "../interfaces/IRepositoryInterface/IQuizRepository";
 
 export type SearchQuiz = FilterQuery<{
     title: string;
@@ -11,7 +12,7 @@ export type SearchQuiz = FilterQuery<{
     stack: string;
 }>;
 
-export class QuizRepository extends BaseRepository<QuizDocument> {
+export class QuizRepository extends BaseRepository<QuizDocument> implements IQuizRepository {
     constructor() {
         super(QuizModel);
     }

@@ -30,8 +30,8 @@ const CourseHeader: React.FC<CourseHeaderProps> = ({ course, courseIDs, courseId
             onClick={() => setIsChatOpen(true)}
           >
             <MessageCircle className="w-5 h-5" />
-            <span>Chat with Instructor</span>
-          </motion.button>
+            <span className="hidden sm:inline">Chat with Instructor</span>
+            </motion.button>
         )}
       </div>
 

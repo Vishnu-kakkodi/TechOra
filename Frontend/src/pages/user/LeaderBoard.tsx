@@ -47,23 +47,19 @@ const LeaderBoard = () => {
         <>
             <Navbar />
             <div className="max-w-6xl mx-auto mt-10 p-6 bg-white shadow-lg rounded-xl">
-                <div className="flex items-center justify-between mb-6">
-                    <h1 className="text-3xl font-bold text-gray-800 flex items-center">
-                        <Trophy className="mr-3 text-yellow-500" size={36} />
-                        Quiz Competition Leaderboard
-                    </h1>
-                    <div className="mb-8">
-                        <div className="relative">
-                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
-                            <input
-                                type="text"
-                                placeholder="Search..."
-                                value={search}
-                                onChange={handleSearchChange}
-                                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                        </div>
-                    </div>
+                <h1 className="text-xl text-wrap sm:text-3xl font-bold text-gray-800 flex items-center text-center">
+                    <Trophy className="mr-3 text-yellow-500" size={36} />
+                    Quiz Leaderboard
+                </h1>
+                <div className="relative">
+                    <Search className="absolute left-3 top-10 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+                    <input
+                        type="text"
+                        placeholder="Search..."
+                        value={search}
+                        onChange={handleSearchChange}
+                        className="mt-5 pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
                 </div>
 
                 {currentUser && (
@@ -77,7 +73,7 @@ const LeaderBoard = () => {
                                 <span className="font-semibold">Score:</span> {currentUser.quizProgress?.score}
                             </div>
                             <div>
-                                <span className="font-semibold">Progress: </span> 
+                                <span className="font-semibold">Progress: </span>
                                 <span className={
                                     (currentUser.quizProgress?.progress ?? '').toString().startsWith('+')
                                         ? 'text-green-600'
@@ -91,7 +87,7 @@ const LeaderBoard = () => {
                 )}
 
                 <div className="bg-gray-50 rounded-lg overflow-hidden">
-                    <table className="w-full">
+                    <table className="w-[300px] md:w-full">
                         <thead className="bg-gray-100 border-b">
                             <tr>
                                 <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rank</th>
@@ -106,7 +102,7 @@ const LeaderBoard = () => {
                                     key={player.id}
                                     className={`
                                         ${player._id === currentUser._id
-                                            ? 'bg-blue-100 font-bold' 
+                                            ? 'bg-blue-100 font-bold'
                                             : 'hover:bg-gray-100'
                                         } 
                                         border-b last:border-b-0 transition-colors duration-200
@@ -124,37 +120,44 @@ const LeaderBoard = () => {
                                         )}
                                     </td>
                                     <td className="p-3">
-                                        <div className="flex items-center">
-                                            <div className={`w-10 h-10 rounded-full flex items-center justify-center mr-3 
-                                                ${player.id === currentUser._id 
-                                                    ? 'bg-blue-300' 
-                                                    : 'bg-blue-100'
-                                                }`
-                                            }>
-                                                <img 
-                                                src={player.profilePhoto}
-                                                className='h-10 w-10 rounded-full'
+                                        <div className="flex flex-col items-center">
+                                            {/* Player Image */}
+                                            <div
+                                                className={`w-10 h-10 rounded-full text-center mb-2 
+      ${player.id === currentUser._id ? 'bg-blue-300' : 'bg-blue-100'}`}
+                                            >
+                                                <img
+                                                    src={player.profilePhoto}
+                                                    alt={`${player.userName}'s profile`}
+                                                    className="h-10 w-10 rounded-full"
                                                 />
                                             </div>
-                                            <div>
-                                                <div className={`font-semibold ${player.id === currentUser._id ? 'text-blue-800' : 'text-gray-800'}`}>
+
+                                            {/* Player Name */}
+                                            <div className="text-center">
+                                                <div
+                                                    className={`font-semibold ${player.id === currentUser._id ? 'text-blue-800' : 'text-gray-800'
+                                                        }`}
+                                                >
                                                     {player.userName}
-                                                    {player.id === currentUser._id && <span className="ml-2 text-xs text-blue-600">(You)</span>}
+                                                    {player.id === currentUser._id && (
+                                                        <span className="ml-2 text-xs text-blue-600">(You)</span>
+                                                    )}
                                                 </div>
                                             </div>
                                         </div>
+
                                     </td>
                                     <td className="p-3 text-right">
-                                        <span className={`font-bold ${player.id === currentUser._id  ? 'text-blue-700' : 'text-blue-600'}`}>
+                                        <span className={`font-bold ${player.id === currentUser._id ? 'text-blue-700' : 'text-blue-600'}`}>
                                             {player.quizProgress?.score}
                                         </span>
                                     </td>
                                     <td className="p-3 text-right">
-                                        <span className={`font-semibold ${
-                                            (player.quizProgress?.progress ?? '').toString().startsWith('+')
-                                                ? 'text-green-600'
-                                                : 'text-red-600'
-                                        }`}>
+                                        <span className={`font-semibold ${(player.quizProgress?.progress ?? '').toString().startsWith('+')
+                                            ? 'text-green-600'
+                                            : 'text-red-600'
+                                            }`}>
                                             {player.quizProgress?.progress}
                                             <Star className="inline ml-1" size={16} />
                                         </span>
@@ -164,7 +167,7 @@ const LeaderBoard = () => {
                         </tbody>
                     </table>
                 </div>
-                
+
                 <div className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6 mt-4">
                     <div className="flex flex-1 justify-between sm:hidden">
                         <button
@@ -215,8 +218,8 @@ const LeaderBoard = () => {
                                 </button>
                             </nav>
                         </div>
-                     </div>
-              </div>
+                    </div>
+                </div>
             </div>
         </>
     );

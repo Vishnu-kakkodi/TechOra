@@ -110,13 +110,11 @@ export class UserController {
     }
 
     async getUser(
-        req: Request<{ email: string, password: string }>,
+        req: Request,
         res: Response,
         next: NextFunction
     ): Promise<void> {
         try {
-            console.log(req.body.email)
-
             const userDetails = await this.userService.getUser(req.body.email, req.body.password);
             if (!userDetails) {
                 throw new HttpException(STATUS_CODES.NOT_FOUND,MESSAGES.ERROR.USER_NOT_FOUND);

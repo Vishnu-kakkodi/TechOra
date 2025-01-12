@@ -2,6 +2,7 @@ import { BaseRepository } from "./base.repository";
 import { WishlistModel } from "../models/wishlist.model";
 import { WishlistDocument } from "../type/wishlist.type";
 import mongoose, { FilterQuery } from "mongoose";
+import { IWishlistRepository } from "../interfaces/IRepositoryInterface/IWishlistRepository";
 
 export type SearchCourse = FilterQuery<{
     title: string;
@@ -9,7 +10,7 @@ export type SearchCourse = FilterQuery<{
     instructor: string;
 }>;
 
-export class WishlistRepository extends BaseRepository<WishlistDocument> {
+export class WishlistRepository extends BaseRepository<WishlistDocument> implements IWishlistRepository {
     constructor() {
         super(WishlistModel)
     }

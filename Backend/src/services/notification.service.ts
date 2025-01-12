@@ -10,11 +10,12 @@ import mongoose from "mongoose";
 import { NotificationRepository } from "../repositories/notification.repository";
 import { INotification } from "../type/notification.type";
 import { INotificationService } from "../interfaces/IServiceInterface/INotificationService";
+import { INotificationRepository } from "../interfaces/IRepositoryInterface/INotificationRepository";
 
 class NotificationService implements INotificationService {
-    private notificationRepository: NotificationRepository;
+    private notificationRepository: INotificationRepository;
 
-    constructor(notificationRepository: NotificationRepository) {
+    constructor(notificationRepository: INotificationRepository) {
         this.notificationRepository = notificationRepository;
     }
 

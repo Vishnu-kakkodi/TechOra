@@ -36,8 +36,9 @@ import { BaseInterface } from "../type/base.type";
 import { HttpException } from "../middleware/error.middleware";
 import STATUS_CODES from "../constants/statusCode";
 import MESSAGES from "../constants/message";
+import { IBaseRepository } from "../interfaces/IRepositoryInterface/IBaseRepository";
 
-export abstract class BaseRepository<T extends BaseInterface & Document> {
+export abstract class BaseRepository<T extends BaseInterface & Document> implements IBaseRepository<T>{
     constructor(protected readonly model: Model<T & Document>) {}
 
     async create(data: Partial<T>): Promise<T> {

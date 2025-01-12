@@ -3,10 +3,11 @@ import { CartDocument } from "../type/cart.type";
 import mongoose from 'mongoose';
 import {INotification}  from "../type/notification.type";
 import notificationModel from "../models/notification.model";
+import { INotificationRepository } from "../interfaces/IRepositoryInterface/INotificationRepository";
 
 
 
-export class NotificationRepository extends BaseRepository<INotification> {
+export class NotificationRepository extends BaseRepository<INotification> implements INotificationRepository {
     constructor() {
         super(notificationModel);
     }

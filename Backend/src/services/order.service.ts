@@ -8,17 +8,23 @@ import STATUS_CODES from "../constants/statusCode";
 import MESSAGES from "../constants/message";
 import { CourseRepository } from "../repositories/course.repository";
 import { IOrderService } from "../interfaces/IServiceInterface/IOrderService";
+import { IOrderRepository } from "../interfaces/IRepositoryInterface/IOrderRepository";
+import { ICartRepository } from "../interfaces/IRepositoryInterface/ICartRepository";
+import { IUserRepository } from "../interfaces/IRepositoryInterface/IUserRepository";
+import { ICourseRepository } from "../interfaces/IRepositoryInterface/ICourseRepository";
 
 
 class OrderService implements IOrderService {
-    constructor(
-        private readonly orderRepository: OrderRepository,
-        private readonly cartRepository: CartRepository,
-        private readonly userRepository: UserRepository,
-        private readonly courseRepository: CourseRepository,
-
-
-    ) { }
+    private readonly orderRepository: IOrderRepository;
+    private readonly cartRepository: ICartRepository;
+    private readonly userRepository: IUserRepository;
+    private readonly courseRepository: ICourseRepository;
+    constructor(orderRepository:IOrderRepository,cartRepository:ICartRepository,userRepository:IUserRepository,courseRepository:ICourseRepository) { 
+        this.orderRepository = orderRepository;
+        this.cartRepository = cartRepository;
+        this.userRepository = userRepository;
+        this.courseRepository = courseRepository;
+    }
 
     async getOrderById(orderId: string): Promise<OrderDocument> {
         try {

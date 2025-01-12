@@ -7,15 +7,18 @@ import STATUS_CODES from "../constants/statusCode";
 import MESSAGES from "../constants/message";
 import { ICartService } from "../interfaces/IServiceInterface/ICartService";
 import { UserRepository } from "../repositories/user.repository";
+import { ICourseRepository } from "../interfaces/IRepositoryInterface/ICourseRepository";
+import { ICartRepository } from "../interfaces/IRepositoryInterface/ICartRepository";
+import { IUserRepository } from "../interfaces/IRepositoryInterface/IUserRepository";
 
 class CartService implements ICartService {
-  private courseRepository: CourseRepository;
-  private cartRepository: CartRepository;
-  private userRepository: UserRepository;
+  private courseRepository: ICourseRepository;
+  private cartRepository: ICartRepository;
+  private userRepository: IUserRepository;
 
 
 
-  constructor(courseRepository: CourseRepository, cartRepository: CartRepository, userRepository: UserRepository) {
+  constructor(courseRepository: ICourseRepository, cartRepository: ICartRepository, userRepository: IUserRepository) {
     this.courseRepository = courseRepository;
     this.cartRepository = cartRepository;
     this.userRepository = userRepository

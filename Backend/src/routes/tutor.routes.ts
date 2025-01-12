@@ -16,15 +16,17 @@ import InstituteService from "../services/institute.service";
 import CourseService from "../services/course.service";
 import QuizService from "../services/quiz.service";
 import TutorService from "../services/tutor.service";
+import { InstituteRepository } from "../repositories/institute.repository";
 
 const router = Router();
-const instituteService = new InstituteService();
+const instituteRepository = new InstituteRepository();
 const courseRepository = new CourseRepository();
 const cartRepository = new CartRepository();
 const userRepository = new UserRepository();
 const tutorRepository = new TutorRepository();
 const wishlistRepository = new WishlistRepository();
 const notificationRepository = new NotificationRepository();
+const instituteService = new InstituteService(instituteRepository,tutorRepository);
 const courseService = new CourseService(courseRepository,cartRepository,userRepository,tutorRepository,wishlistRepository);
 const instituteController = new InstitutionController(instituteService);
 const quizRepository = new QuizRepository();

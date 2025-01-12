@@ -87,7 +87,7 @@ const OrderList = () => {
                 <thead>
                   <tr className="bg-gray-200">
                     <th className="px-4 py-2 border">ID</th>
-                    <th className="px-4 py-2 border">Transaction ID</th>
+                    <th className="px-4 py-2 border">Payment Type</th>
                     <th className="px-4 py-2 border">Date</th>
                     <th className="px-4 py-2 border">Price</th>
                     <th className="px-4 py-2 border">Status</th>
@@ -98,7 +98,7 @@ const OrderList = () => {
                   {orders.map((order: Order) => (
                     <tr key={order._id} className="text-center hover:bg-gray-50">
                       <td className="px-4 py-2 border">{order.orderId}</td>
-                      <td className="px-4 py-2 border">{order.transactionId}</td>
+                      <td className="px-4 py-2 border">{order.paymentMethod}</td>
                       <td className="px-4 py-2 border">
                         {new Date(order.createdAt).toLocaleDateString()}
                       </td>
