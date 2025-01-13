@@ -53,7 +53,7 @@ export class WishlistRepository extends BaseRepository<WishlistDocument> impleme
     async removeWishlist(
         userId: string,
         courseId: string
-    ): Promise<any>{
+    ): Promise<string>{
         try{
             const result =  await this.model.updateOne(
                 {userId:new mongoose.Types.ObjectId(userId)},

@@ -16,6 +16,7 @@ import { IUserService } from "../interfaces/IServiceInterface/IUserService";
 import { IUserRepository } from "../interfaces/IRepositoryInterface/IUserRepository";
 import { ICourseRepository } from "../interfaces/IRepositoryInterface/ICourseRepository";
 import { log } from "console";
+import { FilterQuery } from "mongoose";
 
 export interface userDetail extends CreateUserDto {
     OTP: string;
@@ -201,7 +202,7 @@ class UserService implements IUserService {
     }
 
 
-    async forgotPassword(email: string, password: string): Promise<any> {
+    async forgotPassword(email: string, password: string): Promise<IUserDocument | null> {
         try {
             const user: IUserDocument | null = await this.userRepository.findByEmail(email)
             const hashPassword = await PasswordUtils.hashPassword(password);
@@ -266,7 +267,7 @@ class UserService implements IUserService {
         }
     }
 
-    async changePassword(credential: UpdatePassword, userId: string): Promise<any> {
+    async changePassword(credential: UpdatePassword, userId: string): Promise<void> {
         try {
             const currentPassword = credential.currentPassword;
             const newPassword = credential.newPassword;
@@ -300,7 +301,7 @@ class UserService implements IUserService {
     async myCourses(userId: string, page: number, limit: number, search: string): Promise<{ course: CourseDocument[] | null; total: number; }> {
         try {
             const skip = (page - 1) * limit;
-            let query: any = {};
+      let query: FilterQuery<CourseDocument> = {};
             if (search && search.trim() !== '') {
                 query.$or = [
                     { title: { $regex: search, $options: 'i' } }
@@ -376,7 +377,7 @@ class UserService implements IUserService {
     async leaderBoard(page: number, limit: number, search: string, userId: string): Promise<{ users: IUserDocument[] | null; total: number; currentUser: IUserDocument | null }> {
         try {
             const skip = (page - 1) * limit;
-            let query: any = {};
+        let query: FilterQuery<IUserDocument> = {};
             if (search && search.trim() !== '') {
                 query.$or = [
                     { userName: { $regex: search, $options: 'i' } },

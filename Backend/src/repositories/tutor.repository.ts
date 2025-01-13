@@ -4,6 +4,9 @@ import { InstituteDocument } from "../type/institute.type";
 import { TutorDocument } from "../type/tutor.type";
 import mongoose from "mongoose";
 import { ITutorRepository } from "../interfaces/IRepositoryInterface/ITutorRepository";
+import { HttpException } from "../middleware/error.middleware";
+import STATUS_CODES from "../constants/statusCode";
+import MESSAGES from "../constants/message";
 
 interface UpdateProfileData {
     tutorname?: string;
@@ -122,7 +125,6 @@ export class TutorRepository extends BaseRepository<TutorDocument> implements IT
             total: total[0]?.totalDepartments || 0 
           };
         } catch (error) {
-          console.error('Error counting tutors by department:', error);
           throw error;
         }
       }
@@ -153,7 +155,7 @@ export class TutorRepository extends BaseRepository<TutorDocument> implements IT
             });
     
             if (!updatedTutor) {
-                throw new Error('Tutor not found');
+                throw new HttpException(STATUS_CODES.NOT_FOUND,MESSAGES.ERROR.DATA_NOTFOUND);
             }
     
             return updatedTutor;

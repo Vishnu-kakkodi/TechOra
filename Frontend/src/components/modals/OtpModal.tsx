@@ -16,6 +16,7 @@ interface OtpModalProps {
 }
 
 interface emailProps {
+  status: number,
   message: string,
   data: string
 }
@@ -59,15 +60,23 @@ const OtpModal: React.FC<OtpModalProps> = ({ setOtpModalOpen, mode }) => {
             break;
 
           case 'forgotPassword':
-            const res: emailProps = await userOtpVerify({ otp }).unwrap();
-            setEmail(res.data)
-            toast.success('OTP verified successfully!');
-            navigate('/forgot-password', {
-              state: { email: res.data }
-            });
-            break;
+            try {
+              const res: emailProps = await userOtpVerify({ otp }).unwrap();
+              if (res.status === 200) {
+                  setEmail(res.data);
+                  toast.success('OTP verified successfully!');
+                  navigate('/forgot-password', {
+                      state: { email: res.data },
+                  });
+                  setOtpModalOpen(false);
+              } else {
+                  toast.error(res.message);
+              }
+          } catch (error) {
+              toast.error('An error occurred while verifying the OTP.');
+          }
+          break;
         }
-        setOtpModalOpen(false);
       } catch (error: any) {
         console.error('Error during OTP verification:', error);
         toast.error(error.message || 'OTP verification failed. Please try again.');

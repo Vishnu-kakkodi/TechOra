@@ -32,8 +32,7 @@ export class OrderRepository extends BaseRepository<OrderDocument> implements IO
             const order = await this.model.findById({ _id: orderId });
             return order
         } catch (error: any) {
-            console.error("Error occurred while fetching order:", error);
-
+            throw error;
         }
     }
 

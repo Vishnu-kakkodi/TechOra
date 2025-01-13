@@ -1,5 +1,5 @@
 import { HttpException } from "../middleware/error.middleware";
-import mongoose from "mongoose";
+import mongoose, { FilterQuery } from "mongoose";
 import { QuizRepository } from "../repositories/quiz.repository";
 import { QuizDocument } from "../type/quiz.type";
 import STATUS_CODES from "../constants/statusCode";
@@ -10,6 +10,7 @@ import { IQuizService } from "../interfaces/IServiceInterface/IQuizService";
 import { IQuizRepository } from "../interfaces/IRepositoryInterface/IQuizRepository";
 import { IUserRepository } from "../interfaces/IRepositoryInterface/IUserRepository";
 import { ITutorRepository } from "../interfaces/IRepositoryInterface/ITutorRepository";
+import { TutorDocument } from "../type/tutor.type";
 
 
 
@@ -49,8 +50,8 @@ class QuizService implements IQuizService {
     async quizList(page:number,limit:number,search:string,department:string,sort:string): Promise<{ quiz: QuizDocument[]; total: number; department:string[] }> {
         try {
             const skip = (page - 1) * limit;
-            let query:any = {};
-            let sortOptions: any = {};
+            let query: FilterQuery<QuizDocument> = {};
+            let sortOptions: Record<string, 1 | -1> = {};
       
             if (search && search.trim() !== '') {
                 query.$or = [
@@ -90,8 +91,8 @@ class QuizService implements IQuizService {
     async listQuiz(institutionId:string,page:number,limit:number,search:string,department:string,sort:string,selectedStatus:string): Promise<{ quiz: QuizDocument[]; total: number; department:string[] }> {
         try {
             const skip = (page - 1) * limit;
-            let query:any = {};
-            let sortOptions: any = {};
+            let query: FilterQuery<QuizDocument> = {};
+            let sortOptions: Record<string, 1 | -1> = {};
       
             if (search && search.trim() !== '') {
                 query.$or = [
@@ -131,8 +132,8 @@ class QuizService implements IQuizService {
     async TutorListQuiz(tutorId:string,page:number,limit:number,search:string,department:string,sort:string,selectedStatus:string): Promise<{ quiz: QuizDocument[]; total: number; department:string[] }> {
         try {
             const skip = (page - 1) * limit;
-            let query:any = {};
-            let sortOptions: any = {};
+            let query: FilterQuery<TutorDocument> = {};
+            let sortOptions: Record<string, 1 | -1> = {};
       
             if (search && search.trim() !== '') {
                 query.$or = [

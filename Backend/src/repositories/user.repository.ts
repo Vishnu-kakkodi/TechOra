@@ -31,7 +31,7 @@ export class UserRepository extends BaseRepository<IUserDocument> implements IUs
         try{
             return await this.model.findOne({email});
         }catch(error){
-            throw new HttpException(400, "Email does not exist");
+            throw error;
         }
     }
 

@@ -80,7 +80,6 @@ export class QuizRepository extends BaseRepository<QuizDocument> implements IQui
 
             return { quiz, total, department };
         } catch (error) {
-            console.error('Error in findQuizzes:', error);
             throw error;
         }
     }

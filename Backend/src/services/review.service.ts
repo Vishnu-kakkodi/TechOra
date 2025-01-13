@@ -36,7 +36,7 @@ class ReviewService implements IReviewService {
                         comment,
                         rating,
                     });
-                    const totalRatings = reviewDoc.userReviews.reduce((acc: any, review: any) => acc + review.rating, 0);
+                    const totalRatings = reviewDoc.userReviews.reduce((acc: number, review: any) => acc + review.rating, 0);
                     reviewDoc.averageRating = totalRatings / reviewDoc.userReviews.length;
     
                     if(course){
@@ -48,7 +48,7 @@ class ReviewService implements IReviewService {
                     const reviewEdit = reviewDoc?.userReviews?.filter((review)=>(review.userId._id ).toString() === userId)
                     reviewEdit[0].comment = comment;
                     reviewEdit[0].rating = rating;
-                    const totalRatings = reviewDoc.userReviews.reduce((acc: any, review: any) => acc + review.rating, 0);
+                    const totalRatings = reviewDoc.userReviews.reduce((acc: number, review: any) => acc + review.rating, 0);
                     reviewDoc.averageRating = totalRatings / reviewDoc.userReviews.length;
     
                     if(course){

@@ -160,6 +160,7 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({
     const userReview = Review?.data?.response?.userReviews?.find(
       (review: Review) => (review.userId.id) === loggedInUserId
     );
+    console.log(userReview,"PP",loggedInUserId)
     if (userReview) {
       setCurrentValue(userReview.rating);
       setReviewText(userReview.comment);

@@ -13,9 +13,9 @@ export interface IUserService{
     googleSign(email: string, userName: string, phoneNumber: string): Promise<any | null>
     verifyEmail(email: string): Promise<string>
     verifyOtp(otp: string, CookieData: string): Promise<string | undefined> 
-    forgotPassword(email: string, password: string): Promise<any>
+    forgotPassword(email: string, password: string): Promise<IUserDocument | null>
     resendOtp(email: string): Promise<string>
-    changePassword(credential:UpdatePassword, userId:string): Promise<any>
+    changePassword(credential:UpdatePassword, userId:string): Promise<void>
     myCourses(userId:string,page:number,limit:number,search:string): Promise<{ course: CourseDocument[] | null; total: number;}>
     profilePhoto(userId:string, fileLocation:string): Promise<IUserDocument | null>
     updateProfile(userId: string, updateData: {userName?: string;phoneNumber?: string;address?: string;}): Promise<IUserDocument | null>

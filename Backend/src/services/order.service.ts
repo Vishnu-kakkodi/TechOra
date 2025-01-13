@@ -1,7 +1,7 @@
 import { OrderDocument } from "../type/order.type";
 import { CartRepository } from "../repositories/cart.repository";
 import { OrderRepository } from "../repositories/order.repository";
-import mongoose from 'mongoose';
+import mongoose, { FilterQuery } from 'mongoose';
 import { UserRepository } from "../repositories/user.repository";
 import { HttpException } from "../middleware/error.middleware";
 import STATUS_CODES from "../constants/statusCode";
@@ -81,8 +81,8 @@ class OrderService implements IOrderService {
     async orderList(userId: string, page: number, limit: number, search: string, status: string, sort: string): Promise<{orders: OrderDocument[] | null; total: number}> {
         try {
             const skip = (page - 1) * limit;
-            let query: any = {};
-            let sortOptions: any = {};
+      let query: FilterQuery<OrderDocument> = {};
+      let sortOptions: Record<string, 1 | -1> = {};
             const id = new mongoose.Types.ObjectId(userId)
             query.userId = id;
 

@@ -75,7 +75,7 @@ const upload: Multer = multer({
     contentType: multerS3.AUTO_CONTENT_TYPE,
   }),
   limits: {
-    fileSize: 100 * 1024 * 1024,
+    fileSize: 1000 * 1024 * 1024,
     files: 1 
   },
   fileFilter: (req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {

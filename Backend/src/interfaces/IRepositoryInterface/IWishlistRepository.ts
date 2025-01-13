@@ -19,5 +19,5 @@ export interface IWishlistRepository extends IBaseRepository<WishlistDocument> {
     removeWishlist(
         userId: string,
         courseId: string
-    ): Promise<any>
+    ): Promise<string>
 }

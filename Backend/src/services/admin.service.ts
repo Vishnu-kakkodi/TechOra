@@ -73,7 +73,7 @@ class AdminService implements IAdminService {
     async getUser(page:number,limit:number,search:string,status:string): Promise<{ users: IUserDocument[]; total: number }> {
         try {
             const skip = (page - 1) * limit;
-            let query:any = {};
+            let query: FilterQuery<IUserDocument> = {};
             if (search && search.trim() !== '') {
                 query.$or = [
                     { userName: { $regex: search, $options: 'i' } },
@@ -93,7 +93,7 @@ class AdminService implements IAdminService {
     async getInstitutes(page:number,limit:number,search:string,filter:string): Promise<{ institutes: InstituteDocument[]; total: number }> {
         try {
             const skip = (page - 1) * limit;
-            let query:any = {};
+            let query: FilterQuery<InstituteDocument> = {};
             if (search && search.trim() !== '') {
                 query.$or = [
                     { collegeName: { $regex: search, $options: 'i' } },

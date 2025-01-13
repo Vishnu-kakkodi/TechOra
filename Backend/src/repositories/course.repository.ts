@@ -68,7 +68,6 @@ export class CourseRepository extends BaseRepository<CourseDocument> implements 
             await existingCourse.save();
             return existingCourse.toObject();
         } catch (error) {
-            console.error("Error occurred during update:", error);
             throw error;
         }
     }
@@ -99,7 +98,6 @@ export class CourseRepository extends BaseRepository<CourseDocument> implements 
 
             return await existingCourse.save();
         } catch (error) {
-            console.error("Error occurred during update:", error);
             throw error;
         }
     }
@@ -116,7 +114,6 @@ export class CourseRepository extends BaseRepository<CourseDocument> implements 
             );
             return
         } catch (error) {
-            console.error("Error occurred during update:", error);
             throw error;
         }
     }

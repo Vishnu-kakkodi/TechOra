@@ -141,7 +141,7 @@ const CourseDetail = () => {
         
         <ReviewSection 
           Review={Review} 
-          loggedInUserId={userdata?.id as string}
+          loggedInUserId={userdata?._id as string}
           isAddingReview={isAddingReview} 
           setIsAddingReview={setIsAddingReview} 
           currentValue={currentValue} 

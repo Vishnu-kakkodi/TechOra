@@ -4,7 +4,7 @@ import { CourseRepository } from "../repositories/course.repository";
 import { Course, CourseDocument, Module } from "../type/course.type";
 import { CartDocument } from "../type/cart.type";
 import { CartRepository } from "../repositories/cart.repository";
-import mongoose from "mongoose";
+import mongoose, { FilterQuery } from "mongoose";
 import STATUS_CODES from "../constants/statusCode";
 import MESSAGES from "../constants/message";
 import { IUserDocument } from "../type/user.type";
@@ -18,6 +18,7 @@ import { ICartRepository } from "../interfaces/IRepositoryInterface/ICartReposit
 import { IUserRepository } from "../interfaces/IRepositoryInterface/IUserRepository";
 import { ITutorRepository } from "../interfaces/IRepositoryInterface/ITutorRepository";
 import { IWishlistRepository } from "../interfaces/IRepositoryInterface/IWishlistRepository";
+import { TutorDocument } from "../type/tutor.type";
 
 
 class CourseService implements ICourseService {
@@ -59,12 +60,12 @@ class CourseService implements ICourseService {
     page: number,
     limit: number,
     search: string,
-  ): Promise<any> {
+  ): Promise<{ course: CourseDocument[]; total: number; }> {
     try {
       if (!Query.tutorId && !Query.institutionId) {
         throw new HttpException(STATUS_CODES.UNAUTHORIZED, MESSAGES.ERROR.UNAUTHORIZED);
       }
-      const query: any = {};
+      let query: FilterQuery<CourseDocument> = {};
       if (Query.institutionId) {
         query.institutionId = Query.institutionId;
       } else if (Query.tutorId) {
@@ -106,14 +107,14 @@ class CourseService implements ICourseService {
     }
   }
 
-  async courseList(instituteId: any, page: number, limit: number, search: string, department: string, sort: string): Promise<{ course: CourseDocument[]; total: number; }> {
+  async courseList(instituteId: string, page: number, limit: number, search: string, department: string, sort: string): Promise<{ course: CourseDocument[]; total: number; }> {
     try {
       if (!instituteId) {
         throw new HttpException(STATUS_CODES.UNAUTHORIZED, MESSAGES.ERROR.UNAUTHORIZED)
       }
       const skip = (page - 1) * limit;
-      let query: any = {};
-      let sortOptions: any = {};
+      let query: FilterQuery<CourseDocument> = {};
+      let sortOptions: Record<string, 1 | -1> = {};
 
       if (search && search.trim() !== '') {
         query.$or = [
@@ -152,14 +153,14 @@ class CourseService implements ICourseService {
   }
 
 
-  async TutorCourseList(tutorId: any, page: number, limit: number, search: string, department: string, sort: string): Promise<{ course: CourseDocument[]; total: number; }> {
+  async TutorCourseList(tutorId: string, page: number, limit: number, search: string, department: string, sort: string): Promise<{ course: CourseDocument[]; total: number; }> {
     try {
       if (!tutorId) {
         throw new HttpException(STATUS_CODES.UNAUTHORIZED, MESSAGES.ERROR.UNAUTHORIZED)
       }
       const skip = (page - 1) * limit;
-      let query: any = {};
-      let sortOptions: any = {};
+      let query: FilterQuery<TutorDocument> = {};
+      let sortOptions: Record<string, 1 | -1> = {};
 
       if (search && search.trim() !== '') {
         query.$or = [
@@ -229,8 +230,8 @@ class CourseService implements ICourseService {
   async userCorseList(page: number, limit: number, search: string, department: string, sort: string): Promise<{ course: CourseDocument[]; total: number; department: string[], totalCourse: number }> {
     try {
       const skip = (page - 1) * limit;
-      let query: any = {};
-      let sortOptions: any = {};
+      let query: FilterQuery<IUserDocument> = {};
+      let sortOptions: Record<string, 1 | -1> = {};
 
       if (search && search.trim() !== '') {
         query.$or = [
@@ -305,7 +306,7 @@ class CourseService implements ICourseService {
     }
   }
 
-  async chartData(instituteId: any): Promise<{ published: number, draft: number, listed: number, unlisted: number, course: CourseDocument[] }> {
+  async chartData(instituteId: string): Promise<{ published: number, draft: number, listed: number, unlisted: number, course: CourseDocument[] }> {
     try {
       if (!instituteId) {
         throw new HttpException(STATUS_CODES.UNAUTHORIZED, MESSAGES.ERROR.UNAUTHORIZED)

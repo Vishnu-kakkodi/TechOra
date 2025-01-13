@@ -20,7 +20,7 @@ class WishlistService implements IWishlistService {
   }
 
 
-  async addToWishlist(userId: string | null, courseId: string): Promise<any> {
+  async addToWishlist(userId: string | null, courseId: string): Promise<string> {
     try {
       if (!courseId) {
         throw new HttpException(STATUS_CODES.BAD_REQUEST, MESSAGES.ERROR.BAD_REQUEST)
@@ -87,7 +87,7 @@ class WishlistService implements IWishlistService {
     }
   }
 
-  async removeWishlist(userId:string, courseId:string): Promise<any>{
+  async removeWishlist(userId:string, courseId:string): Promise<string>{
     try{
       if (!userId) {
         throw new HttpException(STATUS_CODES.BAD_REQUEST, MESSAGES.ERROR.BAD_REQUEST)

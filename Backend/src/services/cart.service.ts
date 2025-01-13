@@ -24,7 +24,7 @@ class CartService implements ICartService {
     this.userRepository = userRepository
   }
 
-  async addToCart(userId: string | null, courseId: string): Promise<any> {
+  async addToCart(userId: string | null, courseId: string): Promise<string> {
     try {
       if (!courseId) {
         throw new HttpException(STATUS_CODES.BAD_REQUEST, MESSAGES.ERROR.BAD_REQUEST)

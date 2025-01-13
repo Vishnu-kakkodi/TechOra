@@ -192,13 +192,16 @@ export class UserController {
         try {
             const { otp } = req.body;
             const CookieOtp: string = req.cookies.forgotPassword.response;
+            if(otp!==CookieOtp){
+                throw new HttpException(STATUS_CODES.NOT_FOUND,MESSAGES.ERROR.OTP_DOESNOT_MATCH)
+            }
             const email: string = req.cookies.forgotPassword.email;
             const response = await this.userService.verifyOtp(otp, CookieOtp);
             if (!response) {
                 throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
             }
             if (response) {
-                res.clearCookie('userData');
+                res.clearCookie('forgotPassword');
                 res.json({ status: STATUS_CODES.SUCCESS, message: MESSAGES.SUCCESS.OTP_VERIFIED, data: email });
             }
         } catch (error) {
