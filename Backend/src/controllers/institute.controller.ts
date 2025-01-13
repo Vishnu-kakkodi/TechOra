@@ -77,6 +77,9 @@ export class InstitutionController{
             if (!CookieData) {
                 throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
               }
+              if(otp!==CookieData){
+                throw new HttpException(STATUS_CODES.NOT_FOUND,MESSAGES.ERROR.OTP_DOESNOT_MATCH)
+            }
             const response = await this.instituteService.verifyOtp(otp,CookieData[0]);
             if (!response) {
                 throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)

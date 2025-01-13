@@ -44,18 +44,23 @@ const OtpModal: React.FC<OtpModalProps> = ({ setOtpModalOpen, mode }) => {
         switch (mode) {
           case 'signup':
             const signupResponse = await verifyUser({ otp }).unwrap();
-            if (signupResponse.userDetails) {
+            if (signupResponse.status===200) {
               toast.success('Account verified successfully!');
               navigate('/');
+            }else{
+              toast.error(signupResponse.message)
             }
             break;
 
           case 'verifyEmail':
             const emailResponse = await otpVerify({ otp }).unwrap();
-            if (emailResponse) {
+            if (emailResponse.status===200) {
               toast.success('Email verified successfully!');
               dispatch(setInstituteEmailCredentials(emailResponse.email))
               navigate('/institute/register');
+              setOtpModalOpen(false);
+            }else{
+              toast.error(emailResponse.message)
             }
             break;
 
