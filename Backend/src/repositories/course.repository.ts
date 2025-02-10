@@ -172,9 +172,6 @@ export class CourseRepository extends BaseRepository<CourseDocument> implements 
                     select:'collegeName'
                 }
                 ]);
-
-            console.log(course)
-
             const totalCourse: number = await this.model.countDocuments({ isListed: true, status: 'published' });
             const total: number = await this.model.countDocuments({ isListed: true, status: 'published' }, searchQuery);
             const department: string[] = await this.model.distinct("department");

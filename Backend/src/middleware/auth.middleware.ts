@@ -24,6 +24,11 @@ export const authMiddleware = async (
 ): Promise<any> => {
   try {
     let role = req.headers.role
+    const authHeader = req.headers['authorization'];
+    console.log(authHeader?.split(' ')[1],"aaaa");
+    console.log(req.headers['x-refresh-token'],"rrrr");
+
+
     const getCookieByRole = (role: string) => {
       switch (role) {
         case "user":
@@ -42,14 +47,26 @@ export const authMiddleware = async (
     const tokenToValidate = getCookieByRole(role as string);
 
     if (!tokenToValidate) {
-      return res.status(401).json({
-        success: false,
-        message: "No authentication token provided",
-        code: "TOKEN_MISSING"
-      });
+      if(!authHeader){
+        return res.status(401).json({
+          success: false,
+          message: "No authentication token provided",
+          code: "TOKEN_MISSING"
+        });
+      }
     }
 
-    const { accessToken, refreshToken } = tokenToValidate;
+    let accessToken, refreshToken;
+
+    if(tokenToValidate){
+      accessToken = tokenToValidate.accessToken;
+      refreshToken = tokenToValidate.refreshToken;
+    }
+
+    if(authHeader){
+      accessToken = authHeader?.split(' ')[1]; 
+      refreshToken = req.headers['x-refresh-token'];
+    }
 
     if (!accessToken) {
       return res.status(401).json({

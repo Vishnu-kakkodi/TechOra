@@ -236,6 +236,7 @@ export class CourseController {
             const search = (req.query.search as string);
             const filter = (req.query.filter as string);
             const sort = (req.query.sort as string);
+            console.log(search,filter,sort,"jjjj");
             const {course,total,department,totalCourse} = await this.courseService.userCorseList(page,limit,search,filter,sort);
             if(!course){
                 throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
