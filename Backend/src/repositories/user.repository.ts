@@ -131,6 +131,17 @@ export class UserRepository extends BaseRepository<IUserDocument> implements IUs
         }
     }
 
+    async findUser(): Promise<{ users: IUserDocument[]; }> { 
+        try {  
+            const users = await this.model.find()
+            .sort({ 'quizProgress.rank': 1 })
+            return { users };
+
+        } catch (error) {
+            throw error;
+        }
+    }
+
     async quizWinners(): Promise<{ quizWinners: IUserDocument[] | null; }> { 
         try {  
             const quizWinners =  await this.model.find()

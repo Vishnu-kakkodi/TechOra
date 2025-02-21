@@ -69,6 +69,15 @@ class UserService implements IUserService {
         }
     }
 
+    async newUser(userData:CreateUserDto): Promise<IUserDocument> {
+        try {
+            const user = await this.userRepository.create(userData);
+            return user;
+        } catch (error) {
+            throw error
+        }
+    }
+
     async getUser(email: string, password: string): Promise<IUserDocument | null> {
         try {
 
@@ -388,6 +397,19 @@ class UserService implements IUserService {
             const currentUser = await this.userRepository.findById(userId);
 
             return { users, total, currentUser }
+        } catch (error) {
+            throw error
+        }
+    }
+
+
+    async leaderBoardData( userId: string): Promise<{ users: IUserDocument[] | null; currentUser: IUserDocument | null }> {
+        try {
+
+            const { users } = await this.userRepository.findUser();
+            const currentUser = await this.userRepository.findById(userId);
+
+            return { users, currentUser }
         } catch (error) {
             throw error
         }

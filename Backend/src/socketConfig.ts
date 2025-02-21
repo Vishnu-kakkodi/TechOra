@@ -17,6 +17,15 @@ class SocketConfig {
         origin: [
           'https://techora.online',
           'https://api.techora.online',
+          'https://techora.online',
+          'http://localhost:5173',
+          'http://10.0.2.2:5000',
+          'http://localhost:3000',
+          'http://192.168.56.228:5000',
+          'http://192.168.57.77:5000',
+          'http://localhost:8000',
+          'http://127.0.0.1:8000',
+          'http://192.168.59.229:5000'
         ],
         methods: ["GET", "POST"],
         credentials: true
@@ -25,6 +34,7 @@ class SocketConfig {
 
     this.io.use((socket, next) => {
       const token = socket.handshake.auth.token;
+      console.log(token,"Tokennnnnn")
       
       try {
         const decoded = jwt.verify(token, process.env.ACCESS_SECRET_KEY as string) as DecodedToken;
@@ -218,6 +228,29 @@ class SocketConfig {
           });
         }
       });
+
+
+      socket.on('fetch_chat_history_mobile', async ({ senderId, receiverId }, callback) => {
+        try {
+          const roomId = this.generateRoomId(senderId, receiverId);
+      
+          const messages = await MessageModel.find({ 
+            roomId: roomId 
+          }).sort({ timestamp: 1 });
+      
+          callback({
+            success: true,
+            messages: messages
+          });
+        } catch (error) {
+          console.error('Error fetching chat history:', error);
+          callback({
+            success: false,
+            error: 'Failed to fetch chat history'
+          });
+        }
+      });
+      
 
       socket.on('send_message', async (messageData) => {
         try {

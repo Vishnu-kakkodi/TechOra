@@ -68,6 +68,7 @@ router.get('/quiz-list',authMiddleware,quizController.quizList.bind(quizControll
 router.get('/review',authMiddleware,reviewController.Review.bind(reviewController));
 router.get('/home-data',userController.homeData.bind(userController));
 router.get('/leaderBoard-list',authMiddleware,userController.leaderBoard.bind(userController));
+router.get('/leaderBoard',authMiddleware,userController.leaderBoardData.bind(userController));
 router.get('/notification',authMiddleware,notificationController.notification.bind(notificationController));
 
 
@@ -76,7 +77,7 @@ router.get('/notification',authMiddleware,notificationController.notification.bi
 router.post('/initiate-register',userController.initiateUser.bind(userController));
 router.post('/verify-user',userController.verifyUser.bind(userController));
 router.post('/resend-otp',userController.resendOtp.bind(userController));
-// router.post('/register',userController.createUser.bind(userController));
+router.post('/register',userController.newUser.bind(userController));
 router.post('/login',userController.getUser.bind(userController));
 router.post('/googleSign',userController.googleSign.bind(userController));
 router.post('/verify-email',userController.verifyEmail.bind(userController));

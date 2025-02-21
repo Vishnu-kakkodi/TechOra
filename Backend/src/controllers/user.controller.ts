@@ -6,6 +6,7 @@ import STATUS_CODES from "../constants/statusCode";
 import MESSAGES from "../constants/message";
 import { decodedToken } from "../helperFunction/authHelper";
 import { IUserService } from "../interfaces/IServiceInterface/IUserService";
+import { log } from "console";
 
 
 export class UserController {
@@ -70,6 +71,29 @@ export class UserController {
             const user = await this.userService.createUser(CookieData, otp);
             if (user) {
                 res.clearCookie('userData');
+                res.json({ status: STATUS_CODES.CREATED, message: MESSAGES.SUCCESS.USER_CREATED, data: user });
+            }
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async newUser(
+        req: Request<{}, {}>,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
+        try {
+            const userDetail: CreateUserDto = {
+                userName: req.body.name,
+                email: req.body.email,
+                password: req.body.password,
+                phoneNumber: req.body.phoneNumber,
+            }
+            console.log(userDetail);
+
+            const user = await this.userService.newUser(userDetail);
+            if (user) {
                 res.json({ status: STATUS_CODES.CREATED, message: MESSAGES.SUCCESS.USER_CREATED, data: user });
             }
         } catch (error) {
@@ -317,6 +341,8 @@ export class UserController {
         next: NextFunction
     ): Promise<void> {
         try {
+            console.log("lllllllllllllll")
+            console.log(req.body,"Nameeeeeee")
             const { userName, phoneNumber } = req.body;
             const userId: string | null = req.user?._id;
             const updatedUser = await this.userService.updateProfile(userId, {
@@ -382,5 +408,26 @@ export class UserController {
             next(error)
         }
     }
+
+    async leaderBoardData
+    (
+        req: Request<{}, {}>,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
+    try {
+        const userId: string | null = req.user?._id;
+        const { users,currentUser } = await this.userService.leaderBoardData( userId);
+        if (!users) {
+            throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
+        }
+        res.status(201).json({
+            users,
+            currentUser
+        });
+    } catch (error) {
+        next(error)
+    }
+}
 
 }

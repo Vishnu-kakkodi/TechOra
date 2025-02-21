@@ -9,6 +9,7 @@ import { userDetail } from "../../services/user.service"
 export interface IUserService{
     initiateUser(userDetail: CreateUserDto): Promise<userDetail>
     createUser(cookieData: UserCookieData, OTP: string): Promise<IUserDocument>
+    newUser(userData: CreateUserDto): Promise<IUserDocument>
     getUser(email: string, password: string): Promise<IUserDocument | null>
     googleSign(email: string, userName: string, phoneNumber: string): Promise<any | null>
     verifyEmail(email: string): Promise<string>
@@ -22,4 +23,6 @@ export interface IUserService{
     homeData(): Promise<{course:CourseDocument[] | null}>
     quizWinners(): Promise<{ quizWinners: IUserDocument[] | null; }>
     leaderBoard(page:number,limit:number,search:string,userId:string): Promise<{ users: IUserDocument[] | null; total: number; currentUser: IUserDocument|null}>
+    leaderBoardData(userId:string): Promise<{ users: IUserDocument[] | null; currentUser: IUserDocument|null}>
+
 }

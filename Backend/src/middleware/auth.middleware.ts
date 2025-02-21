@@ -68,6 +68,8 @@ export const authMiddleware = async (
       refreshToken = req.headers['x-refresh-token'];
     }
 
+    console.log(accessToken,"oooooooooooooo",refreshToken,"pppppppppppppppppp")
+
     if (!accessToken) {
       return res.status(401).json({
         success: false,
@@ -99,6 +101,7 @@ export const authMiddleware = async (
       }
 
       req.user = decoded
+      console.log(decoded);
       next();
     } catch (tokenError) {
       if (tokenError instanceof jwt.TokenExpiredError) {
