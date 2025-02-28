@@ -71,6 +71,8 @@ class UserService implements IUserService {
 
     async newUser(userData:CreateUserDto): Promise<IUserDocument> {
         try {
+            const hashPassword = await PasswordUtils.hashPassword(userData.password);
+            userData.password = hashPassword;
             const user = await this.userRepository.create(userData);
             return user;
         } catch (error) {

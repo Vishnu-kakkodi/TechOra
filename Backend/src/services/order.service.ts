@@ -38,6 +38,8 @@ class OrderService implements IOrderService {
 
     async createOrder(orderId: string, userId: string, orderItems: Array<{ courseId: string, price: number }>, paymentMethod: string, total: number): Promise<OrderDocument> {
         try {
+            const courseIds = orderItems?.map((item) => new mongoose.Types.ObjectId(item.courseId));
+            await this.cartRepository.findOneAndUpdate(userId, courseIds)
             return this.orderRepository.create({
                 orderId,
                 userId: new mongoose.Types.ObjectId(userId),
@@ -61,14 +63,14 @@ class OrderService implements IOrderService {
     async updatePayment(orderId: string, userId: string): Promise<OrderDocument | null> {
         try {
 
-            const cart = await this.cartRepository.findCart(userId)
+            // const cart = await this.cartRepository.findCart(userId)
             const mongoOrderId = new mongoose.Types.ObjectId(orderId);
 
             const updatedOrder = await this.orderRepository.updatePaymentStatus(mongoOrderId);
 
             const courseIds = updatedOrder?.items.map((item) => item.course._id);
             await this.userRepository.findByIdAndUpdate(userId, courseIds)
-            const res = await this.cartRepository.findOneAndUpdate(userId, courseIds)
+            // const res = await this.cartRepository.findOneAndUpdate(userId, courseIds)
             if (courseIds && courseIds.length > 0) {
                 await this.courseRepository.incrementEnrolledStudents(courseIds);
             }

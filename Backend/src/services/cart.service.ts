@@ -102,11 +102,18 @@ class CartService implements ICartService {
       if (!userId) {
         throw new HttpException(STATUS_CODES.BAD_REQUEST, MESSAGES.ERROR.BAD_REQUEST)
       }
+      const course = await this.courseRepository.findById(courseId);
+
       const cart = await this.cartRepository.findCart(userId);
       if (!cart) {
         throw new HttpException(STATUS_CODES.NOT_FOUND, MESSAGES.ERROR.DATA_NOTFOUND)
       }
       if (cart) {
+        cart.totalItems = cart.totalItems-1
+        if(course?.price){
+          cart.totalPrice = cart.totalPrice-course?.price
+        }
+        await cart.save()
         await this.cartRepository.remove(userId, courseId)
       }
 

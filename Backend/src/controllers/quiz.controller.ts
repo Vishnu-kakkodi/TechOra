@@ -47,10 +47,13 @@ export class QuizController {
             const search = (req.query.search as string);
             const filter = (req.query.filter as string);
             const sort = (req.query.sort as string);
+            console.log(page,limit,search,filter,sort)
+
             const {quiz,total,department} = await this.quizService.quizList(page,limit,search,filter,sort);
             if (!quiz) {
                 throw new HttpException(STATUS_CODES.BAD_REQUEST, MESSAGES.ERROR.BAD_REQUEST)
               }
+              console.log(quiz)
               res.status(201).json({
                 quiz,
                 total,

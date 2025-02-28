@@ -197,7 +197,11 @@ export class CourseRepository extends BaseRepository<CourseDocument> implements 
             const course = await this.model
                 .find(query)
                 .skip(skip)
-                .limit(limit);
+                .limit(limit)
+                .populate([{
+                    path: 'tutorId',
+                    select:'tutorname department education experiance profilePic'
+                }]);
 
             const total = await this.model.countDocuments(query);
 

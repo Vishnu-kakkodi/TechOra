@@ -123,6 +123,8 @@ export class OrderController {
             const { orderItems, total } = req.body.orderDetails;
             const paymentMethod = req.body.paymentMethod;
             console.log(paymentMethod,"Method")
+            console.log(req.body.orderDetails,"Method")
+
             if (!Array.isArray(orderItems) || typeof total !== 'number') {
                 throw new HttpException(STATUS_CODES.BAD_REQUEST, MESSAGES.ERROR.INVALID_ORDER_DETAIL);
             }
@@ -216,8 +218,12 @@ export class OrderController {
     ): Promise<void> {
         try {
             const orderId= req.body.orderId;
+            console.log(req.body);
+            console.log(orderId,"llllllllllllllllllllllllllll");
             const userId: string | null = req.user?._id;
+            console.log(userId,"llllllllllllllllllllllllllll");
             const order = await this.orderService.updatePayment(orderId,userId);
+            console.log("Okkkk");   
             res.json({
                 status: STATUS_CODES.SUCCESS,
                 message: MESSAGES.SUCCESS.DATA_RETRIEVED,
