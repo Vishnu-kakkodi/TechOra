@@ -17,34 +17,34 @@
     const app = express();
     const server = http.createServer(app);
 
-    // const allowedOrigins = [
-    //     'https://techora.online',
-    //     'http://localhost:5173',
-    //     'http://10.0.2.2:5000',
-    //     'http://localhost:3000',
-    //     'http://192.168.56.34',
-    //     'http://192.168.57.77:5000',
-    //     'http://localhost:8000',
-    //     'http://127.0.0.1:8000',
-    //     'http://192.168.59.229:5000'
-    //   ];
+    const allowedOrigins = [
+        'https://techora.online',
+        'http://localhost:5173',
+        'http://10.0.2.2:5000',
+        'http://localhost:3000',
+        'http://192.168.56.34',
+        'http://192.168.57.77:5000',
+        'http://localhost:8000',
+        'http://127.0.0.1:8000',
+        'http://192.168.59.229:5000'
+      ];
 
 
       app.use(cors())
 
-    // app.use(cors({
-    //     origin: (origin, callback) => {
-    //         if (!origin || allowedOrigins.includes(origin)) {
-    //             callback(null, origin);
-    //         } else {
-    //             callback(new Error('Not allowed by CORS'));
-    //         }
-    //     },    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-    // allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'role'],
-    // exposedHeaders: ['Content-Range', 'X-Content-Range'],
-    // credentials: true,
-    // maxAge: 86400
-    // }));
+    app.use(cors({
+        origin: (origin, callback) => {
+            if (!origin || allowedOrigins.includes(origin)) {
+                callback(null, origin);
+            } else {
+                callback(new Error('Not allowed by CORS'));
+            }
+        },    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'role'],
+    exposedHeaders: ['Content-Range', 'X-Content-Range'],
+    credentials: true,
+    maxAge: 86400
+    }));
 
 
     app.use(express.json());
