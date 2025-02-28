@@ -30,7 +30,7 @@
       ];
 
 
-      app.use(cors())
+    //   app.use(cors())
 
     app.use(cors({
         origin: (origin, callback) => {
