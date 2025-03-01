@@ -29,9 +29,6 @@
         'http://192.168.59.229:5000'
       ];
 
-
-    //   app.use(cors())
-
     app.use(cors({
         origin: (origin, callback) => {
             if (!origin || allowedOrigins.includes(origin)) {
